@@ -9,12 +9,10 @@ export class CreateMeasurementDto {
 
     @ApiProperty()
     @IsNumber()
-    @IsNotEmpty()
     caloriesDelivered: number;
 
     @ApiProperty()
     @IsNumber()
-    @IsNotEmpty()
     distanceTraveled: number;
 
     @ApiProperty()
