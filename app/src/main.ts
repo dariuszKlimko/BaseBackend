@@ -17,5 +17,3 @@ async function bootstrap(): Promise<void> {
   await app.listen(port, () => console.log(`App listening on port ${port} or docker on ${docker_port}`));
 }
 bootstrap();
-
-// kommit;
