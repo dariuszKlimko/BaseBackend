@@ -1,0 +1,41 @@
+version: "3.7"
+
+services:
+  app:
+    # image: 
+    env_file: ../.env
+    environment:
+      CONFIRMATION_HOST_NODEMAILER: http://localhost:3000
+    networks:
+      - default-network
+
+  postgres:
+    image: postgres:15
+    ports:
+      - ${DOCKER_DB_PORT}:${DB_PORT}
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - backend-postgres-data:/var/lib/postgresql/data/pgdata
+    networks:
+      - default-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - '5050:80'
+    networks:
+      - default-network
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      GUNICORN_ACCESS_LOGFILE: /dev/null
+
+volumes:
+  backend-postgres-data: {}
+
+networks:
+  default-network: {}

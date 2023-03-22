@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2017",
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": false,
+    "incremental": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "paths": {
+      "*": ["./node_modules/*"],
+      "@app/*": ["./src/*"],
+      "@test/*": ["./test/*"],
+    },
+    "typeRoots": ["./@types", "./node_modules/@types"]
+  },
+  "include": ["./src/**/*", "./test/**/*", "./@types/**/*", "src/common/exception/.exception.ts"]
+}

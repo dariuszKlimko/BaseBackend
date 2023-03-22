@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+
+  app:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      target: packer
+      args:
+        FROM_IMAGE: 18
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+    ports:
+      - ${DOCKER_PORT}:${PORT}
+    volumes:
+      - ../app:/var/www
+      - /var/www/dist
+      - /var/www/node_modules
+      - ./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh

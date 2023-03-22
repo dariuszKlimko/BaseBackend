@@ -1,0 +1,13 @@
+.DS_Store
+.idea/
+
+.env
+!.env.dist
+!.env.test
+
+docker/docker-compose.*.yml
+!docker/docker-compose.dev.yml
+!docker/docker-compose.prod.yml
+!docker/docker-compose.test.yml
+
+!.gitkeep

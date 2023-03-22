@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+
+  app:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      target: packer
+      args:
+        FROM_IMAGE: 18
+    environment:
+      NODE_ENV: test
+      DB_HOST: postgres
+      DB_NAME: ${DB_NAME}_test
+    entrypoint: ["test-entrypoint.sh"]
+    ports:
+      - ${DOCKER_PORT}:${PORT}
+    volumes:
+      - ../app:/var/www
+      - /var/www/node_modules
+      - ./test-entrypoint.sh:/usr/local/bin/test-entrypoint.sh
+
+  postgres:
+    environment:
+      POSTGRES_DB: ${DB_NAME}_test
