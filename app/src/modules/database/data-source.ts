@@ -15,7 +15,7 @@ export const dataSourceFunc = (env: string): DataSourceOptions => {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    synchronize: true,
+    synchronize: false,
     logging: ["migration", "error"],
     entities: [path.join(root, "dist/modules/**/*.entity{.js,.ts}")],
     migrations: [path.join(root, "dist/migrations/*.js")],
