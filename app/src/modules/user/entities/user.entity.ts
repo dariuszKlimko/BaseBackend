@@ -1,5 +1,6 @@
+import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -61,4 +62,9 @@ export class User extends BaseEntity {
     default: false,
   })
   verified: boolean;
+
+  @OneToMany(() => Measurement, (measurement: Measurement) => measurement.user, {
+    cascade: ["remove"],
+  })
+  measurements: Measurement[];
 }
