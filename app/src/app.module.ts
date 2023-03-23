@@ -7,13 +7,6 @@ import { AuthModule } from "@app/modules/auth/auth.module";
 import { MeasurementModule } from "@app/modules/measurements/measuremants.module";
 
 @Module({
-  imports: [
-    AppConfigModule, 
-    DatabaseModule, 
-    EmailModule, 
-    UserModule, 
-    AuthModule, 
-    MeasurementModule
-  ],
+  imports: [AppConfigModule, DatabaseModule, EmailModule, UserModule, AuthModule, MeasurementModule],
 })
 export class AppModule {}

@@ -7,9 +7,7 @@ import { dataSourceFunc } from "@app/modules/database/data-source";
   imports: [
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (serviceConfig: ConfigService) => (
-        dataSourceFunc(serviceConfig.get("NODE_ENV"))
-      ),
+      useFactory: (serviceConfig: ConfigService) => dataSourceFunc(serviceConfig.get("NODE_ENV")),
     }),
   ],
 })

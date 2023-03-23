@@ -1,3 +1,3 @@
 export type MeasurementId = {
-    id: string;
-}
+  id: string;
+};
