@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Measurements } from "@app/modules/measurements/entities/measurements.entity";
+import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
 import { Repository } from "typeorm";
 import { CreateMeasurementDto } from "@app/modules/measurements/dto/create-measurement.dto";
 import { UpdateMeasurementDto } from "@app/modules/measurements/dto/update-measurement.dto";
 
 @Injectable()
 export class MeasurementsService {
-    constructor(@InjectRepository(Measurements) private measurementsService: Repository<Measurements>) {}
+    constructor(@InjectRepository(Measurement) private measurementsService: Repository<Measurement>) {}
 
     async createMeasurement(userId: string, measurementPayload: CreateMeasurementDto): Promise<any> {
 

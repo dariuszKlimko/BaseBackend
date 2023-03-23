@@ -1,8 +1,9 @@
+import { User } from "@app/modules/user/entities/user.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("measurements")
-export class Measurements extends BaseEntity {
+export class Measurement extends BaseEntity {
     @ApiProperty()
     @PrimaryGeneratedColumn("uuid")
     id: string;
@@ -44,4 +45,12 @@ export class Measurements extends BaseEntity {
         nullable: true,
     })
     measurementDate: string;
+
+    @ManyToOne(() => User, (user: User) => user.measurements, {
+        onDelete: "CASCADE",
+        orphanedRowAction: "delete",
+    })
+    @JoinColumn({name: "user_id"})
+    userId: string;
+    user: User;
 }
