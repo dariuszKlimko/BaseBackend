@@ -10,7 +10,7 @@ export class Measurement extends BaseEntity {
 
     @ApiProperty()
     @Column({
-        type: "int",
+        type: "float",
         nullable: true,
     })
     bmi: number;
@@ -24,7 +24,7 @@ export class Measurement extends BaseEntity {
 
     @ApiProperty()
     @Column({
-        name: "callories_delivered",
+        name: "calories_delivered",
         type: "int",
         nullable: true,
     })
@@ -43,6 +43,7 @@ export class Measurement extends BaseEntity {
         name: "measurement_date",
         type: "text",
         nullable: true,
+        unique: true,
     })
     measurementDate: string;
 
@@ -51,6 +52,12 @@ export class Measurement extends BaseEntity {
         orphanedRowAction: "delete",
     })
     @JoinColumn({name: "user_id"})
-    userId: string;
     user: User;
+
+    @ApiProperty()
+    @Column({
+        name: "user_id",
+        nullable: false
+    })
+    userId: string;
 }

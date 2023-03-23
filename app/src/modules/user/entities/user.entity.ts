@@ -64,7 +64,7 @@ export class User extends BaseEntity {
   verified: boolean;
 
   @OneToMany(() => Measurement, (measurement: Measurement) => measurement.user, {
-    cascade: ["remove"]
+    cascade: ["remove"],
   })
   measurements: Measurement[];
 }
