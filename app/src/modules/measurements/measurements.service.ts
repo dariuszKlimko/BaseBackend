@@ -6,7 +6,6 @@ import { CreateMeasurementDto } from "@app/modules/measurements/dto/create-measu
 import { UpdateMeasurementDto } from "@app/modules/measurements/dto/update-measurement.dto";
 import { UsersService } from "@app/modules/user/user.service";
 import { MeasurementNotFoundException } from "@app/modules/measurements/exceptions/measurementNotFound.exception";
-import { MeasurementResponseDto } from "@app/modules/measurements/dto/measurementResponse.dto";
 import { MessageInfo } from "@app/common/types/messageInfo";
 
 @Injectable()
@@ -16,10 +15,7 @@ export class MeasurementsService {
     private usersService: UsersService
   ) {}
 
-  async createMeasurement(
-    userId: string,
-    measurementPayload: CreateMeasurementDto
-  ): Promise<MeasurementResponseDto> {
+  async createMeasurement(userId: string, measurementPayload: CreateMeasurementDto): Promise<Measurement> {
     const user = await this.usersService.getUser(userId);
     let bmi: number;
     const measurement = await this.measurementsRepository.create(measurementPayload);
@@ -31,14 +27,14 @@ export class MeasurementsService {
     return await this.measurementsRepository.save(measurement);
   }
 
-  async getAllMeasurements(userId: string): Promise<MeasurementResponseDto[]> {
+  async getAllMeasurements(userId: string): Promise<Measurement[]> {
     return await this.measurementsRepository.findBy({ userId });
   }
 
-  async getOneMeasurement(userId: string, measurementId: string): Promise<MeasurementResponseDto> {
+  async getOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
     const measurement = await this.measurementsRepository.findOneBy({ userId, id: measurementId });
     if (!measurement) {
-      throw new MeasurementNotFoundException("measurement with given id not exist in database ");
+      throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }
     return measurement;
   }
@@ -47,10 +43,10 @@ export class MeasurementsService {
     userId: string,
     measurementId: string,
     measurementPayload: UpdateMeasurementDto
-  ): Promise<MeasurementResponseDto> {
+  ): Promise<Measurement> {
     const measurement = await this.measurementsRepository.findOneBy({ userId, id: measurementId });
     if (!measurement) {
-      throw new MeasurementNotFoundException("measurement with given id not exist in database ");
+      throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }
     console.log(measurementPayload);
     await this.measurementsRepository.update({ userId, id: measurementId }, measurementPayload);
@@ -60,16 +56,16 @@ export class MeasurementsService {
   async deleteAllMeasurementsByUserId(userId: string): Promise<MessageInfo> {
     const measurements = await this.measurementsRepository.findBy({ userId });
     if (measurements.length === 0) {
-      throw new MeasurementNotFoundException("measurements not found for given id");
+      throw new MeasurementNotFoundException("measurements for given user id not found");
     }
     await this.measurementsRepository.delete({ userId });
     return { status: "ok", message: "all measurements deleted" };
   }
 
-  async deleteOneMeasurement(userId: string, measurementId: string): Promise<MeasurementResponseDto> {
+  async deleteOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
     const measurement = await this.measurementsRepository.findOneBy({ userId, id: measurementId });
     if (!measurement) {
-      throw new MeasurementNotFoundException("wrong user id or measurement id");
+      throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }
     await this.measurementsRepository.delete({ userId, id: measurementId });
     return measurement;

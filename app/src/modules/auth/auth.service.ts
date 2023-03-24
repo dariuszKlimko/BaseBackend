@@ -6,13 +6,13 @@ import { CreateUserDto } from "@app/modules/user/dto/create-user.dto";
 import { JwtService } from "@nestjs/jwt";
 import { randomBytes } from "crypto";
 import { UserAuthenticateException } from "@app/modules/auth/exceptions/userAuthenticate.exception";
-import { UserNotFoundException } from "@app/common/types/userNotFound.exception";
+import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/modules/auth/exceptions/userNotVerified.exception";
-import { LoginResponse } from "@app/modules/auth/types/loginResponse";
+import { LoginResponse } from "@app/modules/auth/types/login-response";
 import { IncorrectVerificationCode } from "@app/modules/auth/exceptions/incorrectVerificationCode.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { InvalidRefreshTokenException } from "@app/modules/auth/exceptions/invalidRefreshToken.exception";
-import { LogoutResponse } from "@app/modules/auth/types/logoutResponse";
+import { LogoutResponse } from "@app/modules/auth/types/logout-response";
 import * as bcrypt from "bcrypt";
 
 @Injectable()

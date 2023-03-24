@@ -43,7 +43,6 @@ export class Measurement extends BaseEntity {
     name: "measurement_date",
     type: "text",
     nullable: true,
-    unique: true,
   })
   measurementDate: string;
 

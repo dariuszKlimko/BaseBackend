@@ -8,6 +8,7 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @ApiProperty()
   @CreateDateColumn({
     name: "created_at",
     type: "timestamp",
@@ -41,7 +42,6 @@ export class User extends BaseEntity {
     name: "refresh_tokens",
     type: "text",
     nullable: true,
-    unique: true,
     array: true,
     default: [],
   })
