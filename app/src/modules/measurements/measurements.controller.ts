@@ -10,6 +10,8 @@ import {
   Post,
   UseFilters,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from "@nestjs/common";
 import { MeasurementsService } from "@app/modules/measurements/measurements.service";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
@@ -20,15 +22,27 @@ import { MeasurementId } from "@app/modules/measurements/types/measurementId";
 import { CreateMeasurementDto } from "@app/modules/measurements/dto/create-measurement.dto";
 import { UpdateMeasurementDto } from "@app/modules/measurements/dto/update-measurement.dto";
 import { MeasurementNotFoundException } from "@app/modules/measurements/exceptions/measurementNotFound.exception";
-import { MeasurementResponseDto } from "@app/modules/measurements/dto/measurementResponse.dto";
-import { MessageInfo } from "@app/common/types/messageInfo";
+import { MeasurementResponseDto } from "@app/modules/measurements/dto/measurement-response.dto";
+import { MessageInfo } from "@app/common/dto/messageInfo";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("measurements")
+@UseFilters(HttpExceptionFilter)
 @Controller("measurements")
 export class MeasurementsController {
   constructor(private measurementsService: MeasurementsService) {}
 
+  @ApiOperation({ summary: "create measuremet" })
+  @ApiResponse({
+    status: 201,
+    type: MeasurementResponseDto,
+    description: "measurement has been successfully created",
+  })
+  @ApiResponse({ status: 400, description: "data validation" })
+  @ApiResponse({ status: 401, description: "unauthorized" })
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
-  @UseFilters(HttpExceptionFilter)
   @Post()
   async createMeasurement(
     @CurrentUser() user: CurrentUserDecorator,
@@ -41,8 +55,15 @@ export class MeasurementsController {
     }
   }
 
+  @ApiOperation({ summary: "get all measurement for given user" })
+  @ApiResponse({
+    status: 200,
+    type: [MeasurementResponseDto],
+    description: "all measurements has been successfully loaded",
+  })
+  @ApiResponse({ status: 401, description: "unauthorized" })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseFilters(HttpExceptionFilter)
   @Get()
   async getAllMeasurements(@CurrentUser() user: CurrentUserDecorator): Promise<MeasurementResponseDto[]> {
     try {
@@ -52,8 +73,16 @@ export class MeasurementsController {
     }
   }
 
+  @ApiOperation({ summary: "get measurement by id" })
+  @ApiResponse({
+    status: 200,
+    type: MeasurementResponseDto,
+    description: "one measurement been successfully loaded",
+  })
+  @ApiResponse({ status: 401, description: "unauthorized" })
+  @ApiResponse({ status: 404, description: "measurement not found" })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseFilters(HttpExceptionFilter)
   @Get("/:id")
   async getOneMeasurement(
     @CurrentUser() user: CurrentUserDecorator,
@@ -69,8 +98,18 @@ export class MeasurementsController {
     }
   }
 
+  @ApiOperation({ summary: "update measurement by id" })
+  @ApiResponse({
+    status: 200,
+    type: MeasurementResponseDto,
+    description: "measurement has been successfully updated",
+  })
+  @ApiResponse({ status: 400, description: "data validation" })
+  @ApiResponse({ status: 401, description: "unauthorized" })
+  @ApiResponse({ status: 404, description: "measurement not found" })
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
-  @UseFilters(HttpExceptionFilter)
   @Patch("/:id")
   async updateMeasurement(
     @CurrentUser() user: CurrentUserDecorator,
@@ -87,8 +126,16 @@ export class MeasurementsController {
     }
   }
 
+  @ApiOperation({ summary: "delete all measurements for given user" })
+  @ApiResponse({
+    status: 200,
+    type: MessageInfo,
+    description: "all user's measurement has been successfully deleted",
+  })
+  @ApiResponse({ status: 401, description: "unauthorized" })
+  @ApiResponse({ status: 404, description: "measurements not found" })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseFilters(HttpExceptionFilter)
   @Delete()
   async deleteAllMeasurementsByUserId(@CurrentUser() user: CurrentUserDecorator): Promise<MessageInfo> {
     try {
@@ -101,8 +148,16 @@ export class MeasurementsController {
     }
   }
 
+  @ApiOperation({ summary: "delete measurement by id" })
+  @ApiResponse({
+    status: 200,
+    type: MeasurementResponseDto,
+    description: "one measurement has been successfully deleted",
+  })
+  @ApiResponse({ status: 401, description: "unauthorized" })
+  @ApiResponse({ status: 404, description: "measurement not found" })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseFilters(HttpExceptionFilter)
   @Delete("/:id")
   async deleteOneMeasurement(
     @CurrentUser() user: CurrentUserDecorator,

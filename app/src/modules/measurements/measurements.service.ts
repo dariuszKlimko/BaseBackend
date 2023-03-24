@@ -6,8 +6,8 @@ import { CreateMeasurementDto } from "@app/modules/measurements/dto/create-measu
 import { UpdateMeasurementDto } from "@app/modules/measurements/dto/update-measurement.dto";
 import { UsersService } from "@app/modules/user/user.service";
 import { MeasurementNotFoundException } from "@app/modules/measurements/exceptions/measurementNotFound.exception";
-import { MeasurementResponseDto } from "@app/modules/measurements/dto/measurementResponse.dto";
-import { MessageInfo } from "@app/common/types/messageInfo";
+import { MeasurementResponseDto } from "@app/modules/measurements/dto/measurement-response.dto";
+import { MessageInfo } from "@app/common/dto/messageInfo";
 
 @Injectable()
 export class MeasurementsService {
@@ -38,7 +38,7 @@ export class MeasurementsService {
   async getOneMeasurement(userId: string, measurementId: string): Promise<MeasurementResponseDto> {
     const measurement = await this.measurementsRepository.findOneBy({ userId, id: measurementId });
     if (!measurement) {
-      throw new MeasurementNotFoundException("measurement with given id not exist in database ");
+      throw new MeasurementNotFoundException("measurement with given id not exist in database");
     }
     return measurement;
   }

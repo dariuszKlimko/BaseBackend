@@ -8,11 +8,11 @@ import { randomBytes } from "crypto";
 import { UserAuthenticateException } from "@app/modules/auth/exceptions/userAuthenticate.exception";
 import { UserNotFoundException } from "@app/common/types/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/modules/auth/exceptions/userNotVerified.exception";
-import { LoginResponse } from "@app/modules/auth/types/loginResponse";
+import { LoginResponseDto } from "@app/modules/auth/dto/login-response.dto";
 import { IncorrectVerificationCode } from "@app/modules/auth/exceptions/incorrectVerificationCode.exception";
-import { MessageInfo } from "@app/common/types/messageInfo";
+import { MessageInfo } from "@app/common/dto/messageInfo";
 import { InvalidRefreshTokenException } from "@app/modules/auth/exceptions/invalidRefreshToken.exception";
-import { LogoutResponse } from "@app/modules/auth/types/logoutResponse";
+import { LogoutResponseDto } from "@app/modules/auth/dto/logout-response.dto";
 import * as bcrypt from "bcrypt";
 
 @Injectable()
@@ -28,7 +28,7 @@ export class AuthService {
     return { status: "ok", message: "user successfully verified" };
   }
 
-  async login(userInfo: CreateUserDto): Promise<LoginResponse> {
+  async login(userInfo: CreateUserDto): Promise<LoginResponseDto> {
     const user = await this.userRepository.findOneBy({ email: userInfo.email });
     if (!user) {
       throw new UserNotFoundException("user with given email not exist in database");
@@ -42,7 +42,7 @@ export class AuthService {
     return await this.tokensResponse(user);
   }
 
-  async logout(id: string, token: string): Promise<LogoutResponse> {
+  async logout(id: string, token: string): Promise<LogoutResponseDto> {
     const user = await this.userRepository.findOneBy({ id });
     const tokenIndex = user.refreshTokens.indexOf(token);
     if (tokenIndex < 0) {
@@ -53,7 +53,7 @@ export class AuthService {
     return { email: user.email };
   }
 
-  async getNewToken(refreshToken: string): Promise<LoginResponse> {
+  async getNewToken(refreshToken: string): Promise<LoginResponseDto> {
     const user = await this.userRepository.findOne({ where: { refreshTokens: ArrayContains([refreshToken]) } });
     if (!user) {
       throw new InvalidRefreshTokenException("invalid refreshToken");
@@ -63,7 +63,7 @@ export class AuthService {
     return await this.tokensResponse(user);
   }
 
-  private async tokensResponse(user: User): Promise<LoginResponse> {
+  private async tokensResponse(user: User): Promise<LoginResponseDto> {
     const payload = { sub: user.id };
     const token = randomBytes(64).toString("hex");
     user.refreshTokens.push(token);

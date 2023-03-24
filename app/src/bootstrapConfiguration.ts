@@ -19,7 +19,11 @@ export function configureValidator(app: INestApplication): void {
   app.useGlobalPipes(
     new ValidationPipe({
       exceptionFactory: (validationErrors) =>
-        new BadRequestException({ type: "validation_error", data: validationErrors }),
+        new BadRequestException({
+          type: "validation error",
+          data: validationErrors,
+          message: "data validation error",
+        }),
     })
   );
 }
