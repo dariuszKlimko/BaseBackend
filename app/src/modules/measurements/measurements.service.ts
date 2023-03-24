@@ -15,10 +15,7 @@ export class MeasurementsService {
     private usersService: UsersService
   ) {}
 
-  async createMeasurement(
-    userId: string,
-    measurementPayload: CreateMeasurementDto
-  ): Promise<Measurement> {
+  async createMeasurement(userId: string, measurementPayload: CreateMeasurementDto): Promise<Measurement> {
     const user = await this.usersService.getUser(userId);
     let bmi: number;
     const measurement = await this.measurementsRepository.create(measurementPayload);

@@ -24,7 +24,7 @@ import { UpdateMeasurementDto } from "@app/modules/measurements/dto/update-measu
 import { MeasurementNotFoundException } from "@app/modules/measurements/exceptions/measurementNotFound.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Measurement } from "./entities/measurement.entity";
+import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)
@@ -90,7 +90,7 @@ export class MeasurementsController {
     @Param("id", ParseUUIDPipe) id: string
   ): Promise<Measurement> {
     try {
-      return await this.measurementsService.getOneMeasurement(user.id,id);
+      return await this.measurementsService.getOneMeasurement(user.id, id);
     } catch (error) {
       if (error instanceof MeasurementNotFoundException) {
         throw new NotFoundException(error.message);
