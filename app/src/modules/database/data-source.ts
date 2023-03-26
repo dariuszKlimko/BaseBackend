@@ -28,6 +28,7 @@ export const dataSourceFunc = (env: string): DataSourceOptions => {
 
   const dataSourceOptionsTest: DataSourceOptions = {
     ...dataSourceOptionsProd,
+    database: `${process.env.DB_NAME}_test`,
     logging: ["migration", "warn", "error"],
     entities: [path.join(root, "src/modules/**/*.entity{.js,.ts}")],
     migrations: [path.join(root, "src/migrations/*.ts")],

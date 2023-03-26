@@ -1,0 +1,48 @@
+entity: User
+items:
+  user{1..4}:
+    email: 'user($current)@email.com'
+    password: 'QWERTqwert($current)'
+    height: 179
+    refreshtoken: 
+      -
+    verificationCode: 
+    verified: true
+  user5:
+    email: 'user5@email.com'
+    password: 'QWERTqwert5'
+    height: 178
+    refreshtoken:
+      -'b01c162b94cac32a3aaa61a563f4c65c0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e'
+    verificationCode: 
+    verified: true
+  user6:
+    email: 'user6@email.com'
+    password: 'QWERTqwert6'
+    token: 
+      -'9iyc162b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6I9jH6'
+    verificationCode: 
+    verified: true
+  user7:
+    email: 'user7@email.com'
+    password: 'QWERTqwert7'
+    height: 185
+    token: 
+      -'pO56h62b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6kkmnb'
+    verificationCode: 
+    verified: true
+  user8:
+    email: 'user8@email.com'
+    password: 'QWERTqwert8'
+    token: 
+      -
+    verificationCode: 604ec0b70d0d7e74 
+    verified: false
+  user9:
+    email: 'user9@email.com'
+    password: 'QWERTqwert9'
+    token: 
+      -
+    verificationCode: cd150e73edc52944
+    verified: false
+  
