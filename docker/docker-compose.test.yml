@@ -12,7 +12,6 @@ services:
     environment:
       NODE_ENV: test
       DB_HOST: postgres
-      DB_NAME: ${DB_NAME}_test
     entrypoint: ["test-entrypoint.sh"]
     ports:
       - ${DOCKER_PORT}:${PORT}

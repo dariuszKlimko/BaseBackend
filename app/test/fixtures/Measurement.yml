@@ -1,0 +1,24 @@
+entity: Measurement
+items:
+  measurement{1..4}:
+    weight: 85
+    distanceTraveled: 10
+    measurementDate: '2023-03-26 0($current) :03:30.118709'
+    caloriesDelivered: 1800
+    bmi:
+    user: "@user1"
+  measurement{5..8}:
+    weight: 78
+    distanceTraveled: 12
+    measurementDate: '2023-03-2($current) 01:03:30.118709'
+    caloriesDelivered: 2000
+    bmi:
+    user: "@user1"
+  measurement{9..10}:
+    weight: 80
+    distanceTraveled: 15
+    measurementDate: '2023-0($current)-26 02:03:30.118709'
+    caloriesDelivered: 1900
+    bmi:
+    user: "@user2"
+  
