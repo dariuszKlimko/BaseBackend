@@ -13,6 +13,15 @@ Prepare .env file from .env.example.
 
 ### Run application
 Go to directory "/HealthAPI" in terminal.
+
+Only for macOS users: in terminal run two commmands:
+```
+chmod +x docker/docker-entrypoint.sh
+```
+```
+chmod +x docker/test-entrypoint.sh
+```
+
 To start application.
 ```
 make start
