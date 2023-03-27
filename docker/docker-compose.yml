@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   app:
-    # image: 
+    # image: darekzegarek/healthapi:latest
     env_file: ../.env
     environment:
       CONFIRMATION_HOST_NODEMAILER: http://localhost:3000
