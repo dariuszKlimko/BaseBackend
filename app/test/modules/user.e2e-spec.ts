@@ -17,12 +17,8 @@ describe("Users (e2e)", () => {
     appUser = moduleFixture.createNestApplication();
     await appUser.init();
   });
-  
 
   describe("/users (POST)", () => {
-    it("should register user in database", () => {
-   
-    })
+    it("should register user in database", () => {});
   });
-  
 });
