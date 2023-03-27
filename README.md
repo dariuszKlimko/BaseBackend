@@ -12,21 +12,34 @@
 Prepare .env file from .env.example.
 
 ### Run application
-Go to directory "/HealthAPI" in terminal.
-To start application.
+1) Go to directory "/HealthAPI" in terminal.
+
+2) If you are Windows users go to point 3, otherwise run two commmands:
+```
+chmod +x docker/docker-entrypoint.sh
+```
+```
+chmod +x docker/test-entrypoint.sh
+```
+
+3) To start application.
 ```
 make start
 ```
 
-To start application e2e tests:
+4) To start application e2e tests:
 ```
 make start ENV=test
 ```
 
-Application documentation:
+5) Application documentation:
 ```
 http://localhost:3000/api
 ```
+
+To run application from remote image:
+ 1) in "docker-compose.dev.yml" comment out "build" section
+ 2) in "docker-compose.yml" uncomment "image" section
 
 ## Run application without docker
 ### Setup application
@@ -37,32 +50,32 @@ Testing database should have the same name like development database plus postfi
 Prepare .env file from .env.example.
 
 ### Run application
-Go to directory "/app" in terminal and install all dependencies.
+1) Go to directory "/app" in terminal and install all dependencies.
 ```
 yarn
 ```
 
-Run command.
+2) Run command.
 ```
 yarn build
 ```
 
-Run migrations.
+3) Run migrations.
 ```
 yarn migration:run
 ```
 
-To start application.
+4) To start application.
 ```
 yarn start
 ```
 
-To start application e2e tests:
+5) To start application e2e tests:
 ```
 yarn test:e2e
 ```
 
-Application documentation:
+6) Application documentation:
 ```
 http://localhost:80/api
 ```
