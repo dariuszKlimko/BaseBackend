@@ -42,6 +42,11 @@ Go to directory "/app" in terminal and install all dependencies.
 yarn
 ```
 
+Run command.
+```
+yarn build
+```
+
 Run migrations.
 ```
 yarn migration:run
