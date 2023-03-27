@@ -12,7 +12,7 @@
 Prepare .env file from .env.example.
 
 ### Run application
-Go to directory "/healthapi" in terminal.
+Go to directory "/HealthAPI" in terminal.
 To start application.
 ```
 make start
