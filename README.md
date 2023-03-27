@@ -28,6 +28,10 @@ Application documentation:
 http://localhost:3000/api
 ```
 
+To run application from remote image:
+ 1) in "docker-compose.dev.yml" comment out "build" section
+ 2) in "docker-compose.yml" uncomment "image" section
+
 ## Run application without docker
 ### Setup application
 Create database for development purpose for example "mydatabase".
