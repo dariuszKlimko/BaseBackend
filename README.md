@@ -12,9 +12,9 @@
 Prepare .env file from .env.example.
 
 ### Run application
-Go to directory "/HealthAPI" in terminal.
+1) Go to directory "/HealthAPI" in terminal.
 
-Only for macOS users: in terminal run two commmands:
+2) If you are Windows users go to point 3, otherwise run two commmands:
 ```
 chmod +x docker/docker-entrypoint.sh
 ```
@@ -22,17 +22,17 @@ chmod +x docker/docker-entrypoint.sh
 chmod +x docker/test-entrypoint.sh
 ```
 
-To start application.
+3) To start application.
 ```
 make start
 ```
 
-To start application e2e tests:
+4) To start application e2e tests:
 ```
 make start ENV=test
 ```
 
-Application documentation:
+5) Application documentation:
 ```
 http://localhost:3000/api
 ```
@@ -50,32 +50,32 @@ Testing database should have the same name like development database plus postfi
 Prepare .env file from .env.example.
 
 ### Run application
-Go to directory "/app" in terminal and install all dependencies.
+1) Go to directory "/app" in terminal and install all dependencies.
 ```
 yarn
 ```
 
-Run command.
+2) Run command.
 ```
 yarn build
 ```
 
-Run migrations.
+3) Run migrations.
 ```
 yarn migration:run
 ```
 
-To start application.
+4) To start application.
 ```
 yarn start
 ```
 
-To start application e2e tests:
+5) To start application e2e tests:
 ```
 yarn test:e2e
 ```
 
-Application documentation:
+6) Application documentation:
 ```
 http://localhost:80/api
 ```
