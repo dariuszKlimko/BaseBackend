@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { INestApplication, HttpStatus } from "@nestjs/common";
+import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/loadFixtures";
 
 describe("Measurements (e2e)", () => {
-  let appMeasurements: INestApplication;
+  let app: INestApplication;
   let fixtures: FixtureFactory;
 
   beforeAll(async () => {
@@ -14,8 +14,9 @@ describe("Measurements (e2e)", () => {
       imports: [AppModule],
     }).compile();
 
-    appMeasurements = moduleFixture.createNestApplication();
-    await appMeasurements.init();
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
+    await app.init();
   });
 
   describe("/measurements (POST) - create measurement", () => {
