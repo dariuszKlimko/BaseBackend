@@ -1,6 +1,16 @@
 import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Exclude } from "class-transformer";
+import {
+  BaseEntity,
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import * as bcrypt from "bcrypt";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -23,6 +33,7 @@ export class User extends BaseEntity {
   })
   email: string;
 
+  @Exclude({ toPlainOnly: true })
   @ApiProperty()
   @Column({
     type: "text",
@@ -37,6 +48,7 @@ export class User extends BaseEntity {
   })
   height: number;
 
+  @Exclude({ toPlainOnly: true })
   @ApiProperty()
   @Column({
     name: "refresh_tokens",
@@ -49,15 +61,6 @@ export class User extends BaseEntity {
 
   @ApiProperty()
   @Column({
-    name: "verification_code",
-    type: "text",
-    nullable: true,
-    unique: true,
-  })
-  verificationCode: string;
-
-  @ApiProperty()
-  @Column({
     type: "boolean",
     default: false,
   })
@@ -67,4 +70,14 @@ export class User extends BaseEntity {
     cascade: ["remove"],
   })
   measurements: Measurement[];
+
+  @BeforeInsert()
+  async hashPassword(): Promise<void> {
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(this.password, salt);
+  }
+
+  async validatePassword(password: string): Promise<boolean> {
+    return await bcrypt.compareSync(password, this.password);
+  }
 }

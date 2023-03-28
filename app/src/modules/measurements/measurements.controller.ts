@@ -30,7 +30,7 @@ import { Measurement } from "@app/modules/measurements/entities/measurement.enti
 @UseFilters(HttpExceptionFilter)
 @Controller("measurements")
 export class MeasurementsController {
-  constructor(private measurementsService: MeasurementsService) {}
+  constructor(private readonly measurementsService: MeasurementsService) {}
 
   @ApiOperation({ summary: "create measuremet" })
   @ApiResponse({

@@ -41,5 +41,4 @@ describe("Measurements (e2e)", () => {
   describe("/measurements/:id (DELETE) - delete one measurments", () => {
     it("should delete one measurement of user", () => {});
   });
-
 });

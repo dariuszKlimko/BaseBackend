@@ -33,5 +33,4 @@ describe("Auth (e2e)", () => {
   describe("/auth/tokens (PATCH) - get new tokens ", () => {
     it("should get new tokens", () => {});
   });
-
 });
