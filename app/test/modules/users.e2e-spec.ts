@@ -5,7 +5,7 @@ import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/loadFixtures";
 
 describe("Users (e2e)", () => {
-  let appUser: INestApplication;
+  let appUsers: INestApplication;
   let fixtures: FixtureFactory;
 
   beforeAll(async () => {
@@ -14,11 +14,23 @@ describe("Users (e2e)", () => {
       imports: [AppModule],
     }).compile();
 
-    appUser = moduleFixture.createNestApplication();
-    await appUser.init();
+    appUsers = moduleFixture.createNestApplication();
+    await appUsers.init();
   });
 
-  describe("/users (POST)", () => {
+  describe("/users (POST) - register user", () => {
     it("should register user in database", () => {});
+  });
+
+  describe("/users (GET) - get user's data", () => {
+    it("should get user from database", () => {});
+  });
+
+  describe("/users (PATCH) - update user's data", () => {
+    it("should update user in database", () => {});
+  });
+
+  describe("/users (DELETE) - delete user's account", () => {
+    it("should delete user account", () => {});
   });
 });
