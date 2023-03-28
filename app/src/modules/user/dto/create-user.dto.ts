@@ -1,5 +1,6 @@
+import { PASSWORD_REGEX, weakPasswordMessage } from "@app/common/password";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsString, MinLength, IsStrongPassword } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsStrongPassword, Matches } from "class-validator";
 
 export class CreateUserDto {
   @ApiProperty()
@@ -8,9 +9,10 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty()
+  @Matches(PASSWORD_REGEX, {
+    message: weakPasswordMessage,
+  })
   @IsString()
-  @MinLength(8)
-  @IsStrongPassword()
   @IsNotEmpty()
   password: string;
 }
