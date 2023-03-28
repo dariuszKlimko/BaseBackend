@@ -17,7 +17,6 @@ export class EmailService {
       secret: this.configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
       expiresIn: `${this.configService.get("JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME")}s`,
     });
-    // const url = `${this.configService.get<string>("CONFIRMATION_HOST_NODEMAILER")}=${token}`;
     const url = `${this.configService.get<string>("CONFIRMATION_HOST_NODEMAILER")}/auth/confirmation/${token}`;
 
     await this.mailerService.sendMail({
