@@ -28,7 +28,10 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 @UseFilters(HttpExceptionFilter)
 @Controller("users")
 export class UsersController {
-  constructor(private usersService: UsersService, private emailService: EmailService) {}
+  constructor(
+    private readonly usersService: UsersService, 
+    private readonly emailService: EmailService
+  ) {}
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
@@ -39,8 +42,7 @@ export class UsersController {
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
     try {
       const userPayload: User = await this.usersService.registerUser(user);
-      await this.emailService.sendEmail(user.email, userPayload.verificationCode);
-      userPayload.verificationCode = null;
+      await this.emailService.sendEmail(user.email);
       return userPayload;
     } catch (error) {
       if (error instanceof UserDuplicateException) {

@@ -21,7 +21,6 @@ import { LoginResponse } from "@app/modules/auth/types/login-response";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
 import { UserAuthenticateException } from "@app/modules/auth/exceptions/userAuthenticate.exception";
 import { UserNotVerifiedException } from "@app/modules/auth/exceptions/userNotVerified.exception";
-import { IncorrectVerificationCode } from "@app/modules/auth/exceptions/incorrectVerificationCode.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { InvalidRefreshTokenException } from "@app/modules/auth/exceptions/invalidRefreshToken.exception";
@@ -30,23 +29,53 @@ import { LogoutResponse } from "@app/modules/auth/types/logout-response";
 import { TokenDto } from "@app/modules/auth/dto/token.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LoginDto } from "@app/modules/auth/dto/login.dto";
+import { EmailDto } from "@app/modules/auth/dto/email.dto";
+import { EmailService } from "@app/modules/email/email.service";
+import { UsersService } from "@app/modules/user/user.service";
+import { UserAlreadyConfirmedException } from "@app/modules/auth/exceptions/userAlreadyConfirmed.exception";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+    private readonly usersService: UsersService
+  ) {}
 
   @ApiOperation({ summary: "account confirmation" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "user has been successfully verified" })
   @ApiResponse({ status: 400, description: "incorrect verification code" })
-  @Get("confirmation/:verificationCode")
-  async userConfirmation(@Param("verificationCode") verificationCode: string): Promise<MessageInfo> {
+  @Get("confirmation/:token")
+  async userConfirmation(@Param("token") token: string): Promise<MessageInfo> {
     try {
-      return await this.authService.userConfirmation(verificationCode);
+      const email = await this.authService.decodeConfirmationToken(token);
+      return await this.authService.userConfirmation(email);
     } catch (error) {
-      if (error instanceof IncorrectVerificationCode) {
+      if (error instanceof UserNotFoundException) {
+        throw new NotFoundException(error.message);
+      } else if (error instanceof UserAlreadyConfirmedException) {
         throw new BadRequestException(error.message);
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "user registration" })
+  @ApiResponse({ status: 201, type: MessageInfo, description: "confirmation email has been resend" })
+  @ApiResponse({ status: 400, description: "data validation" })
+  @ApiResponse({ status: 404, description: "user already exist" })
+  @UsePipes(ValidationPipe)
+  @Post("resend-confirmation")
+  async resendConfirmationLink(@Body() userInfo: EmailDto): Promise<MessageInfo> {
+    try {
+      const user = await this.usersService.getUserByEmail(userInfo.email);
+      await this.emailService.sendEmail(user.email);
+      return { status: "ok", message: "confirmation email has been resend" };
+    } catch (error) {
+      if (error instanceof UserNotFoundException) {
+        throw new NotFoundException(error.message);
       }
       throw new InternalServerErrorException();
     }

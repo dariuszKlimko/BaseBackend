@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ArrayContains, Repository } from "typeorm";
 import { User } from "@app/modules/user/entities/user.entity";
@@ -9,22 +9,46 @@ import { UserAuthenticateException } from "@app/modules/auth/exceptions/userAuth
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/modules/auth/exceptions/userNotVerified.exception";
 import { LoginResponse } from "@app/modules/auth/types/login-response";
-import { IncorrectVerificationCode } from "@app/modules/auth/exceptions/incorrectVerificationCode.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { InvalidRefreshTokenException } from "@app/modules/auth/exceptions/invalidRefreshToken.exception";
 import { LogoutResponse } from "@app/modules/auth/types/logout-response";
-import * as bcrypt from "bcrypt";
+import { ConfigService } from "@nestjs/config";
+import { UserAlreadyConfirmedException } from "@app/modules/auth/exceptions/userAlreadyConfirmed.exception";
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) private userRepository: Repository<User>, private jwtService: JwtService) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService
+  ) {}
 
-  async userConfirmation(verificationCode: string): Promise<MessageInfo> {
-    const userDb = await this.userRepository.findOneBy({ verificationCode });
-    if (!userDb) {
-      throw new IncorrectVerificationCode("incorrect verification code");
+  async decodeConfirmationToken(token: string): Promise<string> {
+    try {
+      const payload = await this.jwtService.verify(token, {
+        secret: this.configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
+      });
+      console.log(payload);
+      if (typeof payload === "object" && "email" in payload) {
+        return payload.email;
+      }
+      throw new BadRequestException();
+    } catch (error) {
+      if (error?.name === "TokenExpiredError") {
+        throw new BadRequestException("Email confirmation token expired");
+      }
+      throw new BadRequestException("Bad confirmation token");
     }
-    await this.userRepository.update(userDb.id, { verificationCode: null, verified: true });
+  }
+
+  async userConfirmation(email: string): Promise<MessageInfo> {
+    const userDb = await this.userRepository.findOneBy({ email });
+    if (!userDb) {
+      throw new UserNotFoundException("user with given email not exist in database");
+    } else if (userDb.verified) {
+      throw new UserAlreadyConfirmedException("user with given email is already confirmed");
+    }
+    await this.userRepository.update(userDb.id, { verified: true });
     return { status: "ok", message: "user successfully verified" };
   }
 
@@ -33,7 +57,7 @@ export class AuthService {
     if (!user) {
       throw new UserNotFoundException("user with given email not exist in database");
     }
-    const isMatch = await bcrypt.compare(userInfo.password, user.password);
+    const isMatch = await user.validatePassword(userInfo.password);
     if (!isMatch) {
       throw new UserAuthenticateException("incorrect email address or password");
     } else if (!user.verified) {
