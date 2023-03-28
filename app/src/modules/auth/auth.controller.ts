@@ -57,6 +57,8 @@ export class AuthController {
         throw new NotFoundException(error.message);
       } else if (error instanceof UserAlreadyConfirmedException) {
         throw new BadRequestException(error.message);
+      } else if(error instanceof BadRequestException){
+        throw error;
       }
       throw new InternalServerErrorException();
     }
