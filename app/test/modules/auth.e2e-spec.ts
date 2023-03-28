@@ -18,8 +18,12 @@ describe("Auth (e2e)", () => {
     await appAuth.init();
   });
 
-  describe("/auth/confirmation/:verificationCode (GET) - confirm user account", () => {
+  describe("/auth/confirmation/:token (GET) - confirm user account", () => {
     it("should confirm user account in database", () => {});
+  });
+
+  describe("/auth/resend-confirmation/ (POST) - resend confirmation link", () => {
+    it("should resend confirmation link", () => {});
   });
 
   describe("/auth (POST) - login user", () => {
