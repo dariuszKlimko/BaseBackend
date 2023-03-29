@@ -8,12 +8,6 @@ export class UpdateUserDto {
   email: string;
 
   @ApiProperty()
-  @IsString()
-  @MinLength(8)
-  @IsOptional()
-  password: string;
-
-  @ApiProperty()
   @IsNumber()
   @IsOptional()
   height: number;

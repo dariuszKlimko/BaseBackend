@@ -3,7 +3,7 @@ import { DataSource } from "typeorm";
 import { Builder, fixturesIterator, IEntity, Loader, Parser, Resolver } from "typeorm-fixtures-cli";
 import { dataSourceFunc } from "@app/modules/database/data-source";
 
-const FIXTURES_PATH = "./test/fixtures/";
+const FIXTURES_PATH = "./test/helpers/fixtures/";
 
 export interface FixtureFactory {
   get: <T extends IEntity>(key: string) => T;

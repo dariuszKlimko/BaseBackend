@@ -2,7 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
-import loadFixtures, { FixtureFactory } from "@test/loadFixtures";
+import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;
