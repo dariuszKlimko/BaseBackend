@@ -13,7 +13,7 @@ items:
     measurementDate: '2023-03-2($current) 01:03:30.118709'
     caloriesDelivered: 2000
     bmi:
-    user: "@user1"
+    user: "@user5"
   measurement{9..10}:
     weight: 80
     distanceTraveled: 15
