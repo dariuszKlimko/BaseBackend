@@ -33,6 +33,8 @@ import { EmailDto } from "@app/modules/auth/dto/email.dto";
 import { EmailService } from "@app/modules/email/email.service";
 import { UsersService } from "@app/modules/user/user.service";
 import { UserAlreadyConfirmedException } from "@app/modules/auth/exceptions/userAlreadyConfirmed.exception";
+import { User } from "../user/entities/user.entity";
+import { UpdateCredentialsDto } from "./dto/update-creadentials.dto";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -138,6 +140,22 @@ export class AuthController {
         throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  @ApiOperation({ summary: "update credentials" })
+  @ApiResponse({ status: 200, type: User, description: "credentials has been successfully updated" })
+  @ApiResponse({ status: 400, description: "data validation" })
+  @ApiResponse({ status: 401, description: "unauthorized" })
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard)
+  @Patch("credentials")
+  async updateUser(@CurrentUser() user: CurrentUserDecorator, @Body() userInfo: UpdateCredentialsDto): Promise<User> {
+    try {
+      return await this.authService.updateCredentials(user.id, userInfo);
+    } catch (error) {
+      throw new InternalServerErrorException();
     }
   }
 }
