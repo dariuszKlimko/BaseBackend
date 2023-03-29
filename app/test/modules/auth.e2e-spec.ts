@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { INestApplication, HttpStatus } from "@nestjs/common";
+import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
-import loadFixtures, { FixtureFactory } from "@test/loadFixtures";
+import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
 
 describe("Auth (e2e)", () => {
-  let appAuth: INestApplication;
+  let app: INestApplication;
   let fixtures: FixtureFactory;
 
   beforeAll(async () => {
@@ -14,8 +14,9 @@ describe("Auth (e2e)", () => {
       imports: [AppModule],
     }).compile();
 
-    appAuth = moduleFixture.createNestApplication();
-    await appAuth.init();
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
+    await app.init();
   });
 
   describe("/auth/confirmation/:token (GET) - confirm user account", () => {

@@ -28,10 +28,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 @UseFilters(HttpExceptionFilter)
 @Controller("users")
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService, 
-    private readonly emailService: EmailService
-  ) {}
+  constructor(private readonly usersService: UsersService, private readonly emailService: EmailService) {}
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })

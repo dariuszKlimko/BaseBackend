@@ -33,8 +33,8 @@ export class User extends BaseEntity {
   })
   email: string;
 
-  @Exclude({ toPlainOnly: true })
   @ApiProperty()
+  @Exclude({ toPlainOnly: true })
   @Column({
     type: "text",
     nullable: true,
