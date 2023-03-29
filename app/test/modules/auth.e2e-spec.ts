@@ -11,7 +11,7 @@ describe("Auth (e2e)", () => {
   beforeAll(async () => {
     fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule], 
+      imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
