@@ -14,7 +14,7 @@ import { InvalidRefreshTokenException } from "@app/modules/auth/exceptions/inval
 import { LogoutResponse } from "@app/modules/auth/types/logout-response";
 import { ConfigService } from "@nestjs/config";
 import { UserAlreadyConfirmedException } from "@app/modules/auth/exceptions/userAlreadyConfirmed.exception";
-import { UpdateCredentialsDto } from "./dto/update-creadentials.dto";
+import { UpdateCredentialsDto } from "@app/modules/auth/dto/update-creadentials.dto";
 
 @Injectable()
 export class AuthService {
@@ -89,10 +89,10 @@ export class AuthService {
 
   async updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
-    if(userInfo.email) {
+    if (userInfo.email) {
       user.email = userInfo.email;
-    } 
-    if(user.password){
+    }
+    if (user.password) {
       user.password = userInfo.password;
     }
     return await this.userRepository.save(user);

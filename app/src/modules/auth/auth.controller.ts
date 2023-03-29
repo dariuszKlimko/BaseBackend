@@ -34,8 +34,8 @@ import { EmailDto } from "@app/modules/auth/dto/email.dto";
 import { EmailService } from "@app/modules/email/email.service";
 import { UsersService } from "@app/modules/user/user.service";
 import { UserAlreadyConfirmedException } from "@app/modules/auth/exceptions/userAlreadyConfirmed.exception";
-import { User } from "../user/entities/user.entity";
-import { UpdateCredentialsDto } from "./dto/update-creadentials.dto";
+import { User } from "@app/modules/user/entities/user.entity";
+import { UpdateCredentialsDto } from "@app/modules/auth/dto/update-creadentials.dto";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -153,7 +153,10 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @Patch("credentials")
-  async updateUser(@CurrentUser() user: CurrentUserDecorator, @Body() userInfo: UpdateCredentialsDto): Promise<User> {
+  async updateUser(
+    @CurrentUser() user: CurrentUserDecorator,
+    @Body() userInfo: UpdateCredentialsDto
+  ): Promise<User> {
     try {
       return await this.authService.updateCredentials(user.id, userInfo);
     } catch (error) {
