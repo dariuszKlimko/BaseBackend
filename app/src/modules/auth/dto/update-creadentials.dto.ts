@@ -2,7 +2,7 @@ import { PASSWORD_REGEX, weakPasswordMessage } from "@app/common/constans/passwo
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsOptional, IsString, Matches } from "class-validator";
 
-export class UpdateUCredentialsDto {
+export class UpdateCredentialsDto {
   @ApiProperty()
   @IsEmail()
   @IsOptional()

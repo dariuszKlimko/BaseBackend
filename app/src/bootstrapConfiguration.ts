@@ -18,6 +18,7 @@ export function configureValidator(app: INestApplication): void {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
       exceptionFactory: (validationErrors) =>
         new BadRequestException({
           type: "validation error",
