@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -71,6 +72,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: "data validation" })
   @ApiResponse({ status: 404, description: "user already exist" })
   @UsePipes(ValidationPipe)
+  @HttpCode(200)
   @Post("resend-confirmation")
   async resendConfirmationLink(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {

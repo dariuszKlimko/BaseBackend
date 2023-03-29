@@ -135,7 +135,7 @@ describe("Users (e2e)", () => {
           expect(res.body.height).toEqual(180);
         });
 
-      return userRepository.findOneBy({ email: "user10@email.com" }).then((user) => {
+      return userRepository.findOneBy({ email: "user1@email.com" }).then((user) => {
         expect(user.height).toEqual(180);
       });
     });

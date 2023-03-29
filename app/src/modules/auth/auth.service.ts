@@ -61,7 +61,7 @@ export class AuthService {
     if (!isMatch) {
       throw new UserAuthenticateException("incorrect email address or password");
     } else if (!user.verified) {
-      throw new UserNotVerifiedException("user with given email is not verivied");
+      throw new UserNotVerifiedException("user with given email is not verified");
     }
     return await this.tokensResponse(user);
   }
