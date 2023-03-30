@@ -35,13 +35,15 @@ describe("Measurements (e2e)", () => {
   });
 
   describe("/measurements (POST) - create measurement", () => {
-    it("should create measurement in database", async () => {
+    it("should create measurement in database and correctly calculate BMI", async () => {
       const measurement = {
         "weight": 77,
         "caloriesDelivered": 1900,
         "distanceTraveled": 5,
         "measurementDate": "2023-01-26 02:03:30.118709"
       }
+      const userHeight = fixtures.get("user5").height;
+      const bmi = +(measurement.weight / Math.pow(userHeight / 100, 2)).toFixed(2);
       let id: string;
       await request.default(app.getHttpServer())
         .post("/measurements")
@@ -50,12 +52,14 @@ describe("Measurements (e2e)", () => {
           expect(res.status).toEqual(HttpStatus.CREATED);
           expect(res.body.measurementDate).toEqual(measurement.measurementDate);
           expect(res.body.weight).toEqual(measurement.weight);
+          expect(res.body.bmi).toEqual(bmi);
           id = res.body.id;
         })
 
       return measurementRepository.findOneBy({ id }).then((measure) => {
         expect(measure.measurementDate).toEqual(measurement.measurementDate);
         expect(measure.weight).toEqual(measurement.weight);
+        expect(measure.bmi).toEqual(bmi);
       })
     });
   });
@@ -205,16 +209,35 @@ describe("Measurements (e2e)", () => {
   });
 
   describe("/measurements/:id (DELETE) - delete one measurments", () => {
-    it("should delete one measurement for user with given accessToken", () => {
-
+    it("should delete one measurement for user with given accessToken", async() => {
+      const userId: string = fixtures.get("user5").id;
+      const allMeasurementsLenght: number = await measurementRepository.findBy({ userId }).then((res) => res.length);
+      await request.default(app.getHttpServer())
+        .delete(`/measurements/${fixtures.get("measurement5").id}`)
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.OK);
+          expect(res.body.id).toEqual(fixtures.get("measurement5").id);
+        })
+      
+      return measurementRepository.findBy({ userId }).then((measurements) => {
+        expect(measurements.length).toEqual(allMeasurementsLenght - 1);
+      })
     });
 
     it("should not delete one measurement with incorrect id for user with given accessToken", () => {
-      
+      return request.default(app.getHttpServer())
+      .delete(`/measurements/${fixtures.get("measurement1").id}`)
+      .then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      })
     });
 
     it("should not delete one measurement if id is not uuid type for user with given accessToken", () => {
-      
+      return request.default(app.getHttpServer())
+        .delete("/measurements/someNotUUIDmeasurementId")
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+        })
     });
   });
 });
