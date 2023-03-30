@@ -1,8 +1,29 @@
 entity: User
 items:
-  user{1..4}:
-    email: 'user($current)@email.com'
-    password: 'QWERTqwert($current)!'
+  user1:
+    email: 'user1@email.com'
+    password: 'Qwert12345!'
+    height: 179
+    refreshToken: 
+      -
+    verified: true
+  user2:
+    email: 'user2@email.com'
+    password: 'Qwert12345!'
+    height: 179
+    refreshToken: 
+      -
+    verified: true
+  user3:
+    email: 'user3@email.com'
+    password: 'Qwert12345!'
+    height: 179
+    refreshToken: 
+      -
+    verified: true
+  user4:
+    email: 'user4@email.com'
+    password: 'Qwert12345!'
     height: 179
     refreshToken: 
       -
@@ -20,23 +41,115 @@ items:
     refreshToken: 
       -'9iyc162b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6I9jH6'
     verified: true
-  user7:
-    email: 'user7@email.com'
-    password: 'QWERTqwert7!'
+  user10:
+    email: 'user10@email.com'
+    password: 'Qwert12345!'
     height: 185
     refreshToken: 
-      -'pO56h62b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6kkmnb'
+      -
+    verified: false
+  user11:
+    email: 'auth1@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: false
+  user12:
+    email: 'auth2@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
     verified: true
-  user8:
-    email: 'user8@email.com'
-    password: 'QWERTqwert8!'
-    refreshTokens: 
+  user13:
+    email: 'auth3@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
       -
     verified: false
-  user9:
-    email: 'user9@email.com'
-    password: 'QWERTqwert9!'
-    refreshTokens: 
+  user14:
+    email: 'auth4@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
       -
     verified: false
-  
+  user15:
+    email: 'auth5@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user16:
+    email: 'auth6@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user17:
+    email: 'auth7@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: false
+  user18:
+    email: 'auth8@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user19:
+    email: 'auth9@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user20:
+    email: 'auth10@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user21:
+    email: 'auth11@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user22:
+    email: 'auth12@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user23:
+    email: 'auth13@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user24:
+    email: 'auth14@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+  user25:
+    email: 'auth15@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true

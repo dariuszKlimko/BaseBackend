@@ -8,6 +8,9 @@ import { JwtService } from "@nestjs/jwt";
 import { Repository } from "typeorm";
 import { User } from "@app/modules/user/entities/user.entity";
 import { LoginResponse } from "@app/modules/auth/types/login-response";
+import { userLogin } from "@test/helpers/userLogin";
+import { credentialsUpdate } from "@test/helpers/credentialsUpdate";
+import { jwtGenerate } from "@test/helpers/jwtGenerate";
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;
@@ -15,10 +18,19 @@ describe("Auth (e2e)", () => {
   let configService: ConfigService;
   let jwtService: JwtService;
   let userRepository: Repository<User>;
-  let user4Tokens: LoginResponse;
-  let user5Tokens: LoginResponse;
+  let tokenSecret: string;
+  let tokenExpireTime: number;
 
-  beforeEach(async () => {
+  let auth8Tokens: LoginResponse;
+  let auth9Tokens: LoginResponse;
+  let auth10Tokens: LoginResponse;
+  let auth11Tokens: LoginResponse;
+  let auth12Tokens: LoginResponse;
+  let auth13Tokens: LoginResponse;
+  let auth14Tokens: LoginResponse;
+  let auth15Tokens: LoginResponse;
+
+  beforeAll(async () => {
     fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -33,27 +45,23 @@ describe("Auth (e2e)", () => {
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
 
-    user5Tokens = await request
-      .default(app.getHttpServer())
-      .post("/auth")
-      .send({ email: "user5@email.com", password: "QWERTqwert5!" })
-      .then((res) => res.body);
+    tokenSecret = configService.get("JWT_CONFIRMATION_TOKEN_SECRET");
+    tokenExpireTime = configService.get("JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME");
 
-    user4Tokens = await request
-      .default(app.getHttpServer())
-      .post("/auth")
-      .send({ email: "user4@email.com", password: "QWERTqwert4!" })
-      .then((res) => res.body);
+    auth8Tokens = await userLogin("auth8@email.com", "Qwert12345!", app).then((res) => res.body);
+    auth9Tokens = await userLogin("auth9@email.com", "Qwert12345!", app).then((res) => res.body);
+    auth10Tokens = await userLogin("auth10@email.com", "Qwert12345!", app).then((res) => res.body);
+    auth11Tokens = await userLogin("auth11@email.com", "Qwert12345!", app).then((res) => res.body);
+    auth12Tokens = await userLogin("auth12@email.com", "Qwert12345!", app).then((res) => res.body);
+    auth13Tokens = await userLogin("auth13@email.com", "Qwert12345!", app).then((res) => res.body);
+    auth14Tokens = await userLogin("auth14@email.com", "Qwert12345!", app).then((res) => res.body);
+    auth15Tokens = await userLogin("auth15@email.com", "Qwert12345!", app).then((res) => res.body);
+
   });
 
   describe("/auth/confirmation/:token (GET) - confirm user account", () => {
     it("should confirm user account in database if token is valid", async () => {
-      const payload = { email: "user8@email.com" };
-      const token = jwtService.sign(payload, {
-        secret: configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
-        expiresIn: `${configService.get("JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME")}s`,
-      });
-
+      const token = jwtGenerate("auth1@email.com", tokenSecret, tokenExpireTime, jwtService);
       await request
         .default(app.getHttpServer())
         .get(`/auth/confirmation/${token}`)
@@ -62,18 +70,13 @@ describe("Auth (e2e)", () => {
           expect(res.body.status).toEqual("ok");
         });
 
-      return userRepository.findOneBy({ email: "user8@email.com" }).then((user) => {
+      return userRepository.findOneBy({ email: "auth1@email.com" }).then((user) => {
         expect(user.verified).toEqual(true);
       });
     });
 
     it("should not confirm account if user with given token not exist in database", () => {
-      const payload = { email: "user80@email.com" };
-      const token = jwtService.sign(payload, {
-        secret: configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
-        expiresIn: `${configService.get("JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME")}s`,
-      });
-
+      const token = jwtGenerate("authNotExistInDb@email.com", tokenSecret, tokenExpireTime, jwtService);
       return request
         .default(app.getHttpServer())
         .get(`/auth/confirmation/${token}`)
@@ -83,12 +86,7 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not confirm user account if user for given token is already confirmed", () => {
-      const payload = { email: "user1@email.com" };
-      const token = jwtService.sign(payload, {
-        secret: configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
-        expiresIn: `${configService.get("JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME")}s`,
-      });
-
+      const token = jwtGenerate("auth2@email.com", tokenSecret, tokenExpireTime, jwtService);
       return request
         .default(app.getHttpServer())
         .get(`/auth/confirmation/${token}`)
@@ -107,12 +105,7 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not confirm user account if given token is expired", () => {
-      const payload = { email: "user1@email.com" };
-      const token = jwtService.sign(payload, {
-        secret: configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
-        expiresIn: "-10s",
-      });
-
+      const token = jwtGenerate("auth3@email.com", tokenSecret, -10, jwtService);
       return request
         .default(app.getHttpServer())
         .get(`/auth/confirmation/${token}`)
@@ -127,7 +120,7 @@ describe("Auth (e2e)", () => {
       return request
         .default(app.getHttpServer())
         .post("/auth/resend-confirmation")
-        .send({ email: "user8@email.com" })
+        .send({ email: "auth4@email.com" })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
           expect(res.body.status).toEqual("ok");
@@ -138,7 +131,7 @@ describe("Auth (e2e)", () => {
       return request
         .default(app.getHttpServer())
         .post("/auth/resend-confirmation")
-        .send({ email: "user80@email.com" })
+        .send({ email: "authNotExistInDb@email.com" })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.NOT_FOUND);
         });
@@ -147,7 +140,7 @@ describe("Auth (e2e)", () => {
 
   describe("/auth (POST) - login user", () => {
     it("should return tokens", async () => {
-      const user = { email: "user1@email.com", password: "QWERTqwert1!" };
+      const user = { email: "auth5@email.com", password: "Qwert12345!" };
       await request
         .default(app.getHttpServer())
         .post("/auth")
@@ -155,7 +148,7 @@ describe("Auth (e2e)", () => {
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.CREATED);
           expect(res.body.accessToken).toBeDefined();
-          expect(res.body.refreshToken.length).toBeDefined();
+          expect(res.body.refreshToken).toBeDefined();
         });
 
       return userRepository.findOneBy({ email: user.email }).then((user) => {
@@ -164,7 +157,7 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not return tokens if email not exist in database", () => {
-      const user = { email: "user80@email.com", password: "QWERTqwert1!" };
+      const user = { email: "authNotExistInDb@email.com", password: "QWERTqwert1!" };
       return request
         .default(app.getHttpServer())
         .post("/auth")
@@ -175,7 +168,7 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not return tokens if password is incorrect", () => {
-      const user = { email: "user1@email.com", password: "QWERTqwert11!" };
+      const user = { email: "auth6@email.com", password: "Qwert123456789!" };
       return request
         .default(app.getHttpServer())
         .post("/auth")
@@ -186,7 +179,7 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not return tokens if email is not verified", () => {
-      const user = { email: "user8@email.com", password: "QWERTqwert8!" };
+      const user = { email: "auth7@email.com", password: "Qwert12345!" };
       return request
         .default(app.getHttpServer())
         .post("/auth")
@@ -202,14 +195,14 @@ describe("Auth (e2e)", () => {
       await request
         .default(app.getHttpServer())
         .patch("/auth")
-        .set("Authorization", `Bearer ${user5Tokens.accessToken}`)
-        .send({ refreshToken: user5Tokens.refreshToken })
+        .set("Authorization", `Bearer ${auth8Tokens.accessToken}`)
+        .send({ refreshToken: auth8Tokens.refreshToken })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.email).toEqual("user5@email.com");
+          expect(res.body.email).toEqual("auth8@email.com");
         });
 
-      return userRepository.findOneBy({ email: "user5@email.com" }).then((user) => {
+      return userRepository.findOneBy({ email: "auth8@email.com" }).then((user) => {
         expect(user.refreshTokens).toEqual([]);
       });
     });
@@ -218,8 +211,8 @@ describe("Auth (e2e)", () => {
       return request
         .default(app.getHttpServer())
         .patch("/auth")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ refreshToken: user5Tokens.refreshToken })
+        .set("Authorization", `Bearer ${auth9Tokens.accessToken}`)
+        .send({ refreshToken: auth10Tokens.refreshToken })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
@@ -229,7 +222,7 @@ describe("Auth (e2e)", () => {
       return request
         .default(app.getHttpServer())
         .patch("/auth")
-        .set("Authorization", `Bearer ${user5Tokens.accessToken}`)
+        .set("Authorization", `Bearer ${auth11Tokens.accessToken}`)
         .send({ refreshToken: "someToken" })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -242,14 +235,14 @@ describe("Auth (e2e)", () => {
       await request
         .default(app.getHttpServer())
         .patch("/auth/tokens")
-        .send({ refreshToken: user5Tokens.refreshToken })
+        .send({ refreshToken: auth12Tokens.refreshToken })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
           expect(res.body.accessToken).toBeDefined();
           expect(res.body.refreshToken.length).toBeDefined();
         });
 
-      return userRepository.findOneBy({ email: "user5@email.com" }).then((user) => {
+      return userRepository.findOneBy({ email: "auth12@email.com" }).then((user) => {
         expect(user.refreshTokens.length).toEqual(1);
       });
     });
@@ -267,105 +260,60 @@ describe("Auth (e2e)", () => {
 
   describe("/auth/credentials (PATCH) - update user email and password ", () => {
     it("should update user email for user with given accessToken", async () => {
-      await request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ email: "test1@email.com" })
-        .then((res) => {
+      await credentialsUpdate(auth13Tokens.accessToken, { email: "authUpdate13@email.com" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.email).toEqual("test1@email.com");
+          expect(res.body.email).toEqual("authUpdate13@email.com");
         });
 
-      return userRepository.findOneBy({ email: "test1@email.com" }).then((user) => {
-        expect(user.email).toEqual("test1@email.com");
+      return userRepository.findOneBy({ email: "authUpdate13@email.com" }).then((user) => {
+        expect(user.email).toEqual("authUpdate13@email.com");
       });
     });
 
     it("should not update user if email is not email", () => {
-      return request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ email: "test1email.com" })
-        .then((res) => {
+      return credentialsUpdate(auth14Tokens.accessToken, { email: "authUpdate14email.com" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
     });
 
     it("should update user password for user with given accessToken", () => {
-      return request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ password: "Qwerty123456!" })
-        .then((res) => {
+      return credentialsUpdate(auth15Tokens.accessToken, { password: "Qwerty123456!" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
         });
     });
 
     it("should not update user password shorter than 8 characters", () => {
-      return request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ password: "Qw12!" })
-        .then((res) => {
+        return credentialsUpdate(auth14Tokens.accessToken, { password: "Qw12!" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
     });
 
     it("should not update user password longer than 24 characters", () => {
-      return request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ password: "QwrtfgvbcfrewqwerQQW229disj12!" })
-        .then((res) => {
+        return credentialsUpdate(auth14Tokens.accessToken, { password: "QwrtfgvbcfrewqwerQQW229disj12!" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
     });
 
     it("should not update user password without number", () => {
-      return request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ password: "Qwertyjhgfjgf!" })
-        .then((res) => {
+      return credentialsUpdate(auth14Tokens.accessToken, { password: "Qwertyjhgfjgf!" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
     });
 
     it("should not update user password without special character", () => {
-      return request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ password: "Qwerty123456" })
-        .then((res) => {
+      return credentialsUpdate(auth14Tokens.accessToken, { password: "Qwerty123456" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
     });
 
     it("should not update user password without capital letter", () => {
-      return request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ password: "qwerty123456!" })
-        .then((res) => {
+      return credentialsUpdate(auth14Tokens.accessToken, { password: "qwerty123456!" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
     });
 
     it("should not update user password without small letter", () => {
-      return request
-        .default(app.getHttpServer())
-        .patch("/auth/credentials")
-        .set("Authorization", `Bearer ${user4Tokens.accessToken}`)
-        .send({ password: "QWERTY123456!" })
-        .then((res) => {
+      return credentialsUpdate(auth14Tokens.accessToken, { password: "QWERTY123456!" }, app).then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
     });
