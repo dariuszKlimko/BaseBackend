@@ -79,3 +79,11 @@ yarn test:e2e
 ```
 http://localhost:80/api
 ```
+
+
+## TO DO
+1) refactor email service
+2) reset password endpoint
+3) pagination
+4) add table "user profile"
+5) add role guard
