@@ -38,8 +38,6 @@ export class MeasurementsController {
     type: Measurement,
     description: "measurement has been successfully created",
   })
-  @ApiResponse({ status: 400, description: "data validation" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -61,7 +59,6 @@ export class MeasurementsController {
     type: [Measurement],
     description: "all measurements has been successfully loaded",
   })
-  @ApiResponse({ status: 401, description: "unauthorized" })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -79,9 +76,6 @@ export class MeasurementsController {
     type: Measurement,
     description: "one measurement been successfully loaded",
   })
-  @ApiResponse({ status: 400, description: "data validation" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
-  @ApiResponse({ status: 404, description: "measurement not found" })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get(":id")
@@ -105,9 +99,6 @@ export class MeasurementsController {
     type: Measurement,
     description: "measurement has been successfully updated",
   })
-  @ApiResponse({ status: 400, description: "data validation" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
-  @ApiResponse({ status: 404, description: "measurement not found" })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -133,8 +124,6 @@ export class MeasurementsController {
     type: MessageInfo,
     description: "all user's measurement has been successfully deleted",
   })
-  @ApiResponse({ status: 401, description: "unauthorized" })
-  @ApiResponse({ status: 404, description: "measurements not found" })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete()
@@ -155,9 +144,6 @@ export class MeasurementsController {
     type: Measurement,
     description: "one measurement has been successfully deleted",
   })
-  @ApiResponse({ status: 400, description: "data validation" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
-  @ApiResponse({ status: 404, description: "measurement not found" })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
