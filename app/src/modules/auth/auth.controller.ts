@@ -49,7 +49,6 @@ export class AuthController {
 
   @ApiOperation({ summary: "account confirmation" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "user has been successfully verified" })
-  @ApiResponse({ status: 400, description: "incorrect verification code" })
   @Get("confirmation/:token")
   async userConfirmation(@Param("token") token: string): Promise<MessageInfo> {
     try {
@@ -69,8 +68,6 @@ export class AuthController {
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: MessageInfo, description: "confirmation email has been resend" })
-  @ApiResponse({ status: 400, description: "data validation" })
-  @ApiResponse({ status: 404, description: "user already exist" })
   @UsePipes(ValidationPipe)
   @HttpCode(200)
   @Post("resend-confirmation")
@@ -89,9 +86,6 @@ export class AuthController {
 
   @ApiOperation({ summary: "user login" })
   @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
-  @ApiResponse({ status: 400, description: "user not verified / data validation " })
-  @ApiResponse({ status: 401, description: "user unauthorized " })
-  @ApiResponse({ status: 404, description: "user not found" })
   @UsePipes(ValidationPipe)
   @Post()
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
@@ -112,8 +106,6 @@ export class AuthController {
 
   @ApiOperation({ summary: "user logout" })
   @ApiResponse({ status: 200, type: LogoutResponse, description: "user has been successfully logged out" })
-  @ApiResponse({ status: 400, description: "invalid refresh token / data validation" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -131,7 +123,6 @@ export class AuthController {
 
   @ApiOperation({ summary: "get new access and refresh tokens" })
   @ApiResponse({ status: 200, type: LoginResponse, description: "tokens has been successfully refreshed" })
-  @ApiResponse({ status: 400, description: "invalid refresh token / data validation" })
   @UsePipes(ValidationPipe)
   @Patch("tokens")
   async getNewTokens(@Body() token: TokenDto): Promise<LoginResponse> {
@@ -147,8 +138,6 @@ export class AuthController {
 
   @ApiOperation({ summary: "update credentials" })
   @ApiResponse({ status: 200, type: User, description: "credentials has been successfully updated" })
-  @ApiResponse({ status: 400, description: "data validation" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)

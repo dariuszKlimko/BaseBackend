@@ -32,8 +32,6 @@ export class UsersController {
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
-  @ApiResponse({ status: 400, description: "data validation" })
-  @ApiResponse({ status: 409, description: "user already exist" })
   @UsePipes(ValidationPipe)
   @Post()
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
@@ -51,7 +49,6 @@ export class UsersController {
 
   @ApiOperation({ summary: "get user data" })
   @ApiResponse({ status: 200, type: User, description: "user's info has been successfully loaded" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -65,8 +62,6 @@ export class UsersController {
 
   @ApiOperation({ summary: "update user" })
   @ApiResponse({ status: 200, type: User, description: "user has been successfully updated" })
-  @ApiResponse({ status: 400, description: "data validation" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -81,7 +76,6 @@ export class UsersController {
 
   @ApiOperation({ summary: "delete user account with measurement" })
   @ApiResponse({ status: 200, type: User, description: "user has been successfully deleted" })
-  @ApiResponse({ status: 401, description: "unauthorized" })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete()
