@@ -8,15 +8,18 @@ import { User } from "@app/modules/user/entities/user.entity";
 import { CreateUserDto } from "@app/modules/user/dto/create-user.dto";
 import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
 import { userRegister } from "@test/helpers/userRegister";
+import { userLogin } from "@test/helpers/userLogin";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactory;
   let userRepository: Repository<User>;
   let measurementRepository: Repository<Measurement>;
-  let accessToken: string;
+  let user2accessToken: string;
+  let user3accessToken: string;
+  let user4accessToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -29,16 +32,14 @@ describe("Users (e2e)", () => {
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
 
-    accessToken = await request
-      .default(app.getHttpServer())
-      .post("/auth")
-      .send({ email: "user1@email.com", password: "QWERTqwert1!" })
-      .then((res) => res.body.accessToken);
+    user2accessToken = await userLogin("user2@email.com", "Qwert12345!", app).then((res) => res.body.accessToken);
+    user3accessToken = await userLogin("user3@email.com", "Qwert12345!", app).then((res) => res.body.accessToken);
+    user4accessToken = await userLogin("user4@email.com", "Qwert12345!", app).then((res) => res.body.accessToken);
   });
 
   describe("/users (POST) - register user", () => {
     it("should register user in database", async () => {
-      const user: CreateUserDto = { email: "test1@email.com", password: "Qwert12345!" };
+      const user: CreateUserDto = { email: "userRegister1@email.com", password: "Qwert12345!" };
       await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.CREATED);
         expect(res.body.email).toEqual(user.email);
@@ -50,49 +51,56 @@ describe("Users (e2e)", () => {
     });
 
     it("should not register user which exist in database", () => {
-      const user: CreateUserDto = { email: "user1@email.com", password: "QWERTqwert1!" };
+      const user: CreateUserDto = { email: "user1@email.com", password: "Qwert12345!" };
       return userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.CONFLICT);
       });
     });
 
+    it("should not register user if email is ot email", () => {
+      const user: CreateUserDto = { email: "userNotRegisteremail.com", password: "Qwert12345!!" };
+      return userRegister(user.email, user.password, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+
     it("should not register user with password shorter than 8 characters", () => {
-      const user: CreateUserDto = { email: "test2@email.com", password: "Qw1hb!" };
+      const user: CreateUserDto = { email: "userNotRegister@email.com", password: "Qw1hb!" };
       return userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
     it("should not register user with password longer than 24 characters", () => {
-      const user: CreateUserDto = { email: "test2@email.com", password: "Qwertoklk1234rfSdCSAWmjhb!" };
+      const user: CreateUserDto = { email: "userNotRegister@email.com", password: "Qwertoklk1234rfSdCSAWmjhb!" };
       return userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
     it("should not register user with password without number", () => {
-      const user: CreateUserDto = { email: "test2@email.com", password: "Qwertoklkmjhb!" };
+      const user: CreateUserDto = { email: "userNotRegister@email.com", password: "Qwertoklkmjhb!" };
       return userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
     it("should not register user with password without special character", () => {
-      const user: CreateUserDto = { email: "test2@email.com", password: "Qwert12345" };
+      const user: CreateUserDto = { email: "userNotRegister@email.com", password: "Qwert12345" };
       return userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
     it("should not register user with password without capital letter", () => {
-      const user: CreateUserDto = { email: "test2@email.com", password: "qwert12345!" };
+      const user: CreateUserDto = { email: "userNotRegister@email.com", password: "qwert12345!" };
       return userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
     it("should not register user with password without small letter", () => {
-      const user: CreateUserDto = { email: "test2@email.com", password: "QWERT12345!" };
+      const user: CreateUserDto = { email: "userNotRegister@email.com", password: "QWERT12345!" };
       return userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
@@ -104,11 +112,11 @@ describe("Users (e2e)", () => {
       return request
         .default(app.getHttpServer())
         .get("/users")
-        .set("Authorization", `Bearer ${accessToken}`)
+        .set("Authorization", `Bearer ${user2accessToken}`)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.id).toEqual(fixtures.get("user1").id);
-          expect(res.body.email).toEqual("user1@email.com");
+          expect(res.body.id).toEqual(fixtures.get("user2").id);
+          expect(res.body.email).toEqual("user2@email.com");
         });
     });
 
@@ -128,14 +136,14 @@ describe("Users (e2e)", () => {
       await request
         .default(app.getHttpServer())
         .patch("/users")
-        .set("Authorization", `Bearer ${accessToken}`)
+        .set("Authorization", `Bearer ${user3accessToken}`)
         .send({ height: 180 })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
           expect(res.body.height).toEqual(180);
         });
 
-      return userRepository.findOneBy({ email: "user10@email.com" }).then((user) => {
+      return userRepository.findOneBy({ email: "user3@email.com" }).then((user) => {
         expect(user.height).toEqual(180);
       });
     });
@@ -154,7 +162,7 @@ describe("Users (e2e)", () => {
       return request
         .default(app.getHttpServer())
         .patch("/users")
-        .set("Authorization", `Bearer ${accessToken}`)
+        .set("Authorization", `Bearer ${user3accessToken}`)
         .send({ height: "180" })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -168,11 +176,11 @@ describe("Users (e2e)", () => {
       await request
         .default(app.getHttpServer())
         .delete("/users")
-        .set("Authorization", `Bearer ${accessToken}`)
+        .set("Authorization", `Bearer ${user4accessToken}`)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.id).toEqual(fixtures.get("user1").id);
-          expect(res.body.email).toEqual(fixtures.get("user1").email);
+          expect(res.body.id).toEqual(fixtures.get("user4").id);
+          expect(res.body.email).toEqual(fixtures.get("user4").email);
           userId = res.body.id;
         });
 
