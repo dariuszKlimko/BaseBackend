@@ -3,6 +3,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { AuthModule } from "@app/modules/auth/auth.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JwtService } from "@nestjs/jwt";
       }),
       inject: [ConfigService],
     }),
+    AuthModule,
   ],
   providers: [EmailService, JwtService],
   exports: [EmailService],

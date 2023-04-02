@@ -82,8 +82,7 @@ http://localhost:80/api
 
 
 ## TO DO
-1) refactor email service
-2) reset password endpoint
-3) pagination
-4) add table "user profile"
-5) add role guard
+1) reset password endpoint
+2) pagination
+3) add table "user profile"
+4) add role guard
