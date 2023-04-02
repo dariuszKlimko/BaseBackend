@@ -74,7 +74,9 @@ export class AuthController {
   async resendConfirmationLink(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
       const user = await this.usersService.getUserByEmail(userInfo.email);
-      await this.emailService.sendEmail(user.email);
+      const text = this.emailService.verificationEmailText(user.email);
+      const subject = "Account confirmation ✔";
+      await this.emailService.sendEmail(user.email, text, subject);
       return { status: "ok", message: "confirmation email has been resend" };
     } catch (error) {
       if (error instanceof UserNotFoundException) {
