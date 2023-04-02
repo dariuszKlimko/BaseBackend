@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "@app/modules/user/entities/user.entity";
-import { CreateUserDto } from "@app/modules/user/dto/create-user.dto";
-import { UserDuplicateException } from "@app/modules/user/exceptions/userDuplicate.exception";
-import { UpdateUserDto } from "@app/modules/user/dto/update-user.dto";
+import { User } from "@app/entities/user/user.entity";
+import { CreateUserDto } from "@app/dtos/user/create-user.dto";
+import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
+import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
 
 @Injectable()

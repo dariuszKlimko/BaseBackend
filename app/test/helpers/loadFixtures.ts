@@ -1,7 +1,7 @@
 import path from "path";
 import { DataSource } from "typeorm";
 import { Builder, fixturesIterator, IEntity, Loader, Parser, Resolver } from "typeorm-fixtures-cli";
-import { dataSourceFunc } from "@app/modules/database/data-source";
+import { dataBaseConfig } from "@app/data-source";
 
 const FIXTURES_PATH = "./test/helpers/fixtures/";
 
@@ -16,7 +16,7 @@ export interface CreatedFixtures {
 const loadFixtures = async (): Promise<FixtureFactory> => {
   const createdFixtures: CreatedFixtures = {};
   try {
-    const dataSource: DataSource = new DataSource(dataSourceFunc(process.env.NODE_ENV));
+    const dataSource: DataSource = new DataSource(dataBaseConfig(process.env.NODE_ENV));
     await dataSource.initialize();
     await dataSource.dropDatabase();
     await dataSource.runMigrations();

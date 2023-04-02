@@ -14,17 +14,17 @@ import {
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
-import { MeasurementsService } from "@app/modules/measurements/measurements.service";
+import { MeasurementsService } from "@app/services/measurements.service";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
-import { CreateMeasurementDto } from "@app/modules/measurements/dto/create-measurement.dto";
-import { UpdateMeasurementDto } from "@app/modules/measurements/dto/update-measurement.dto";
-import { MeasurementNotFoundException } from "@app/modules/measurements/exceptions/measurementNotFound.exception";
+import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
+import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
+import { MeasurementNotFoundException } from "@app/common/exceptions/measurement/measurementNotFound.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
+import { Measurement } from "@app/entities/measurement/measurement.entity";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)

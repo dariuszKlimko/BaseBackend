@@ -1,20 +1,20 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ArrayContains, Repository } from "typeorm";
-import { User } from "@app/modules/user/entities/user.entity";
-import { CreateUserDto } from "@app/modules/user/dto/create-user.dto";
+import { User } from "@app/entities/user/user.entity";
+import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { JwtService } from "@nestjs/jwt";
 import { randomBytes } from "crypto";
-import { UserAuthenticateException } from "@app/modules/auth/exceptions/userAuthenticate.exception";
+import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
-import { UserNotVerifiedException } from "@app/modules/auth/exceptions/userNotVerified.exception";
-import { LoginResponse } from "@app/modules/auth/types/login-response";
+import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
+import { LoginResponse } from "@app/common/types/auth/login-response";
 import { MessageInfo } from "@app/common/types/messageInfo";
-import { InvalidRefreshTokenException } from "@app/modules/auth/exceptions/invalidRefreshToken.exception";
-import { LogoutResponse } from "@app/modules/auth/types/logout-response";
+import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";
+import { LogoutResponse } from "@app/common/types/auth/logout-response";
 import { ConfigService } from "@nestjs/config";
-import { UserAlreadyConfirmedException } from "@app/modules/auth/exceptions/userAlreadyConfirmed.exception";
-import { UpdateCredentialsDto } from "@app/modules/auth/dto/update-creadentials.dto";
+import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/userAlreadyConfirmed.exception";
+import { UpdateCredentialsDto } from "@app/dtos/auth/update-creadentials.dto";
 
 @Injectable()
 export class AuthService {

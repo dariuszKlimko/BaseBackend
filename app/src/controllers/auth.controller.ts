@@ -15,27 +15,27 @@ import {
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
-import { AuthService } from "@app/modules/auth/auth.service";
+import { AuthService } from "@app/services/auth.service";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
-import { LoginResponse } from "@app/modules/auth/types/login-response";
+import { LoginResponse } from "@app/common/types/auth/login-response";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
-import { UserAuthenticateException } from "@app/modules/auth/exceptions/userAuthenticate.exception";
-import { UserNotVerifiedException } from "@app/modules/auth/exceptions/userNotVerified.exception";
+import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
+import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { InvalidRefreshTokenException } from "@app/modules/auth/exceptions/invalidRefreshToken.exception";
+import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
-import { LogoutResponse } from "@app/modules/auth/types/logout-response";
-import { TokenDto } from "@app/modules/auth/dto/token.dto";
+import { LogoutResponse } from "@app/common/types/auth/logout-response";
+import { TokenDto } from "@app/dtos/auth/token.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { LoginDto } from "@app/modules/auth/dto/login.dto";
-import { EmailDto } from "@app/modules/auth/dto/email.dto";
-import { EmailService } from "@app/modules/email/email.service";
-import { UsersService } from "@app/modules/user/user.service";
-import { UserAlreadyConfirmedException } from "@app/modules/auth/exceptions/userAlreadyConfirmed.exception";
-import { User } from "@app/modules/user/entities/user.entity";
-import { UpdateCredentialsDto } from "@app/modules/auth/dto/update-creadentials.dto";
+import { LoginDto } from "@app/dtos/auth/login.dto";
+import { EmailDto } from "@app/dtos/auth/email.dto";
+import { EmailService } from "@app/services/email.service";
+import { UsersService } from "@app/services/user.service";
+import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/userAlreadyConfirmed.exception";
+import { User } from "@app/entities/user/user.entity";
+import { UpdateCredentialsDto } from "@app/dtos/auth/update-creadentials.dto";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)

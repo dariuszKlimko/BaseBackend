@@ -21,6 +21,10 @@ import { ConfigModule } from "@nestjs/config";
         PASSWORD_NODEMAILER: Joi.string().required(),
         SERVICE_NODEMAILER: Joi.string().required(),
         CONFIRMATION_HOST_NODEMAILER: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRATION: Joi.number().required(),
+        JWT_CONFIRMATION_TOKEN_SECRET: Joi.string().required(),
+        JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME: Joi.number().required(),
       }),
       envFilePath: "../.env",
       validationOptions: {
