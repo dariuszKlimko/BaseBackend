@@ -15,6 +15,7 @@ import { ConfigService } from "@nestjs/config";
 import { dataBaseConfig } from "@app/data-source";
 import { PassportModule } from "@nestjs/passport";
 import { MailerModule } from "@nestjs-modules/mailer";
+import { JwtStrategy } from "@app/common/strategies/jwt.strategy";
 
 @Module({
   imports: [
@@ -61,7 +62,8 @@ import { MailerModule } from "@nestjs-modules/mailer";
     MeasurementsService, 
     AuthService, 
     EmailService, 
-    JwtService
+    JwtService,
+    JwtStrategy,
   ],
 })
 export class AppModule {}
