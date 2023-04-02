@@ -2,7 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
-import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
+import loadFixtures from "@test/helpers/loadFixtures";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Repository } from "typeorm";
@@ -14,7 +14,6 @@ import { jwtGenerate } from "@test/helpers/jwtGenerate";
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;
-  let fixtures: FixtureFactory;
   let configService: ConfigService;
   let jwtService: JwtService;
   let userRepository: Repository<User>;
@@ -31,7 +30,7 @@ describe("Auth (e2e)", () => {
   let auth15Tokens: LoginResponse;
 
   beforeAll(async () => {
-    fixtures = await loadFixtures();
+    await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
       providers: [ConfigService, JwtService],
@@ -56,7 +55,6 @@ describe("Auth (e2e)", () => {
     auth13Tokens = await userLogin("auth13@email.com", "Qwert12345!", app).then((res) => res.body);
     auth14Tokens = await userLogin("auth14@email.com", "Qwert12345!", app).then((res) => res.body);
     auth15Tokens = await userLogin("auth15@email.com", "Qwert12345!", app).then((res) => res.body);
-
   });
 
   describe("/auth/confirmation/:token (GET) - confirm user account", () => {
@@ -261,9 +259,9 @@ describe("Auth (e2e)", () => {
   describe("/auth/credentials (PATCH) - update user email and password ", () => {
     it("should update user email for user with given accessToken", async () => {
       await credentialsUpdate(auth13Tokens.accessToken, { email: "authUpdate13@email.com" }, app).then((res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.email).toEqual("authUpdate13@email.com");
-        });
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.email).toEqual("authUpdate13@email.com");
+      });
 
       return userRepository.findOneBy({ email: "authUpdate13@email.com" }).then((user) => {
         expect(user.email).toEqual("authUpdate13@email.com");
@@ -272,50 +270,52 @@ describe("Auth (e2e)", () => {
 
     it("should not update user if email is not email", () => {
       return credentialsUpdate(auth14Tokens.accessToken, { email: "authUpdate14email.com" }, app).then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should update user password for user with given accessToken", () => {
       return credentialsUpdate(auth15Tokens.accessToken, { password: "Qwerty123456!" }, app).then((res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-        });
+        expect(res.status).toEqual(HttpStatus.OK);
+      });
     });
 
     it("should not update user password shorter than 8 characters", () => {
-        return credentialsUpdate(auth14Tokens.accessToken, { password: "Qw12!" }, app).then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+      return credentialsUpdate(auth14Tokens.accessToken, { password: "Qw12!" }, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should not update user password longer than 24 characters", () => {
-        return credentialsUpdate(auth14Tokens.accessToken, { password: "QwrtfgvbcfrewqwerQQW229disj12!" }, app).then((res) => {
+      return credentialsUpdate(auth14Tokens.accessToken, { password: "QwrtfgvbcfrewqwerQQW229disj12!" }, app).then(
+        (res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+        }
+      );
     });
 
     it("should not update user password without number", () => {
       return credentialsUpdate(auth14Tokens.accessToken, { password: "Qwertyjhgfjgf!" }, app).then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should not update user password without special character", () => {
       return credentialsUpdate(auth14Tokens.accessToken, { password: "Qwerty123456" }, app).then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should not update user password without capital letter", () => {
       return credentialsUpdate(auth14Tokens.accessToken, { password: "qwerty123456!" }, app).then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should not update user password without small letter", () => {
       return credentialsUpdate(auth14Tokens.accessToken, { password: "QWERTY123456!" }, app).then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
   });
 });

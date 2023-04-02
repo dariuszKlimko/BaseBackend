@@ -17,17 +17,17 @@ describe("Measurements (e2e)", () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-    .overrideGuard(JwtAuthGuard)
-    .useValue({
-      canActivate: (context: ExecutionContext) => {
-        const req = context.switchToHttp().getRequest();
-        req.user = { id: fixtures.get("user5").id};
-        return true;
-      },
-    })
-    .compile();
+      .overrideGuard(JwtAuthGuard)
+      .useValue({
+        canActivate: (context: ExecutionContext) => {
+          const req = context.switchToHttp().getRequest();
+          req.user = { id: fixtures.get("user5").id };
+          return true;
+        },
+      })
+      .compile();
 
-    measurementRepository = moduleFixture.get("MeasurementRepository")
+    measurementRepository = moduleFixture.get("MeasurementRepository");
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -37,15 +37,16 @@ describe("Measurements (e2e)", () => {
   describe("/measurements (POST) - create measurement", () => {
     it("should create measurement in database and correctly calculate BMI", async () => {
       const measurement = {
-        "weight": 77,
-        "caloriesDelivered": 1900,
-        "distanceTraveled": 5,
-        "measurementDate": "2023-01-26 02:03:30.118709"
-      }
+        weight: 77,
+        caloriesDelivered: 1900,
+        distanceTraveled: 5,
+        measurementDate: "2023-01-26 02:03:30.118709",
+      };
       const userHeight = fixtures.get("user5").height;
       const bmi = +(measurement.weight / Math.pow(userHeight / 100, 2)).toFixed(2);
       let id: string;
-      await request.default(app.getHttpServer())
+      await request
+        .default(app.getHttpServer())
         .post("/measurements")
         .send(measurement)
         .then((res) => {
@@ -54,82 +55,89 @@ describe("Measurements (e2e)", () => {
           expect(res.body.weight).toEqual(measurement.weight);
           expect(res.body.bmi).toEqual(bmi);
           id = res.body.id;
-        })
+        });
 
       return measurementRepository.findOneBy({ id }).then((measure) => {
         expect(measure.measurementDate).toEqual(measurement.measurementDate);
         expect(measure.weight).toEqual(measurement.weight);
         expect(measure.bmi).toEqual(bmi);
-      })
+      });
     });
   });
 
   describe("/measurements (GET) - get all measurements", () => {
     it("should get all measurements of user", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .get("/measurements")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
           expect(res.body.length).toEqual(4);
-        })
+        });
     });
 
-    it("should return empty array if there id no measurements for user", async() => {
+    it("should return empty array if there id no measurements for user", async () => {
       await request.default(app.getHttpServer()).delete("/measurements");
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .get("/measurements")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
           expect(res.body).toEqual([]);
-        })
+        });
     });
   });
 
   describe("/measurements/:id (GET) - get one measurement", () => {
     it("should get one measurement for user  with given accessToken", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .get(`/measurements/${fixtures.get("measurement5").id}`)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
           expect(res.body.id).toEqual(fixtures.get("measurement5").id);
           expect(res.body.userId).toEqual(fixtures.get("measurement5").userId);
-        })
+        });
     });
 
     it("should not get one measurement for user  with given accessToken which is not owner of measurement", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .get(`/measurements/${fixtures.get("measurement1").id}`)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-        })
+        });
     });
 
     it("should not get one measurement with wrong id for user with given accessToken", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .get("/measurements/fcbe637d-6472-4033-8862-b1553990422f")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-        })
+        });
     });
 
     it("should not get one measurement with id not uuid type for user with given accessToken", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .get("/measurements/notUUUIDmeasurementId")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        })
+        });
     });
   });
 
   describe("/measurements/:id (PATCH) - update measurement", () => {
-    it("should update measurement for given user ith accessToken", async() => {
+    it("should update measurement for given user ith accessToken", async () => {
       const measurement = {
-        "weight": 67,
-        "caloriesDelivered": 1500,
-        "distanceTraveled": 3,
-        "measurementDate": "2023-01-16 02:03:30.118709"
-      }
-      await request.default(app.getHttpServer())
+        weight: 67,
+        caloriesDelivered: 1500,
+        distanceTraveled: 3,
+        measurementDate: "2023-01-16 02:03:30.118709",
+      };
+      await request
+        .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send(measurement)
         .then((res) => {
@@ -138,106 +146,117 @@ describe("Measurements (e2e)", () => {
           expect(res.body.caloriesDelivered).toEqual(measurement.caloriesDelivered);
           expect(res.body.distanceTraveled).toEqual(measurement.distanceTraveled);
           expect(res.body.measurementDate).toEqual(measurement.measurementDate);
-        })
+        });
 
       return measurementRepository.findOneBy({ id: fixtures.get("measurement5").id }).then((measure) => {
         expect(measure.weight).toEqual(measurement.weight);
         expect(measure.caloriesDelivered).toEqual(measurement.caloriesDelivered);
         expect(measure.distanceTraveled).toEqual(measurement.distanceTraveled);
-        expect(measure.measurementDate).toEqual(measurement.measurementDate);        
-      })
+        expect(measure.measurementDate).toEqual(measurement.measurementDate);
+      });
     });
 
     it("should not update measurement ith wrong id for user with given accessToken", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement1").id}`)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-        })
+        });
     });
 
     it("should not update measurement when weight is not number", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send({ weight: "76" })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        })
+        });
     });
 
     it("should not update measurement when caloriesDelivered is not number", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send({ caloriesDelivered: "1976" })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        })
+        });
     });
 
     it("should not update measurement when distanceTraveled is not number", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send({ distanceTraveled: "9" })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        })
+        });
     });
 
     it("should not update measurement when measurementDate is not number", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send({ measurementDate: 567789 })
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        })
+        });
     });
   });
 
   describe("/measurements (DELETE) - delete all measurments", () => {
-    it("should delete all measurements for user with given accessToken", async() => {
-      await request.default(app.getHttpServer())
+    it("should delete all measurements for user with given accessToken", async () => {
+      await request
+        .default(app.getHttpServer())
         .delete("/measurements")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
           expect(res.body.status).toEqual("ok");
-        })
+        });
 
       return measurementRepository.findBy({ userId: fixtures.get("user5").id }).then((measurements) => {
         expect(measurements).toEqual([]);
-      })
+      });
     });
   });
 
   describe("/measurements/:id (DELETE) - delete one measurments", () => {
-    it("should delete one measurement for user with given accessToken", async() => {
+    it("should delete one measurement for user with given accessToken", async () => {
       const userId: string = fixtures.get("user5").id;
-      const allMeasurementsLenght: number = await measurementRepository.findBy({ userId }).then((res) => res.length);
-      await request.default(app.getHttpServer())
+      const allMeasurementsLenght: number = await measurementRepository
+        .findBy({ userId })
+        .then((res) => res.length);
+      await request
+        .default(app.getHttpServer())
         .delete(`/measurements/${fixtures.get("measurement5").id}`)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
           expect(res.body.id).toEqual(fixtures.get("measurement5").id);
-        })
-      
+        });
+
       return measurementRepository.findBy({ userId }).then((measurements) => {
         expect(measurements.length).toEqual(allMeasurementsLenght - 1);
-      })
+      });
     });
 
     it("should not delete one measurement with incorrect id for user with given accessToken", () => {
-      return request.default(app.getHttpServer())
-      .delete(`/measurements/${fixtures.get("measurement1").id}`)
-      .then((res) => {
-        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-      })
+      return request
+        .default(app.getHttpServer())
+        .delete(`/measurements/${fixtures.get("measurement1").id}`)
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+        });
     });
 
     it("should not delete one measurement if id is not uuid type for user with given accessToken", () => {
-      return request.default(app.getHttpServer())
+      return request
+        .default(app.getHttpServer())
         .delete("/measurements/someNotUUIDmeasurementId")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        })
+        });
     });
   });
 });
