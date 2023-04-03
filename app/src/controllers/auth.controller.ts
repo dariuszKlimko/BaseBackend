@@ -94,7 +94,6 @@ export class AuthController {
     try {
       return await this.authService.login(user);
     } catch (error) {
-      console.log(error.message);
       if (error instanceof UserNotFoundException) {
         throw new NotFoundException(error.message);
       } else if (error instanceof UserAuthenticateException) {
