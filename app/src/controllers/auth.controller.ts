@@ -70,7 +70,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: MessageInfo, description: "confirmation email has been resend" })
-      // @UseGuards(EmailVerifiedGuard)
+      // @UseGuards(EmailGuard)
   @UsePipes(ValidationPipe)
   @HttpCode(200)
   @Post("resend-confirmation")
@@ -93,7 +93,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "user login" })
   @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
-    // @UseGuards(EmailVerifiedGuard)
+    // @UseGuards(EmailGuard)
   @UsePipes(ValidationPipe)
   @Post()
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
@@ -163,7 +163,7 @@ export class AuthController {
   @ApiOperation({ summary: "reset password" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "verification code has been send" })
   @UsePipes(ValidationPipe)
-    // @UseGuards(EmailVerifiedGuard)
+    // @UseGuards(EmailGuard)
   @Patch("reset-password")
   async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
@@ -186,7 +186,7 @@ export class AuthController {
   @ApiOperation({ summary: "reset password confirmation" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "password has been reset" })
   @UsePipes(ValidationPipe)
-    // @UseGuards(EmailVerifiedGuard)
+    // @UseGuards(EmailGuard)
   @Patch("reset-password-confirm")
   async resetPasswordConfirm(@Body() resetPassword: ResetPasswordDto): Promise<MessageInfo> {
     try {
