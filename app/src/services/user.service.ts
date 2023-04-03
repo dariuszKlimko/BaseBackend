@@ -43,7 +43,7 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ email });
     if (!user) {
       throw new UserNotFoundException("user with given email address not exist in database");
-    } else if(!user.verified) {
+    } else if (!user.verified) {
       throw new UserNotVerifiedException("user with given email is not verified");
     }
     return user;

@@ -101,20 +101,20 @@ export class AuthService {
   }
 
   async codeGenerator(email: string): Promise<number> {
-    const code = randomInt(100000,999999);
-    await this.userRepository.update({email: email},{verificationCode: code});
+    const code = randomInt(100000, 999999);
+    await this.userRepository.update({ email: email }, { verificationCode: code });
     return code;
   }
 
   async resetPasswordConfirm(resetPassord: ResetPasswordDto): Promise<MessageInfo> {
     const user = await this.userRepository.findOneBy({ email: resetPassord.email });
-    if(user.verificationCode !== resetPassord.verificationCode) {
+    if (user.verificationCode !== resetPassord.verificationCode) {
       throw new InvalidVerificationCodeException("invalid verification code");
     }
     user.password = resetPassord.password;
     user.verificationCode = null;
     await this.userRepository.save(user);
-    return { status: "ok", message: "password has been reset" }
+    return { status: "ok", message: "password has been reset" };
   }
 
   private async tokensResponse(user: User): Promise<LoginResponse> {
