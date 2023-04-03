@@ -48,7 +48,6 @@ export class MeasurementsService {
     if (!measurement) {
       throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }
-    console.log(measurementPayload);
     await this.measurementsRepository.update({ userId, id: measurementId }, measurementPayload);
     return await this.measurementsRepository.findOneBy({ userId, id: measurementId });
   }

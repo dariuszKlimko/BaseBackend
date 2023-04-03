@@ -7,7 +7,7 @@ import { UsersService } from "@app/services/user.service";
 import { MeasurementsService } from "@app/services/measurements.service";
 import { AuthService } from "@app/services/auth.service";
 import { EmailService } from "@app/services/email.service";
-import { JwtModule, JwtService } from "@nestjs/jwt";
+import { JwtModule } from "@nestjs/jwt";
 import { User } from "@app/entities/user/user.entity";
 import { Measurement } from "@app/entities/measurement/measurement.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -52,18 +52,7 @@ import { JwtStrategy } from "@app/common/strategies/jwt.strategy";
     PassportModule,
     AppConfigModule,
   ],
-  controllers: [
-    UsersController, 
-    MeasurementsController, 
-    AuthController
-  ],
-  providers: [
-    UsersService, 
-    MeasurementsService, 
-    AuthService, 
-    EmailService, 
-    JwtService,
-    JwtStrategy,
-  ],
+  controllers: [UsersController, MeasurementsController, AuthController],
+  providers: [UsersService, MeasurementsService, AuthService, EmailService, JwtStrategy],
 })
 export class AppModule {}
