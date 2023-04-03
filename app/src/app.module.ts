@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { AppConfigModule } from "@app/config/config.module";
+import { AppConfigModule } from "@app/common/config/config.module";
 import { UsersController } from "@app/controllers/users.controller";
 import { MeasurementsController } from "@app/controllers/measurements.controller";
 import { AuthController } from "@app/controllers/auth.controller";
