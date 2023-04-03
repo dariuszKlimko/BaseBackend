@@ -25,6 +25,10 @@ export class EmailService {
     return `${this.configService.get<string>("CONFIRMATION_HOST_NODEMAILER")}/auth/confirmation/${token}`;
   }
 
+  resetPasswordEmailText(email: string, code: number): string {
+    return `Hello ${email} \n\n Please reset your password with code: ${code} \n\n Thank You!\n`;
+  }
+
   async sendEmail(email: string, text: string, subject: string): Promise<void> {
     await this.mailerService.sendMail({
       to: email,

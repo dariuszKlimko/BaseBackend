@@ -67,6 +67,15 @@ export class User extends BaseEntity {
   })
   verified: boolean;
 
+  @Exclude({ toPlainOnly: true })
+  @ApiProperty()
+  @Column({
+    name: "verification_code",
+    type: "int",
+    nullable: true,
+  })
+  verificationCode: number;
+
   @OneToMany(() => Measurement, (measurement: Measurement) => measurement.user, {
     cascade: ["remove"],
   })

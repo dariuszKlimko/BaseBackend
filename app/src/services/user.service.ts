@@ -6,6 +6,7 @@ import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
 import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 
 @Injectable()
 export class UsersService {
@@ -42,6 +43,8 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ email });
     if (!user) {
       throw new UserNotFoundException("user with given email address not exist in database");
+    } else if(!user.verified) {
+      throw new UserNotVerifiedException("user with given email is not verified");
     }
     return user;
   }

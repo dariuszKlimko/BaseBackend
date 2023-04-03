@@ -4,7 +4,7 @@ import { ArrayContains, Repository } from "typeorm";
 import { User } from "@app/entities/user/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { JwtService } from "@nestjs/jwt";
-import { randomBytes } from "crypto";
+import { randomBytes, randomInt } from "crypto";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
@@ -15,6 +15,8 @@ import { LogoutResponse } from "@app/common/types/auth/logout-response";
 import { ConfigService } from "@nestjs/config";
 import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/userAlreadyConfirmed.exception";
 import { UpdateCredentialsDto } from "@app/dtos/auth/update-creadentials.dto";
+import { ResetPasswordDto } from "@app/dtos/auth/password-reset.dto";
+import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalidVerificationCode.exception ";
 
 @Injectable()
 export class AuthService {
@@ -96,6 +98,21 @@ export class AuthService {
       user.password = userInfo.password;
     }
     return await this.userRepository.save(user);
+  }
+
+  async resetPasswordConfirm(resetPassord: ResetPasswordDto): Promise<MessageInfo> {
+    const user = await this.userRepository.findOneBy({ email: resetPassord.email });
+    if(user.verificationCode !== resetPassord.verificationCode) {
+      throw new InvalidVerificationCodeException("invalid verification code");
+    }
+    await this.userRepository.update({ email: resetPassord.email },{ password: resetPassord.password, verificationCode: null });
+    return { status: "ok", message: "password has been reset" }
+  }
+
+  async codeGenerator(email: string): Promise<number> {
+    const code = randomInt(100000,999999);
+    await this.userRepository.update({email: email},{verificationCode: code});
+    return code;
   }
 
   private async tokensResponse(user: User): Promise<LoginResponse> {

@@ -36,6 +36,8 @@ import { UsersService } from "@app/services/user.service";
 import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/userAlreadyConfirmed.exception";
 import { User } from "@app/entities/user/user.entity";
 import { UpdateCredentialsDto } from "@app/dtos/auth/update-creadentials.dto";
+import { ResetPasswordDto } from "@app/dtos/auth/password-reset.dto";
+import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalidVerificationCode.exception ";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -68,6 +70,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: MessageInfo, description: "confirmation email has been resend" })
+      // @UseGuards(EmailVerifiedGuard)
   @UsePipes(ValidationPipe)
   @HttpCode(200)
   @Post("resend-confirmation")
@@ -81,6 +84,8 @@ export class AuthController {
     } catch (error) {
       if (error instanceof UserNotFoundException) {
         throw new NotFoundException(error.message);
+      } else if (error instanceof UserNotVerifiedException) {
+        throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException();
     }
@@ -88,6 +93,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "user login" })
   @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
+    // @UseGuards(EmailVerifiedGuard)
   @UsePipes(ValidationPipe)
   @Post()
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
@@ -150,6 +156,50 @@ export class AuthController {
     try {
       return await this.authService.updateCredentials(user.id, userInfo);
     } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "reset password" })
+  @ApiResponse({ status: 200, type: MessageInfo, description: "verification code has been send" })
+  @UsePipes(ValidationPipe)
+    // @UseGuards(EmailVerifiedGuard)
+  @Patch("reset-password")
+  async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
+    try {
+      const user = await this.usersService.getUserByEmail(userInfo.email);
+      const code = await this.authService.codeGenerator(user.email);
+      const text = this.emailService.resetPasswordEmailText(user.email,code);
+      const subject = "Reset password verification code ✔";
+      await this.emailService.sendEmail(user.email, text, subject);
+      return { status: "ok", message: "verification code has been send" };
+    } catch (error) {
+      if(error instanceof UserNotFoundException) {
+         throw new NotFoundException(error.message);
+      } else if (error instanceof UserNotVerifiedException) {
+        throw new BadRequestException(error.message);
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "reset password confirmation" })
+  @ApiResponse({ status: 200, type: MessageInfo, description: "password has been reset" })
+  @UsePipes(ValidationPipe)
+    // @UseGuards(EmailVerifiedGuard)
+  @Patch("reset-password-confirm")
+  async resetPasswordConfirm(@Body() resetPassword: ResetPasswordDto): Promise<MessageInfo> {
+    try {
+      const user = await this.usersService.getUserByEmail(resetPassword.email);
+      return await this.authService.resetPasswordConfirm(resetPassword);
+    } catch (error) {
+      if(error instanceof UserNotFoundException) {
+         throw new NotFoundException(error.message);
+      } else if(error instanceof InvalidVerificationCodeException){
+        throw new BadRequestException(error.message);
+      } else if(error instanceof UserNotVerifiedException){
+        throw new BadRequestException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }
