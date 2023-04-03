@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
+import { Measurement } from "@app/entities/measurement/measurement.entity";
 import { Repository } from "typeorm";
-import { CreateMeasurementDto } from "@app/modules/measurements/dto/create-measurement.dto";
-import { UpdateMeasurementDto } from "@app/modules/measurements/dto/update-measurement.dto";
-import { UsersService } from "@app/modules/user/user.service";
-import { MeasurementNotFoundException } from "@app/modules/measurements/exceptions/measurementNotFound.exception";
+import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
+import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
+import { UsersService } from "@app/services/user.service";
+import { MeasurementNotFoundException } from "@app/common/exceptions/measurement/measurementNotFound.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 
 @Injectable()
@@ -48,7 +48,6 @@ export class MeasurementsService {
     if (!measurement) {
       throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }
-    console.log(measurementPayload);
     await this.measurementsRepository.update({ userId, id: measurementId }, measurementPayload);
     return await this.measurementsRepository.findOneBy({ userId, id: measurementId });
   }

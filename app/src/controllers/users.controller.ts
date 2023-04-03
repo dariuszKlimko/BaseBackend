@@ -12,14 +12,14 @@ import {
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
-import { UsersService } from "@app/modules/user/user.service";
-import { CreateUserDto } from "@app/modules/user/dto/create-user.dto";
-import { UpdateUserDto } from "@app/modules/user/dto/update-user.dto";
+import { UsersService } from "@app/services/user.service";
+import { CreateUserDto } from "@app/dtos/user/create-user.dto";
+import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
-import { UserDuplicateException } from "@app/modules/user/exceptions/userDuplicate.exception";
-import { EmailService } from "@app/modules/email/email.service";
-import { User } from "@app/modules/user/entities/user.entity";
+import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
+import { EmailService } from "@app/services/email.service";
+import { User } from "@app/entities/user/user.entity";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -45,7 +45,7 @@ export class UsersController {
       if (error instanceof UserDuplicateException) {
         throw new ConflictException(error.message);
       }
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(error.message);
     }
   }
 

@@ -1,4 +1,4 @@
-import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
+import { Measurement } from "@app/entities/measurement/measurement.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import {

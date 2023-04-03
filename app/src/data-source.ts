@@ -1,13 +1,13 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { config } from "dotenv";
 import path from "path";
-import { IDataSource } from "@app/modules/database/types/dataSourceOptions";
+import { IDataSource } from "@app/common/types/database/dataSourceOptions";
 
-const root = path.resolve(__dirname, "../../../");
+const root = path.resolve(__dirname, "../");
 const envpath = path.resolve(root, "../");
 config({ path: `${envpath}/.env` });
 
-export const dataSourceFunc = (env: string): DataSourceOptions => {
+export const dataBaseConfig = (env: string): DataSourceOptions => {
   const dataSourceOptionsProd: DataSourceOptions = {
     type: "postgres",
     host: process.env.DB_HOST,
@@ -17,7 +17,7 @@ export const dataSourceFunc = (env: string): DataSourceOptions => {
     database: process.env.DB_NAME,
     synchronize: false,
     logging: ["migration", "error"],
-    entities: [path.join(root, "dist/modules/**/*.entity{.js,.ts}")],
+    entities: [path.join(root, "dist/**/*.entity{.js,.ts}")],
     migrations: [path.join(root, "dist/migrations/*.js")],
   };
 
@@ -30,7 +30,7 @@ export const dataSourceFunc = (env: string): DataSourceOptions => {
     ...dataSourceOptionsProd,
     database: `${process.env.DB_NAME}_test`,
     logging: ["migration", "warn", "error"],
-    entities: [path.join(root, "src/modules/**/*.entity{.js,.ts}")],
+    entities: [path.join(root, "src/**/*.entity{.js,.ts}")],
     migrations: [path.join(root, "src/migrations/*.ts")],
   };
 
@@ -43,6 +43,6 @@ export const dataSourceFunc = (env: string): DataSourceOptions => {
   return options[env];
 };
 
-const dataSource = new DataSource(dataSourceFunc(process.env.NODE_ENV));
+const dataSource = new DataSource(dataBaseConfig(process.env.NODE_ENV));
 
 export default dataSource;

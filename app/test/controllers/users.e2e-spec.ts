@@ -4,9 +4,9 @@ import * as request from "supertest";
 import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
 import { Repository } from "typeorm";
-import { User } from "@app/modules/user/entities/user.entity";
-import { CreateUserDto } from "@app/modules/user/dto/create-user.dto";
-import { Measurement } from "@app/modules/measurements/entities/measurement.entity";
+import { User } from "@app/entities/user/user.entity";
+import { CreateUserDto } from "@app/dtos/user/create-user.dto";
+import { Measurement } from "@app/entities/measurement/measurement.entity";
 import { userRegister } from "@test/helpers/userRegister";
 import { userLogin } from "@test/helpers/userLogin";
 
