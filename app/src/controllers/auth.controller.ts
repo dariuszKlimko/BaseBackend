@@ -31,23 +31,19 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 import { LoginDto } from "@app/dtos/auth/login.dto";
 import { EmailDto } from "@app/dtos/auth/email.dto";
 import { EmailService } from "@app/services/email.service";
-import { UsersService } from "@app/services/user.service";
 import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/userAlreadyConfirmed.exception";
 import { User } from "@app/entities/user/user.entity";
 import { UpdateCredentialsDto } from "@app/dtos/auth/update-creadentials.dto";
 import { ResetPasswordDto } from "@app/dtos/auth/password-reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalidVerificationCode.exception ";
-import { EmailGuard } from "@app/common/guards/email.guard";
+import { EmailVerifiedGuard } from "@app/common/guards/email-verified.guard";
+import { EmailExistGuard } from "@app/common/guards/email-exist.guard";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
 @Controller("auth")
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly emailService: EmailService,
-    private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly authService: AuthService, private readonly emailService: EmailService) {}
 
   @ApiOperation({ summary: "account confirmation" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "user has been successfully verified" })
@@ -70,7 +66,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: MessageInfo, description: "confirmation email has been resend" })
-  @UseGuards(EmailGuard)
+  @UseGuards(EmailExistGuard)
   @UsePipes(ValidationPipe)
   @HttpCode(200)
   @Post("resend-confirmation")
@@ -87,7 +83,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "user login" })
   @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
-  @UseGuards(EmailGuard)
+  @UseGuards(EmailVerifiedGuard)
   @UsePipes(ValidationPipe)
   @Post()
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
@@ -153,7 +149,7 @@ export class AuthController {
   @ApiOperation({ summary: "reset password" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "verification code has been send" })
   @UsePipes(ValidationPipe)
-  @UseGuards(EmailGuard)
+  @UseGuards(EmailVerifiedGuard)
   @Patch("reset-password")
   async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
@@ -170,7 +166,7 @@ export class AuthController {
   @ApiOperation({ summary: "reset password confirmation" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "password has been reset" })
   @UsePipes(ValidationPipe)
-  @UseGuards(EmailGuard)
+  @UseGuards(EmailVerifiedGuard)
   @Patch("reset-password-confirm")
   async resetPasswordConfirm(@Body() resetPassword: ResetPasswordDto): Promise<MessageInfo> {
     try {

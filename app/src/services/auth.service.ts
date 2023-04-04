@@ -120,6 +120,7 @@ export class AuthService {
   private async tokensResponse(user: User): Promise<LoginResponse> {
     const payload = { sub: user.id };
     const token = randomBytes(64).toString("hex");
+    user.password = undefined;
     user.refreshTokens.push(token);
     await this.userRepository.save(user);
     return {

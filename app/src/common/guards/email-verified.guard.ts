@@ -11,13 +11,13 @@ import { UserNotFoundException } from "@app/common/exceptions/userNotFound.excep
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 
 @Injectable()
-export class EmailGuard implements CanActivate {
+export class EmailVerifiedGuard implements CanActivate {
   constructor(private readonly userService: UsersService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const body = context.switchToHttp().getRequest().body;
     try {
-      const user = await this.userService.getUserByEmail(body.email);
+      const user = await this.userService.checkIfEmailVerified(body.email);
       return !!user;
     } catch (error) {
       if (error instanceof UserNotFoundException) {

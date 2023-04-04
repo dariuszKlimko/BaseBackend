@@ -7,6 +7,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user2:
     email: 'user2@email.com'
     password: 'Qwert12345!'
@@ -14,6 +15,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user3:
     email: 'user3@email.com'
     password: 'Qwert12345!'
@@ -21,6 +23,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user4:
     email: 'user4@email.com'
     password: 'Qwert12345!'
@@ -28,6 +31,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user5:
     email: 'user5@email.com'
     password: 'QWERTqwert5!'
@@ -35,12 +39,14 @@ items:
     refreshToken:
       -'b01c162b94cac32a3aaa61a563f4c65c0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e'
     verified: true
+    verificationCode:
   user6:
     email: 'user6@email.com'
     password: 'QWERTqwert6!'
     refreshToken: 
       -'9iyc162b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6I9jH6'
     verified: true
+    verificationCode:
   user10:
     email: 'user10@email.com'
     password: 'Qwert12345!'
@@ -48,6 +54,7 @@ items:
     refreshToken: 
       -
     verified: false
+    verificationCode:
   user11:
     email: 'auth1@email.com'
     password: 'Qwert12345!'
@@ -55,6 +62,7 @@ items:
     refreshToken: 
       -
     verified: false
+    verificationCode:
   user12:
     email: 'auth2@email.com'
     password: 'Qwert12345!'
@@ -62,6 +70,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user13:
     email: 'auth3@email.com'
     password: 'Qwert12345!'
@@ -69,6 +78,7 @@ items:
     refreshToken: 
       -
     verified: false
+    verificationCode:
   user14:
     email: 'auth4@email.com'
     password: 'Qwert12345!'
@@ -76,6 +86,7 @@ items:
     refreshToken: 
       -
     verified: false
+    verificationCode:
   user15:
     email: 'auth5@email.com'
     password: 'Qwert12345!'
@@ -83,6 +94,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user16:
     email: 'auth6@email.com'
     password: 'Qwert12345!'
@@ -90,6 +102,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user17:
     email: 'auth7@email.com'
     password: 'Qwert12345!'
@@ -97,6 +110,7 @@ items:
     refreshToken: 
       -
     verified: false
+    verificationCode:
   user18:
     email: 'auth8@email.com'
     password: 'Qwert12345!'
@@ -104,6 +118,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user19:
     email: 'auth9@email.com'
     password: 'Qwert12345!'
@@ -111,6 +126,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user20:
     email: 'auth10@email.com'
     password: 'Qwert12345!'
@@ -118,6 +134,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user21:
     email: 'auth11@email.com'
     password: 'Qwert12345!'
@@ -125,6 +142,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user22:
     email: 'auth12@email.com'
     password: 'Qwert12345!'
@@ -132,6 +150,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user23:
     email: 'auth13@email.com'
     password: 'Qwert12345!'
@@ -139,6 +158,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user24:
     email: 'auth14@email.com'
     password: 'Qwert12345!'
@@ -146,6 +166,7 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
   user25:
     email: 'auth15@email.com'
     password: 'Qwert12345!'
@@ -153,3 +174,12 @@ items:
     refreshToken: 
       -
     verified: true
+    verificationCode:
+  user26:
+    email: 'auth16@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+    verificationCode:

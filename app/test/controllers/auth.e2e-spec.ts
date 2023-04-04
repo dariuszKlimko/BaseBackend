@@ -154,6 +154,33 @@ describe("Auth (e2e)", () => {
       });
     });
 
+    it("should login one user twice", async () => {
+      const user = { email: "auth16@email.com", password: "Qwert12345!" };
+      await request
+        .default(app.getHttpServer())
+        .post("/auth")
+        .send(user)
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.CREATED);
+          expect(res.body.accessToken).toBeDefined();
+          expect(res.body.refreshToken).toBeDefined();
+        });
+
+      await request
+        .default(app.getHttpServer())
+        .post("/auth")
+        .send(user)
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.CREATED);
+          expect(res.body.accessToken).toBeDefined();
+          expect(res.body.refreshToken).toBeDefined();
+        });
+
+      return userRepository.findOneBy({ email: user.email }).then((user) => {
+        expect(user.refreshTokens.length).toEqual(2);
+      });
+    });
+
     it("should not return tokens if email not exist in database", () => {
       const user = { email: "authNotExistInDb@email.com", password: "QWERTqwert1!" };
       return request
@@ -316,6 +343,30 @@ describe("Auth (e2e)", () => {
       return credentialsUpdate(auth14Tokens.accessToken, { password: "QWERTY123456!" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
+    });
+  });
+
+  describe("/auth/reset-password (PATCH) - send verification code ", () => {
+    it("should send email with verification code", async () => {
+     
+    });
+
+    it("should not send email with verification code if user not exist in database", async () => {
+     
+    });
+
+    it("should not send email with verification code if user is not verified", async () => {
+     
+    });
+  });
+
+  describe("/auth/reset-password (PATCH) - reset user password ", () => {
+    it("should reset password with valid verification code", async () => {
+     
+    });
+
+    it("should not reset password with invalid verification code", async () => {
+     
     });
   });
 });
