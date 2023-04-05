@@ -363,12 +363,22 @@ describe("Auth (e2e)", () => {
       })
     });
 
-    it("should not send email with verification code if user not exist in database", async () => {
-     
+    it("should not send email with verification code if user not exist in database", () => {
+      return request.default(app.getHttpServer())
+      .patch("/auth/reset-password")
+      .send({ email: 'authNotExistInDb@email.com' })
+      .then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      })
     });
 
-    it("should not send email with verification code if user is not verified", async () => {
-     
+    it("should not send email with verification code if user is not verified", () => {
+      return request.default(app.getHttpServer())
+      .patch("/auth/reset-password")
+      .send({ email: 'auth18@email.com' })
+      .then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      })
     });
   });
 
