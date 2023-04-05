@@ -348,7 +348,19 @@ describe("Auth (e2e)", () => {
 
   describe("/auth/reset-password (PATCH) - send verification code ", () => {
     it("should send email with verification code", async () => {
-     
+      await request.default(app.getHttpServer())
+        .patch("/auth/reset-password")
+        .send({ email: 'auth17@email.com' })
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.OK);
+          expect(res.body.status).toEqual("ok");
+        })
+      
+      return userRepository.findOneBy({ email: 'auth17@email.com' }).then((user) => {
+        expect(user.verificationCode).toBeDefined();
+        expect(user.verificationCode).toBeGreaterThanOrEqual(100000);
+        expect(user.verificationCode).toBeLessThanOrEqual(999999);
+      })
     });
 
     it("should not send email with verification code if user not exist in database", async () => {

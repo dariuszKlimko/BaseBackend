@@ -183,3 +183,11 @@ items:
       -
     verified: true
     verificationCode:
+  user27:
+    email: 'auth17@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+    verificationCode:
