@@ -199,3 +199,19 @@ items:
       -
     verified: false
     verificationCode:
+  user29:
+    email: 'auth19@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+    verificationCode: 123456
+  user30:
+    email: 'auth20@email.com'
+    password: 'Qwert12345!'
+    height: 185
+    refreshToken: 
+      -
+    verified: true
+    verificationCode: 123456
