@@ -154,6 +154,33 @@ describe("Auth (e2e)", () => {
       });
     });
 
+    it("should login one user twice", async () => {
+      const user = { email: "auth16@email.com", password: "Qwert12345!" };
+      await request
+        .default(app.getHttpServer())
+        .post("/auth")
+        .send(user)
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.CREATED);
+          expect(res.body.accessToken).toBeDefined();
+          expect(res.body.refreshToken).toBeDefined();
+        });
+
+      await request
+        .default(app.getHttpServer())
+        .post("/auth")
+        .send(user)
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.CREATED);
+          expect(res.body.accessToken).toBeDefined();
+          expect(res.body.refreshToken).toBeDefined();
+        });
+
+      return userRepository.findOneBy({ email: user.email }).then((user) => {
+        expect(user.refreshTokens.length).toEqual(2);
+      });
+    });
+
     it("should not return tokens if email not exist in database", () => {
       const user = { email: "authNotExistInDb@email.com", password: "QWERTqwert1!" };
       return request
@@ -315,6 +342,91 @@ describe("Auth (e2e)", () => {
     it("should not update user password without small letter", () => {
       return credentialsUpdate(auth14Tokens.accessToken, { password: "QWERTY123456!" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+  });
+
+  describe("/auth/reset-password (PATCH) - send verification code ", () => {
+    it("should send email with verification code", async () => {
+      await request
+        .default(app.getHttpServer())
+        .patch("/auth/reset-password")
+        .send({ email: "auth17@email.com" })
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.OK);
+          expect(res.body.status).toEqual("ok");
+        });
+
+      return userRepository.findOneBy({ email: "auth17@email.com" }).then((user) => {
+        expect(user.verificationCode).toBeDefined();
+        expect(user.verificationCode).toBeGreaterThanOrEqual(100000);
+        expect(user.verificationCode).toBeLessThanOrEqual(999999);
+      });
+    });
+
+    it("should not send email with verification code if user not exist in database", () => {
+      return request
+        .default(app.getHttpServer())
+        .patch("/auth/reset-password")
+        .send({ email: "authNotExistInDb@email.com" })
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+        });
+    });
+
+    it("should not send email with verification code if user is not verified", () => {
+      return request
+        .default(app.getHttpServer())
+        .patch("/auth/reset-password")
+        .send({ email: "auth18@email.com" })
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+        });
+    });
+  });
+
+  describe("/auth/reset-password (PATCH) - reset user password ", () => {
+    it("should reset password with valid verification code", async () => {
+      const resetPassord = {
+        email: "auth19@email.com",
+        password: "Qwerty123456!",
+        verificationCode: 123456,
+      };
+      await request
+        .default(app.getHttpServer())
+        .patch("/auth/reset-password-confirm")
+        .send(resetPassord)
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.OK);
+          expect(res.body.status).toEqual("ok");
+        });
+
+      await userLogin("auth19@email.com", "Qwerty123456!", app).then((res) => {
+        expect(res.body.accessToken).toBeDefined();
+        expect(res.body.refreshToken).toBeDefined();
+      });
+
+      return userRepository.findOneBy({ email: "auth19@email.com" }).then((user) => {
+        expect(user.verificationCode).toEqual(null);
+      });
+    });
+
+    it("should not reset password with invalid verification code", async () => {
+      const resetPassord = {
+        email: "auth20@email.com",
+        password: "Qwerty123456!",
+        verificationCode: 777777,
+      };
+      await request
+        .default(app.getHttpServer())
+        .patch("/auth/reset-password-confirm")
+        .send(resetPassord)
+        .then((res) => {
+          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+        });
+
+      return userRepository.findOneBy({ email: "auth20@email.com" }).then((user) => {
+        expect(user.verificationCode).toEqual(123456);
       });
     });
   });
