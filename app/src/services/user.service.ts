@@ -7,6 +7,7 @@ import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicat
 import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
+import { Profile } from "@app/entities/profile/profile.entity";
 
 @Injectable()
 export class UsersService {
@@ -18,6 +19,8 @@ export class UsersService {
       throw new UserDuplicateException("user with given email address aldeady exist in database");
     }
     const userPayload = this.userRepository.create(userInfo);
+    const profile = new Profile();
+    userPayload.profile = profile;
     await this.userRepository.save(userPayload);
     return userPayload;
   }

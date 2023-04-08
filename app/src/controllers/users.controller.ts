@@ -37,9 +37,9 @@ export class UsersController {
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
     try {
       const userPayload: User = await this.usersService.registerUser(user);
-      const text = this.emailService.verificationEmailText(user.email);
+      const text = this.emailService.verificationEmailText(userPayload.email);
       const subject = "Account confirmation ✔";
-      await this.emailService.sendEmail(user.email, text, subject);
+      await this.emailService.sendEmail(userPayload.email, text, subject);
       return userPayload;
     } catch (error) {
       if (error instanceof UserDuplicateException) {
