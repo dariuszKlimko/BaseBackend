@@ -194,8 +194,12 @@ describe("Users (e2e)", () => {
           userId = res.body.id;
         });
 
-      return measurementRepository.findOneBy({ userId }).then((user) => {
+      await measurementRepository.findOneBy({ userId }).then((user) => {
         expect(user).toEqual(null);
+      });
+
+      return profileRepository.findOneBy({ userId }).then((profile) => {
+        expect(profile).toEqual(null);
       });
     });
 
