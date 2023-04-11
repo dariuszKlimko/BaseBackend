@@ -42,7 +42,7 @@ describe("Measurements (e2e)", () => {
         distanceTraveled: 5,
         measurementDate: "2023-01-26 02:03:30.118709",
       };
-      const userHeight = fixtures.get("user5").height;
+      const userHeight = fixtures.get("profile5").height;
       const bmi = +(measurement.weight / Math.pow(userHeight / 100, 2)).toFixed(2);
       let id: string;
       await request

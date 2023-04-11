@@ -44,13 +44,6 @@ export class User extends BaseEntity {
   })
   password: string;
 
-  @ApiProperty()
-  @Column({
-    type: "int",
-    nullable: true,
-  })
-  height: number;
-
   @Exclude({ toPlainOnly: true })
   @ApiProperty()
   @Column({

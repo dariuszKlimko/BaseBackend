@@ -4,24 +4,24 @@ import { Measurement } from "@app/entities/measurement.entity";
 import { Repository } from "typeorm";
 import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
 import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
-import { UsersService } from "@app/services/user.service";
 import { MeasurementNotFoundException } from "@app/common/exceptions/measurement/measurementNotFound.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
+import { ProfilesService } from "@app/services/profile.service";
 
 @Injectable()
 export class MeasurementsService {
   constructor(
     @InjectRepository(Measurement) private measurementsRepository: Repository<Measurement>,
-    private usersService: UsersService
+    private profilesService: ProfilesService
   ) {}
 
   async createMeasurement(userId: string, measurementPayload: CreateMeasurementDto): Promise<Measurement> {
-    const user = await this.usersService.getUser(userId);
+    const profile = await this.profilesService.getProfile(userId);
     let bmi: number;
     const measurement = await this.measurementsRepository.create(measurementPayload);
     measurement.userId = userId;
-    if (user.height) {
-      bmi = measurementPayload.weight / Math.pow(user.height / 100, 2);
+    if (profile.height) {
+      bmi = measurementPayload.weight / Math.pow(profile.height / 100, 2);
       measurement.bmi = +bmi.toFixed(2);
     }
     return await this.measurementsRepository.save(measurement);
