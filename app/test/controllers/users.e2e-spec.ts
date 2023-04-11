@@ -4,17 +4,19 @@ import * as request from "supertest";
 import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
 import { Repository } from "typeorm";
-import { User } from "@app/entities/user/user.entity";
+import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
-import { Measurement } from "@app/entities/measurement/measurement.entity";
+import { Measurement } from "@app/entities/measurement.entity";
 import { userRegister } from "@test/helpers/userRegister";
 import { userLogin } from "@test/helpers/userLogin";
+import { Profile } from "@app/entities/profile.entity";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactory;
   let userRepository: Repository<User>;
   let measurementRepository: Repository<Measurement>;
+  let profileRepository: Repository<Profile>;
   let user2accessToken: string;
   let user3accessToken: string;
   let user4accessToken: string;
@@ -27,6 +29,7 @@ describe("Users (e2e)", () => {
 
     userRepository = moduleFixture.get("UserRepository");
     measurementRepository = moduleFixture.get("MeasurementRepository");
+    profileRepository = moduleFixture.get("ProfileRepository");
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -40,13 +43,20 @@ describe("Users (e2e)", () => {
   describe("/users (POST) - register user", () => {
     it("should register user in database", async () => {
       const user: CreateUserDto = { email: "userRegister1@email.com", password: "Qwert12345!" };
+      let userId: string;
       await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.CREATED);
         expect(res.body.email).toEqual(user.email);
+        userId = res.body.id;
       });
-      return userRepository.findOneBy({ email: user.email }).then((userDb) => {
+
+      await userRepository.findOneBy({ email: user.email }).then((userDb) => {
         expect(userDb).toBeDefined();
         expect(userDb.email).toEqual(user.email);
+      });
+
+      return profileRepository.findOneBy({ userId }).then((profile) => {
+        expect(profile.userId).toEqual(userId);
       });
     });
 
@@ -184,8 +194,12 @@ describe("Users (e2e)", () => {
           userId = res.body.id;
         });
 
-      return measurementRepository.findOneBy({ userId }).then((user) => {
+      await measurementRepository.findOneBy({ userId }).then((user) => {
         expect(user).toEqual(null);
+      });
+
+      return profileRepository.findOneBy({ userId }).then((profile) => {
+        expect(profile).toEqual(null);
       });
     });
 

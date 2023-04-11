@@ -19,7 +19,7 @@ import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
 import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
 import { EmailService } from "@app/services/email.service";
-import { User } from "@app/entities/user/user.entity";
+import { User } from "@app/entities/user.entity";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -37,9 +37,9 @@ export class UsersController {
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
     try {
       const userPayload: User = await this.usersService.registerUser(user);
-      const text = this.emailService.verificationEmailText(user.email);
+      const text = this.emailService.verificationEmailText(userPayload.email);
       const subject = "Account confirmation ✔";
-      await this.emailService.sendEmail(user.email, text, subject);
+      await this.emailService.sendEmail(userPayload.email, text, subject);
       return userPayload;
     } catch (error) {
       if (error instanceof UserDuplicateException) {

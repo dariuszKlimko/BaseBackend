@@ -8,14 +8,15 @@ import { MeasurementsService } from "@app/services/measurements.service";
 import { AuthService } from "@app/services/auth.service";
 import { EmailService } from "@app/services/email.service";
 import { JwtModule } from "@nestjs/jwt";
-import { User } from "@app/entities/user/user.entity";
-import { Measurement } from "@app/entities/measurement/measurement.entity";
+import { User } from "@app/entities/user.entity";
+import { Measurement } from "@app/entities/measurement.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigService } from "@nestjs/config";
 import { dataBaseConfig } from "@app/data-source";
 import { PassportModule } from "@nestjs/passport";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { JwtStrategy } from "@app/common/strategies/jwt.strategy";
+import { Profile } from "@app/entities/profile.entity";
 
 @Module({
   imports: [
@@ -48,7 +49,7 @@ import { JwtStrategy } from "@app/common/strategies/jwt.strategy";
       useFactory: (serviceConfig: ConfigService) => dataBaseConfig(serviceConfig.get("NODE_ENV")),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User, Measurement]),
+    TypeOrmModule.forFeature([User, Measurement, Profile]),
     PassportModule,
     AppConfigModule,
   ],

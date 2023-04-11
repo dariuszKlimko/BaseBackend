@@ -1,4 +1,4 @@
-import { Measurement } from "@app/entities/measurement/measurement.entity";
+import { Measurement } from "@app/entities/measurement.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import {
@@ -9,9 +9,11 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import * as bcrypt from "bcrypt";
+import { Profile } from "@app/entities/profile.entity";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -80,6 +82,11 @@ export class User extends BaseEntity {
     cascade: ["remove"],
   })
   measurements: Measurement[];
+
+  @OneToOne(() => Profile, (profile: Profile) => profile.user, {
+    cascade: ["insert", "remove"],
+  })
+  profile: Profile;
 
   @BeforeInsert()
   @BeforeUpdate()

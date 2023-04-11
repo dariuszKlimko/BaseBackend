@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Measurement } from "@app/entities/measurement/measurement.entity";
+import { Measurement } from "@app/entities/measurement.entity";
 import { Repository } from "typeorm";
 import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
 import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
