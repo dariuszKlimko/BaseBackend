@@ -81,8 +81,6 @@ http://localhost:80/api
 ```
 
 
-## TO DO
-1) reset password endpoint
-2) pagination
-3) add table "user profile"
-4) add role guard
+## TO DO 
+1) pagination
+2) add role guard
