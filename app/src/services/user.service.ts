@@ -4,7 +4,6 @@ import { Repository } from "typeorm";
 import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
-import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 import { Profile } from "@app/entities/profile.entity";
@@ -26,12 +25,6 @@ export class UsersService {
   }
 
   async getUser(id: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
-    return user;
-  }
-
-  async updateUser(id: string, userInfo: UpdateUserDto): Promise<User> {
-    await this.userRepository.update(id, userInfo);
     const user = await this.userRepository.findOneBy({ id });
     return user;
   }

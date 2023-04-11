@@ -3,7 +3,6 @@ items:
   user1:
     email: 'user1@email.com'
     password: 'Qwert12345!'
-    height: 179
     refreshToken: 
       -
     verified: true
@@ -11,7 +10,6 @@ items:
   user2:
     email: 'user2@email.com'
     password: 'Qwert12345!'
-    height: 179
     refreshToken: 
       -
     verified: true
@@ -19,7 +17,6 @@ items:
   user3:
     email: 'user3@email.com'
     password: 'Qwert12345!'
-    height: 179
     refreshToken: 
       -
     verified: true
@@ -27,7 +24,6 @@ items:
   user4:
     email: 'user4@email.com'
     password: 'Qwert12345!'
-    height: 179
     refreshToken: 
       -
     verified: true
@@ -35,7 +31,6 @@ items:
   user5:
     email: 'user5@email.com'
     password: 'QWERTqwert5!'
-    height: 178
     refreshToken:
       -'b01c162b94cac32a3aaa61a563f4c65c0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e'
     verified: true
@@ -50,7 +45,6 @@ items:
   user10:
     email: 'user10@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: false
@@ -58,7 +52,6 @@ items:
   user11:
     email: 'auth1@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: false
@@ -66,7 +59,6 @@ items:
   user12:
     email: 'auth2@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -74,7 +66,6 @@ items:
   user13:
     email: 'auth3@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: false
@@ -82,7 +73,6 @@ items:
   user14:
     email: 'auth4@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: false
@@ -90,7 +80,6 @@ items:
   user15:
     email: 'auth5@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -98,7 +87,6 @@ items:
   user16:
     email: 'auth6@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -106,7 +94,6 @@ items:
   user17:
     email: 'auth7@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: false
@@ -114,7 +101,6 @@ items:
   user18:
     email: 'auth8@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -122,7 +108,6 @@ items:
   user19:
     email: 'auth9@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -130,7 +115,6 @@ items:
   user20:
     email: 'auth10@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -138,7 +122,6 @@ items:
   user21:
     email: 'auth11@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -146,7 +129,6 @@ items:
   user22:
     email: 'auth12@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -154,7 +136,6 @@ items:
   user23:
     email: 'auth13@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -162,7 +143,6 @@ items:
   user24:
     email: 'auth14@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -170,7 +150,6 @@ items:
   user25:
     email: 'auth15@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -178,7 +157,6 @@ items:
   user26:
     email: 'auth16@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -186,7 +164,6 @@ items:
   user27:
     email: 'auth17@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -194,7 +171,6 @@ items:
   user28:
     email: 'auth18@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: false
@@ -202,7 +178,6 @@ items:
   user29:
     email: 'auth19@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true
@@ -210,7 +185,6 @@ items:
   user30:
     email: 'auth20@email.com'
     password: 'Qwert12345!'
-    height: 185
     refreshToken: 
       -
     verified: true

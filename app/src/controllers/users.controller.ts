@@ -3,7 +3,6 @@ import {
   Post,
   Get,
   Delete,
-  Patch,
   Body,
   UseFilters,
   UseGuards,
@@ -14,7 +13,6 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
-import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
 import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
@@ -57,20 +55,6 @@ export class UsersController {
   async getUser(@CurrentUser() user: CurrentUserDecorator): Promise<User> {
     try {
       return await this.usersService.getUser(user.id);
-    } catch (error) {
-      throw new InternalServerErrorException();
-    }
-  }
-
-  @ApiOperation({ summary: "update user" })
-  @ApiResponse({ status: 200, type: User, description: "user has been successfully updated" })
-  @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
-  @UseGuards(JwtAuthGuard)
-  @Patch()
-  async updateUser(@CurrentUser() user: CurrentUserDecorator, @Body() userInfo: UpdateUserDto): Promise<User> {
-    try {
-      return await this.usersService.updateUser(user.id, userInfo);
     } catch (error) {
       throw new InternalServerErrorException();
     }

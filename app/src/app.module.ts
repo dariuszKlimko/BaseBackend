@@ -17,6 +17,8 @@ import { PassportModule } from "@nestjs/passport";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { JwtStrategy } from "@app/common/strategies/jwt.strategy";
 import { Profile } from "@app/entities/profile.entity";
+import { ProfilessController } from "@app/controllers/profile.controller";
+import { ProfilesService } from "@app/services/profile.service";
 
 @Module({
   imports: [
@@ -53,7 +55,7 @@ import { Profile } from "@app/entities/profile.entity";
     PassportModule,
     AppConfigModule,
   ],
-  controllers: [UsersController, MeasurementsController, AuthController],
-  providers: [UsersService, MeasurementsService, AuthService, EmailService, JwtStrategy],
+  controllers: [UsersController, MeasurementsController, AuthController, ProfilessController],
+  providers: [UsersService, MeasurementsService, AuthService, EmailService, JwtStrategy, ProfilesService],
 })
 export class AppModule {}
