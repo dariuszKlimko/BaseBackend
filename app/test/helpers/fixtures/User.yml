@@ -189,3 +189,24 @@ items:
       -
     verified: true
     verificationCode: 123456
+  user31:
+    email: 'profile1@email.com'
+    password: 'Qwert12345!'
+    refreshToken: 
+      -
+    verified: true
+    verificationCode: 
+  user32:
+    email: 'profile2@email.com'
+    password: 'Qwert12345!'
+    refreshToken: 
+      -
+    verified: true
+    verificationCode: 
+  user33:
+    email: 'profile3@email.com'
+    password: 'Qwert12345!'
+    refreshToken: 
+      -
+    verified: true
+    verificationCode: 
