@@ -24,7 +24,7 @@ import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.d
 import { MeasurementNotFoundException } from "@app/common/exceptions/measurement/measurementNotFound.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Measurement } from "@app/entities/measurement/measurement.entity";
+import { Measurement } from "@app/entities/measurement.entity";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)

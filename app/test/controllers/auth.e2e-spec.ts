@@ -6,7 +6,7 @@ import loadFixtures from "@test/helpers/loadFixtures";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Repository } from "typeorm";
-import { User } from "@app/entities/user/user.entity";
+import { User } from "@app/entities/user.entity";
 import { LoginResponse } from "@app/common/types/auth/login-response";
 import { userLogin } from "@test/helpers/userLogin";
 import { credentialsUpdate } from "@test/helpers/credentialsUpdate";
@@ -385,7 +385,7 @@ describe("Auth (e2e)", () => {
     });
   });
 
-  describe("/auth/reset-password (PATCH) - reset user password ", () => {
+  describe("/auth/reset-password-confirm (PATCH) - reset user password with verification code ", () => {
     it("should reset password with valid verification code", async () => {
       const resetPassord = {
         email: "auth19@email.com",

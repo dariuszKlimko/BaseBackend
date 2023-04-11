@@ -1,19 +1,6 @@
-import { Measurement } from "@app/entities/measurement/measurement.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { Exclude } from "class-transformer";
-import {
-  BaseEntity,
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import * as bcrypt from "bcrypt";
-import { User } from "../user/user.entity";
+import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "@app/entities/user.entity";
 
 @Entity("profiles")
 export class Profile extends BaseEntity {

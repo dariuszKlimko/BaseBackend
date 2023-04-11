@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "@app/entities/user/user.entity";
+import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
 import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
-import { Profile } from "@app/entities/profile/profile.entity";
+import { Profile } from "@app/entities/profile.entity";
 
 @Injectable()
 export class UsersService {

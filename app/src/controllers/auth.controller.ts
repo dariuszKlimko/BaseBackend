@@ -32,7 +32,7 @@ import { LoginDto } from "@app/dtos/auth/login.dto";
 import { EmailDto } from "@app/dtos/auth/email.dto";
 import { EmailService } from "@app/services/email.service";
 import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/userAlreadyConfirmed.exception";
-import { User } from "@app/entities/user/user.entity";
+import { User } from "@app/entities/user.entity";
 import { UpdateCredentialsDto } from "@app/dtos/auth/update-creadentials.dto";
 import { ResetPasswordDto } from "@app/dtos/auth/password-reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalidVerificationCode.exception ";

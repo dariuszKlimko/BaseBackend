@@ -1,4 +1,4 @@
-import { Measurement } from "@app/entities/measurement/measurement.entity";
+import { Measurement } from "@app/entities/measurement.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import {
@@ -13,7 +13,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import * as bcrypt from "bcrypt";
-import { Profile } from "../profile/profile.entity";
+import { Profile } from "@app/entities/profile.entity";
 
 @Entity("users")
 export class User extends BaseEntity {

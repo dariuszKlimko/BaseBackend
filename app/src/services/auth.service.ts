@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ArrayContains, Repository } from "typeorm";
-import { User } from "@app/entities/user/user.entity";
+import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { JwtService } from "@nestjs/jwt";
 import { randomBytes, randomInt } from "crypto";

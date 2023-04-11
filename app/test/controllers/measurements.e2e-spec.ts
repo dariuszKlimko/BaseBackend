@@ -5,7 +5,7 @@ import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { Repository } from "typeorm";
-import { Measurement } from "@app/entities/measurement/measurement.entity";
+import { Measurement } from "@app/entities/measurement.entity";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;
