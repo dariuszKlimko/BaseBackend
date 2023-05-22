@@ -135,7 +135,7 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @Patch("credentials")
-  async updateUser(
+  async updateCredentials(
     @CurrentUser() user: CurrentUserDecorator,
     @Body() userInfo: UpdateCredentialsDto
   ): Promise<User> {
