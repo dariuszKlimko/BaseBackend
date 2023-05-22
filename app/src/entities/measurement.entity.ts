@@ -1,13 +1,10 @@
 import { User } from "@app/entities/user.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { BaseEntity } from "./base.entity";
 
 @Entity("measurements")
 export class Measurement extends BaseEntity {
-  @ApiProperty()
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
-
   @ApiProperty()
   @Column({
     type: "float",
