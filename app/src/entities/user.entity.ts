@@ -2,33 +2,19 @@ import { Measurement } from "@app/entities/measurement.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import {
-  BaseEntity,
   BeforeInsert,
   BeforeUpdate,
   Column,
-  CreateDateColumn,
   Entity,
   OneToMany,
   OneToOne,
-  PrimaryGeneratedColumn,
 } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Profile } from "@app/entities/profile.entity";
+import { BaseEntity } from "./base.entity";
 
 @Entity("users")
 export class User extends BaseEntity {
-  @ApiProperty()
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
-
-  @ApiProperty()
-  @CreateDateColumn({
-    name: "created_at",
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP(6)",
-  })
-  createdAt: number;
-
   @ApiProperty()
   @Column({
     type: "text",
