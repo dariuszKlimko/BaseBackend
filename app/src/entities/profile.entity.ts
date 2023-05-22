@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 import { User } from "@app/entities/user.entity";
-import { BaseEntity } from "./base.entity";
+import { BaseEntity } from "@app/entities/base.entity";
 
 @Entity("profiles")
 export class Profile extends BaseEntity {
