@@ -1,85 +1,80 @@
 import { BaseEntity } from "@app/entities/base.entity";
 import { NotFoundException } from "@nestjs/common";
-import { DeepPartial, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
+import { DeepPartial, FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 export abstract class BaseCrudRepository<E extends BaseEntity, CreateDTO, UpdateDTO> {
-    private readonly errorMessage: string;
+  private readonly errorMessage: string;
+  private readonly repository: Repository<E>;
 
-    constructor(private readonly repository: Repository<E>, errorMessage: string) {
-        this.errorMessage = errorMessage;
+  constructor(repository: Repository<E>, errorMessage: string) {
+    this.errorMessage = errorMessage;
+    this.repository = repository;
+  }
+
+  async findAll(): Promise<E[]> {
+    return await this.repository.find();
+  }
+
+  async findAllByIds(ids: string[]): Promise<E[]> {
+    return await this.repository.find({
+      where: { id: In(ids) } as FindOptionsWhere<E>,
+    });
+  }
+
+  async findOneById(id: string): Promise<E> {
+    const row = await this.repository.findOneBy({ id } as FindOptionsWhere<E>);
+    if (!row) {
+      throw new NotFoundException(this.errorMessage);
     }
+    return row;
+  }
 
-    async findAllBase(): Promise<E[]> {
-        return await this.repository.find();
+  async findWithRelation(rel: FindOptionsRelations<E>): Promise<E[]> {
+    const rows = await this.repository.find({
+      relations: rel,
+    });
+    if (rows.length === 0) {
+      throw new NotFoundException(this.errorMessage);
     }
+    return rows;
+  }
 
-    async findOneBase(id: string): Promise<E> {
-        const result  = await this.repository.findOneBy({id} as FindOptionsWhere<E>);
-        if(!result) {
-            throw new NotFoundException(this.errorMessage);
-        }
-        return result;
+  async findByCondition(condition: FindOptionsWhere<E>): Promise<E[]> {
+    const rows = await this.repository.find({
+      where: condition,
+    });
+    if (rows.length === 0) {
+      throw new NotFoundException(this.errorMessage);
     }
+    return rows;
+  }
 
-    async createOneBase(createEntityDto: CreateDTO): Promise<E> {
-        const entity = await this.repository.create(createEntityDto as DeepPartial<E>);
-        return await this.repository.save(entity);
-    }
+  async createOne(createEntityDto: CreateDTO): Promise<E> {
+    const entity = await this.repository.create(createEntityDto as DeepPartial<E>);
+    return await this.repository.save(entity);
+  }
 
-    async updateOneBase(id: string, updateEntityDto: UpdateDTO): Promise<E> {
-        this.findOneBase(id);
-        await this.repository.update({id} as FindOptionsWhere<E>, updateEntityDto as QueryDeepPartialEntity<E>);
-        return this.findOneBase(id);
-    }
-    
-    async deleteOneBase(id: string): Promise<E> {
-        const entity = this.findOneBase(id);
-        this.repository.delete(id);
-        return entity;
-    }
-//------------------------------------------------------
-    async findAllByUserIdBase(userId: string): Promise<E[]> {
-        return await this.repository.findBy({userId} as FindOptionsWhere<E>);
-    }
+  async createMany(createEntityDtos: CreateDTO[]): Promise<E[]> {
+    const entities = await this.repository.create(createEntityDtos as DeepPartial<E[]>);
+    return await this.repository.save(entities);
+  }
 
-    async findOneByUserIdBase(userId: string, id: string): Promise<E> {
-        const result  = await this.repository.findOneBy({userId, id} as FindOptionsWhere<E>);
-        if(!result) {
-            throw new NotFoundException(this.errorMessage);
-        }
-        return result;
-    }
+  async updateOne(id: string, updateEntityDto: UpdateDTO): Promise<E> {
+    this.findOneById(id);
+    await this.repository.update({ id } as FindOptionsWhere<E>, updateEntityDto as QueryDeepPartialEntity<E>);
+    return this.findOneById(id);
+  }
 
-//------------------------------------------------------
+  async deleteOne(id: string): Promise<E> {
+    const entity = this.findOneById(id);
+    this.repository.delete(id);
+    return entity;
+  }
 
-    
-
-
-    async findAllByPropertyBase(property: string, value: string): Promise<E[]> {
-        return await this.repository.findBy({[property]: value} as FindOptionsWhere<E>);
-    }
-
-    async findOneByPropertyBase(property: string, value: string, id: string): Promise<E> {
-        const result  = await this.repository.findOneBy({[property]: value, id} as FindOptionsWhere<E>);
-        if(!result) {
-            throw new NotFoundException(this.errorMessage);
-        }
-        return result;
-    }
-
-    async createOneByPropertyBase(createEntityDto: CreateDTO): Promise<E> {
-        const entity = await this.repository.create(createEntityDto as DeepPartial<E>);
-        return await this.repository.save(entity);
-    }
-
-    // async updateOneByPropertyBase(id: string, updateEntityDto: UpdateDTO): Promise<E> {
-
-    // }
-
-    // async deleteOneByPropertyBase(property: string, value: string, id: string): Promise<E> {
-
-    // }
-    
-    // async deleteAllByPropertyBase(property: string, value: string) ??? 
+  async deleteMany(ids: string[]): Promise<E[]> {
+    const entities = this.findAllByIds(ids);
+    this.repository.delete(ids);
+    return entities;
+  }
 }
