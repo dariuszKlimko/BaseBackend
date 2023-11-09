@@ -2,8 +2,11 @@ import { BaseEntity } from "@app/entities/base.entity";
 import { NotFoundException } from "@nestjs/common";
 import { DeepPartial, FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+import { BaseInterfaceRepository } from "@app/common/repository/base.interface.repository";
 
-export abstract class BaseCrudRepository<E extends BaseEntity, CreateDTO, UpdateDTO> {
+export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, UpdateDTO>
+  implements BaseInterfaceRepository<E, CreateDTO, UpdateDTO>
+{
   private readonly errorMessage: string;
   private readonly repository: Repository<E>;
 
