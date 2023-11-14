@@ -1,4 +1,3 @@
-import { UsersService } from "@app/services/user.service";
 import {
   Injectable,
   CanActivate,
@@ -7,15 +6,16 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { EmailService } from "@app/services/email.service";
 
 @Injectable()
 export class EmailExistGuard implements CanActivate {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly emailService: EmailService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const body = context.switchToHttp().getRequest().body;
     try {
-      const user = await this.userService.checkIfEmailExist(body.email);
+      const user = await this.emailService.checkIfEmailExist(body.email);
       return !!user;
     } catch (error) {
       if (error instanceof UserNotFoundException) {

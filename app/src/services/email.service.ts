@@ -1,32 +1,36 @@
+import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
+import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { User } from "@app/entities/user.entity";
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class EmailService {
   constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
     private readonly configService: ConfigService,
-    private readonly mailerService: MailerService,
-    private readonly jwtService: JwtService
+    private readonly mailerService: MailerService
   ) {}
 
-  verificationEmailText(email: string): string {
-    const url = this.confirmationLinkGenerate(email);
-    return `Hello ${email} \n\n Please verify your account by clicking the link: ${url} \n\n Thank You!\n`;
+  async checkIfEmailExist(email: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      throw new UserNotFoundException("user with given email address not exist in database");
+    }
+    return user;
   }
 
-  private confirmationLinkGenerate(email: string): string {
-    const payload = { email };
-    const token = this.jwtService.sign(payload, {
-      secret: this.configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
-      expiresIn: `${this.configService.get("JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME")}s`,
-    });
-    return `${this.configService.get<string>("CONFIRMATION_HOST_NODEMAILER")}/auth/confirmation/${token}`;
-  }
-
-  resetPasswordEmailText(email: string, code: number): string {
-    return `Hello ${email} \n\n Please reset your password with code: ${code} \n\n Thank You!\n`;
+  async checkIfEmailVerified(email: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      throw new UserNotFoundException("user with given email address not exist in database");
+    } else if (!user.verified) {
+      throw new UserNotVerifiedException("user with given email is not verified");
+    }
+    return user;
   }
 
   async sendEmail(email: string, text: string, subject: string): Promise<void> {

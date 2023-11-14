@@ -4,8 +4,6 @@ import { Repository } from "typeorm";
 import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
-import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
-import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 import { Profile } from "@app/entities/profile.entity";
 
 @Injectable()
@@ -32,24 +30,6 @@ export class UsersService {
   async deleteUser(id: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
     await this.userRepository.delete(id);
-    return user;
-  }
-
-  async checkIfEmailExist(email: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email });
-    if (!user) {
-      throw new UserNotFoundException("user with given email address not exist in database");
-    }
-    return user;
-  }
-
-  async checkIfEmailVerified(email: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email });
-    if (!user) {
-      throw new UserNotFoundException("user with given email address not exist in database");
-    } else if (!user.verified) {
-      throw new UserNotVerifiedException("user with given email is not verified");
-    }
     return user;
   }
 }
