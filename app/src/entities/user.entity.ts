@@ -23,8 +23,8 @@ export class User extends BaseEntity {
   })
   password: string;
 
-  @Exclude({ toPlainOnly: true })
   @ApiProperty()
+  @Exclude({ toPlainOnly: true })
   @Column({
     name: "refresh_tokens",
     type: "text",
@@ -41,8 +41,8 @@ export class User extends BaseEntity {
   })
   verified: boolean;
 
-  @Exclude({ toPlainOnly: true })
   @ApiProperty()
+  @Exclude({ toPlainOnly: true })
   @Column({
     name: "verification_code",
     type: "int",

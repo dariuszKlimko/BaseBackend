@@ -38,19 +38,26 @@ import { ResetPasswordDto } from "@app/dtos/auth/password-reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalidVerificationCode.exception ";
 import { EmailVerifiedGuard } from "@app/common/guards/email-verified.guard";
 import { EmailExistGuard } from "@app/common/guards/email-exist.guard";
+import { TokenService } from "@app/services/token.service";
+import { GeneratorSevice } from "@app/services/generator.service";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly emailService: EmailService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+    private readonly tokenService: TokenService,
+    private readonly generatorService: GeneratorSevice
+  ) {}
 
   @ApiOperation({ summary: "account confirmation" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "user has been successfully verified" })
   @Get("confirmation/:token")
   async userConfirmation(@Param("token") token: string): Promise<MessageInfo> {
     try {
-      const email = await this.authService.decodeConfirmationToken(token);
+      const email = await this.tokenService.decodeConfirmationToken(token);
       return await this.authService.userConfirmation(email);
     } catch (error) {
       if (error instanceof UserNotFoundException) {
@@ -72,7 +79,7 @@ export class AuthController {
   @Post("resend-confirmation")
   async resendConfirmationLink(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
-      const text = this.emailService.verificationEmailText(userInfo.email);
+      const text = this.generatorService.verificationEmailText(userInfo.email);
       const subject = "Account confirmation ✔";
       await this.emailService.sendEmail(userInfo.email, text, subject);
       return { status: "ok", message: "confirmation email has been resend" };
@@ -88,7 +95,8 @@ export class AuthController {
   @Post()
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
     try {
-      return await this.authService.login(user);
+      const authorizedUser: User = await this.authService.comparePassword(user);
+      return await this.tokenService.tokensResponse(authorizedUser);
     } catch (error) {
       if (error instanceof UserAuthenticateException) {
         throw new UnauthorizedException(error.message);
@@ -120,7 +128,8 @@ export class AuthController {
   @Patch("tokens")
   async getNewTokens(@Body() token: TokenDto): Promise<LoginResponse> {
     try {
-      return await this.authService.getNewToken(token.refreshToken);
+      const authorizedUser: User = await this.tokenService.findRefreshToken(token.refreshToken);
+      return await this.tokenService.tokensResponse(authorizedUser);
     } catch (error) {
       if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
@@ -153,8 +162,8 @@ export class AuthController {
   @Patch("reset-password")
   async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
-      const code = await this.authService.codeGenerator(userInfo.email);
-      const text = this.emailService.resetPasswordEmailText(userInfo.email, code);
+      const code = await this.generatorService.codeGenerator(userInfo.email);
+      const text = this.generatorService.resetPasswordEmailText(userInfo.email, code);
       const subject = "Reset password verification code ✔";
       await this.emailService.sendEmail(userInfo.email, text, subject);
       return { status: "ok", message: "verification code has been send" };

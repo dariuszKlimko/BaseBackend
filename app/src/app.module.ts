@@ -19,6 +19,8 @@ import { JwtStrategy } from "@app/common/strategies/jwt.strategy";
 import { Profile } from "@app/entities/profile.entity";
 import { ProfilessController } from "@app/controllers/profile.controller";
 import { ProfilesService } from "@app/services/profile.service";
+import { TokenService } from "@app/services/token.service";
+import { GeneratorSevice } from "@app/services/generator.service";
 
 @Module({
   imports: [
@@ -56,6 +58,15 @@ import { ProfilesService } from "@app/services/profile.service";
     AppConfigModule,
   ],
   controllers: [UsersController, MeasurementsController, AuthController, ProfilessController],
-  providers: [UsersService, MeasurementsService, AuthService, EmailService, JwtStrategy, ProfilesService],
+  providers: [
+    UsersService,
+    MeasurementsService,
+    AuthService,
+    EmailService,
+    JwtStrategy,
+    ProfilesService,
+    TokenService,
+    GeneratorSevice,
+  ],
 })
 export class AppModule {}

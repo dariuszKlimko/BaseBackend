@@ -21,12 +21,17 @@ import { User } from "@app/entities/user.entity";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { GeneratorSevice } from "@app/services/generator.service";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
 @Controller("users")
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly emailService: EmailService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly emailService: EmailService,
+    private readonly generatorService: GeneratorSevice
+  ) {}
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
@@ -35,7 +40,7 @@ export class UsersController {
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
     try {
       const userPayload: User = await this.usersService.registerUser(user);
-      const text = this.emailService.verificationEmailText(userPayload.email);
+      const text = this.generatorService.verificationEmailText(userPayload.email);
       const subject = "Account confirmation ✔";
       await this.emailService.sendEmail(userPayload.email, text, subject);
       return userPayload;
