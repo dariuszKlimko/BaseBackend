@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "@app/app.module";
-import { configureHttpExceptionFilters, configureSwagger, configureValidator } from "@app/bootstrapConfiguration";
+import { configureHttpExceptionFilters, configureSwagger, configureValidator } from "@app/common/config/bootstrapConfiguration";
 import { ConfigService } from "@nestjs/config";
 
 async function bootstrap(): Promise<void> {

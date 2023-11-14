@@ -45,4 +45,12 @@ export const dataBaseConfig = (env: string): DataSourceOptions => {
 
 const dataSource = new DataSource(dataBaseConfig(process.env.NODE_ENV));
 
+dataSource.initialize()
+  .then(() => {
+    console.log("Data Source has been initialized!");
+  })
+  .catch((err) => {
+    console.error("Error during Data Source initialization", err);
+  })
+
 export default dataSource;
