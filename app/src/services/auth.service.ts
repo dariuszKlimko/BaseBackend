@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
-import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";

@@ -15,7 +15,7 @@ import { UsersService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
-import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
+import { UserDuplicatedException } from "@app/common/exceptions/user/userDuplicated.exception";
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
@@ -47,7 +47,7 @@ export class UsersController {
       await this.emailService.sendEmail(userPayload.email, text, subject);
       return userPayload;
     } catch (error) {
-      if (error instanceof UserDuplicateException) {
+      if (error instanceof UserDuplicatedException) {
         throw new ConflictException(error.message);
       }
       throw new InternalServerErrorException(error.message);

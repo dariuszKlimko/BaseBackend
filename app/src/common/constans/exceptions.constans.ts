@@ -5,9 +5,6 @@ export const DULICATED_EXCEPTION_MESSAGE: string = "user with given email addres
 // UserNotFoundException("user with given email address not exist in database");
 // UserNotVerifiedException("user with given email is not verified");
 // InvalidVerificationCodeException("invalid verification code");
-// InvalidRefreshTokenException("invalid refreshToken");
-// UserNotVerifiedException("user with given email is not verified");
 // UserAuthenticateException("incorrect email address or password");
 // UserNotFoundException("user with given email not exist in database");
 // UserAlreadyConfirmedException("user with given email is already confirmed");
-// UserNotFoundException("user with given email not exist in database");

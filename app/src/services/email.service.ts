@@ -1,5 +1,5 @@
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
-import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { User } from "@app/entities/user.entity";
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";

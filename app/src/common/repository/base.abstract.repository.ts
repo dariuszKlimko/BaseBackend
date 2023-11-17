@@ -26,7 +26,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, Up
   }
 
   async findOneById(id: string): Promise<E> {
-    const row = await this.repository.findOneBy({ id } as FindOptionsWhere<E>);
+    const row: E = await this.repository.findOneBy({ id } as FindOptionsWhere<E>);
     if (!row) {
       throw new NotFoundException(this.errorMessage);
     }
@@ -34,7 +34,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, Up
   }
 
   async findWithRelation(rel: FindOptionsRelations<E>): Promise<E[]> {
-    const rows = await this.repository.find({
+    const rows: E[] = await this.repository.find({
       relations: rel,
     });
     if (rows.length === 0) {
@@ -44,7 +44,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, Up
   }
 
   async findByCondition(condition: FindOptionsWhere<E>): Promise<E[]> {
-    const rows = await this.repository.find({
+    const rows: E[] = await this.repository.find({
       where: condition,
     });
     if (rows.length === 0) {
@@ -54,30 +54,34 @@ export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, Up
   }
 
   async createOne(createEntityDto: CreateDTO): Promise<E> {
-    const entity = await this.repository.create(createEntityDto as DeepPartial<E>);
+    const entity: E = await this.repository.create(createEntityDto as DeepPartial<E>);
     return await this.repository.save(entity);
   }
 
   async createMany(createEntityDtos: CreateDTO[]): Promise<E[]> {
-    const entities = await this.repository.create(createEntityDtos as DeepPartial<E[]>);
+    const entities: E[] = await this.repository.create(createEntityDtos as DeepPartial<E[]>);
     return await this.repository.save(entities);
   }
 
+  // async updateOne(id: string, updateEntityDto: UpdateDTO): Promise<E> {
+  //   await this.findOneById(id);
+  //   await this.repository.update({ id } as FindOptionsWhere<E>, updateEntityDto as QueryDeepPartialEntity<E>);
+  //   return this.findOneById(id);
+  // }
+
   async updateOne(id: string, updateEntityDto: UpdateDTO): Promise<E> {
-    this.findOneById(id);
-    await this.repository.update({ id } as FindOptionsWhere<E>, updateEntityDto as QueryDeepPartialEntity<E>);
-    return this.findOneById(id);
+    const entity: E = await this.findOneById(id);
+    this.repository.merge(entity, updateEntityDto as DeepPartial<E>);
+    return await this.repository.save(entity);
   }
 
   async deleteOne(id: string): Promise<E> {
-    const entity = this.findOneById(id);
-    this.repository.delete(id);
-    return entity;
+    const entity: E = await this.findOneById(id);
+    return this.repository.remove(entity);
   }
 
   async deleteMany(ids: string[]): Promise<E[]> {
-    const entities = this.findAllByIds(ids);
-    this.repository.delete(ids);
-    return entities;
+    const entities: E[] = await this.findAllByIds(ids);
+    return this.repository.remove(entities);
   }
 }

@@ -19,7 +19,7 @@ import { AuthService } from "@app/services/auth.service";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { LoginResponse } from "@app/common/types/auth/login-response";
-import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";

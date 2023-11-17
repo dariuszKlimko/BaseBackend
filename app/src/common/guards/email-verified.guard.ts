@@ -6,7 +6,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from "@nestjs/common";
-import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 import { EmailService } from "@app/services/email.service";
 
