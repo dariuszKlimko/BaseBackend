@@ -13,6 +13,7 @@ import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/userA
 import { UpdateCredentialsDto } from "@app/dtos/auth/update-creadentials.dto";
 import { ResetPasswordDto } from "@app/dtos/auth/password-reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalidVerificationCode.exception ";
+import { PASSWORD_RESET_RESPONSE, USER_VERIFIED_RESPONSE } from "@app/common/constans/constans";
 
 @Injectable()
 export class AuthService {
@@ -26,7 +27,7 @@ export class AuthService {
       throw new UserAlreadyConfirmedException("user with given email is already confirmed");
     }
     await this.userRepository.update(user.id, { verified: true });
-    return { status: "ok", message: "user successfully verified" };
+    return USER_VERIFIED_RESPONSE;
   }
 
   async comparePassword(userInfo: CreateUserDto): Promise<User> {
@@ -62,7 +63,7 @@ export class AuthService {
     user.password = resetPassord.password;
     user.verificationCode = null;
     await this.userRepository.save(user);
-    return { status: "ok", message: "password has been reset" };
+    return PASSWORD_RESET_RESPONSE;
   }
 
   async updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User> {

@@ -8,6 +8,7 @@ import { MeasurementNotFoundException } from "@app/common/exceptions/measurement
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { ProfilesService } from "@app/services/profile.service";
 import { Profile } from "@app/entities/profile.entity";
+import { MEASUREMENTS_DELETED_RESPONSE } from "@app/common/constans/constans";
 
 @Injectable()
 export class MeasurementsService {
@@ -59,7 +60,7 @@ export class MeasurementsService {
       throw new MeasurementNotFoundException("measurements for given user id not found");
     }
     await this.measurementsRepository.delete({ userId });
-    return { status: "ok", message: "all measurements deleted" };
+    return MEASUREMENTS_DELETED_RESPONSE;
   }
 
   async deleteOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {

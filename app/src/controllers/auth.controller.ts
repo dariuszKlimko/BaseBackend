@@ -40,7 +40,7 @@ import { EmailVerifiedGuard } from "@app/common/guards/email-verified.guard";
 import { EmailExistGuard } from "@app/common/guards/email-exist.guard";
 import { TokenService } from "@app/services/token.service";
 import { GeneratorSevice } from "@app/services/generator.service";
-import { ACCOUTN_CONFIRMATION, RESEND_CONFIRMATION_RESPONSE, RESET_PASSWORD_RESPONSE, RESET_PASSWORD_VERIFICATION_CODE } from "@app/common/constans/constans";
+import { ACCOUTN_CONFIRMATION, RESEND_CONFIRMATION_RESPONSE, VVERIFICTION_CODE_RESPONSE, RESET_PASSWORD_VERIFICATION_CODE } from "@app/common/constans/constans";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -170,7 +170,7 @@ export class AuthController {
       const text: string = this.generatorService.resetPasswordEmailText(userInfo.email, code);
       const subject: string = RESET_PASSWORD_VERIFICATION_CODE;
       await this.emailService.sendEmail(userInfo.email, text, subject);
-      return RESET_PASSWORD_RESPONSE;
+      return VVERIFICTION_CODE_RESPONSE;
     } catch (error) {
       throw new InternalServerErrorException();
     }
