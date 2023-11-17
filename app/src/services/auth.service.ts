@@ -19,22 +19,22 @@ export class AuthService {
   constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
   async userConfirmation(email: string): Promise<MessageInfo> {
-    const userDb = await this.userRepository.findOneBy({ email });
-    if (!userDb) {
+    const user: User = await this.userRepository.findOneBy({ email });
+    if (!user) {
       throw new UserNotFoundException("user with given email not exist in database");
-    } else if (userDb.verified) {
+    } else if (user.verified) {
       throw new UserAlreadyConfirmedException("user with given email is already confirmed");
     }
-    await this.userRepository.update(userDb.id, { verified: true });
+    await this.userRepository.update(user.id, { verified: true });
     return { status: "ok", message: "user successfully verified" };
   }
 
   async comparePassword(userInfo: CreateUserDto): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email: userInfo.email });
+    const user: User = await this.userRepository.findOneBy({ email: userInfo.email });
     if (!user) {
       throw new UserNotFoundException("user with given email not exist in database");
     }
-    const isMatch = await user.validatePassword(userInfo.password);
+    const isMatch: boolean = await user.validatePassword(userInfo.password);
     if (!isMatch) {
       throw new UserAuthenticateException("incorrect email address or password");
     } else if (!user.verified) {
@@ -44,8 +44,8 @@ export class AuthService {
   }
 
   async logout(id: string, token: string): Promise<LogoutResponse> {
-    const user = await this.userRepository.findOneBy({ id });
-    const tokenIndex = user.refreshTokens.indexOf(token);
+    const user: User = await this.userRepository.findOneBy({ id });
+    const tokenIndex: number = user.refreshTokens.indexOf(token);
     if (tokenIndex < 0) {
       throw new InvalidRefreshTokenException("invalid refreshToken");
     }
@@ -55,7 +55,7 @@ export class AuthService {
   }
 
   async resetPasswordConfirm(resetPassord: ResetPasswordDto): Promise<MessageInfo> {
-    const user = await this.userRepository.findOneBy({ email: resetPassord.email });
+    const user: User = await this.userRepository.findOneBy({ email: resetPassord.email });
     if (user.verificationCode !== resetPassord.verificationCode) {
       throw new InvalidVerificationCodeException("invalid verification code");
     }
@@ -66,7 +66,7 @@ export class AuthService {
   }
 
   async updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user: User = await this.userRepository.findOneBy({ id });
     if (userInfo.email) {
       user.email = userInfo.email;
     }

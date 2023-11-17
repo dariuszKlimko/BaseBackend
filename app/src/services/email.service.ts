@@ -16,7 +16,7 @@ export class EmailService {
   ) {}
 
   async checkIfEmailExist(email: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email });
+    const user: User = await this.userRepository.findOneBy({ email });
     if (!user) {
       throw new UserNotFoundException("user with given email address not exist in database");
     }
@@ -24,7 +24,7 @@ export class EmailService {
   }
 
   async checkIfEmailVerified(email: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email });
+    const user: User = await this.userRepository.findOneBy({ email });
     if (!user) {
       throw new UserNotFoundException("user with given email address not exist in database");
     } else if (!user.verified) {

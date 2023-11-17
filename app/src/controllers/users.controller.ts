@@ -22,6 +22,7 @@ import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GeneratorSevice } from "@app/services/generator.service";
+import { ACCOUTN_CONFIRMATION } from "@app/common/constans/constans";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
@@ -30,7 +31,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
-    private readonly generatorService: GeneratorSevice
+    private readonly generatorService: GeneratorSevice,
   ) {}
 
   @ApiOperation({ summary: "user registration" })
@@ -40,8 +41,9 @@ export class UsersController {
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
     try {
       const userPayload: User = await this.usersService.registerUser(user);
-      const text = this.generatorService.verificationEmailText(userPayload.email);
-      const subject = "Account confirmation ✔";
+      const confirmationLink: string = this.generatorService.confirmationLinkGenerate(userPayload.email);
+      const text: string = this.generatorService.verificationEmailText(userPayload.email, confirmationLink);
+      const subject: string = ACCOUTN_CONFIRMATION;
       await this.emailService.sendEmail(userPayload.email, text, subject);
       return userPayload;
     } catch (error) {

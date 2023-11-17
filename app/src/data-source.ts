@@ -3,11 +3,11 @@ import { config } from "dotenv";
 import path from "path";
 import { IDataSource } from "@app/common/types/database/dataSourceOptions";
 
-const root = path.resolve(__dirname, "../");
-const envpath = path.resolve(root, "../");
+const root: string = path.resolve(__dirname, "../");
+const envpath: string = path.resolve(root, "../");
 config({ path: `${envpath}/.env` });
 
-export const dataBaseConfig = (env: string): DataSourceOptions => {
+export const dataBaseConfig: (env: string) => DataSourceOptions = (env: string): DataSourceOptions => {
   const dataSourceOptionsProd: DataSourceOptions = {
     type: "postgres",
     host: process.env.DB_HOST,
@@ -43,7 +43,7 @@ export const dataBaseConfig = (env: string): DataSourceOptions => {
   return options[env];
 };
 
-const dataSource = new DataSource(dataBaseConfig(process.env.NODE_ENV));
+const dataSource: DataSource = new DataSource(dataBaseConfig(process.env.NODE_ENV));
 
 dataSource.initialize()
   .then(() => {

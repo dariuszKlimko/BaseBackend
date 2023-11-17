@@ -9,13 +9,13 @@ export class ProfilesService {
   constructor(@InjectRepository(Profile) private profileRepository: Repository<Profile>) {}
 
   async getProfile(userId: string): Promise<Profile> {
-    const profile = await this.profileRepository.findOneBy({ userId });
+    const profile: Profile = await this.profileRepository.findOneBy({ userId });
     return profile;
   }
 
   async updateProfile(userId: string, profileInfo: UpdateProfileDto): Promise<Profile> {
     await this.profileRepository.update({ userId }, profileInfo);
-    const profile = await this.profileRepository.findOneBy({ userId });
+    const profile: Profile = await this.profileRepository.findOneBy({ userId });
     return profile;
   }
 }
