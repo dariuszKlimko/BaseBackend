@@ -36,13 +36,17 @@ export class UsersService {
   
   // async updateUser()
 
-  // async getAllUsers() - admin
+  // async getAllUsersByAdmin() - admin
 
-  // async getUsersByIds() - admin
+  // async getUsersByIdsByAdmin() - admin
 
-  // async getUsersWithCondition()????? - admin
+  // async getUsersWithConditionByAdmin()????? - admin
 
-  // async getUserWithRelation() - admin
+  // async getUserWithRelationByAdmin() - admin
 
-  // async deleteUsersByIds() - admin
+  // async deleteUsersByIdsByAdmin() - admin
+
+  // async createUserByAdmin() - admin
+
+  // async updateUserByAdmin() - admin
 }
