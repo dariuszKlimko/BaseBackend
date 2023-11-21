@@ -71,4 +71,14 @@ export class MeasurementsService {
     await this.measurementsRepository.delete({ userId, id: measurementId });
     return measurement;
   }
+
+  // async getAllMeasurementsByAdmin() - admin
+
+  // async getMeasurementsByIdsByAdmin() - admin
+
+  // async getMeasurementsWithConditionByAdmin()????? - admin
+
+  // async deleteMeasurementsByIdsByAdmin() - admin
+
+  // async updateMeasurementsByAdmin() - admin
 }

@@ -18,4 +18,10 @@ export class ProfilesService {
     const profile: Profile = await this.profileRepository.findOneBy({ userId });
     return profile;
   }
+
+  // async getAllProfilesByAdmin() - admin
+
+  // async getProfilesByIdsByAdmin() - admin
+
+  // async getProfilesWithConditionByAdmin()????? - admin
 }
