@@ -31,7 +31,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
-    private readonly generatorService: GeneratorSevice,
+    private readonly generatorService: GeneratorSevice
   ) {}
 
   @ApiOperation({ summary: "user registration" })

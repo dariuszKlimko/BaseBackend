@@ -34,7 +34,10 @@ export class MeasurementsService {
   }
 
   async getOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
-    const measurement: Measurement = await this.measurementsRepository.findOneBy({ userId, id: measurementId });
+    const measurement: Measurement = await this.measurementsRepository.findOneBy({
+      userId,
+      id: measurementId,
+    });
     if (!measurement) {
       throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }
@@ -46,7 +49,10 @@ export class MeasurementsService {
     measurementId: string,
     measurementPayload: UpdateMeasurementDto
   ): Promise<Measurement> {
-    const measurement: Measurement = await this.measurementsRepository.findOneBy({ userId, id: measurementId });
+    const measurement: Measurement = await this.measurementsRepository.findOneBy({
+      userId,
+      id: measurementId,
+    });
     if (!measurement) {
       throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }
@@ -64,7 +70,10 @@ export class MeasurementsService {
   }
 
   async deleteOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
-    const measurement: Measurement = await this.measurementsRepository.findOneBy({ userId, id: measurementId });
+    const measurement: Measurement = await this.measurementsRepository.findOneBy({
+      userId,
+      id: measurementId,
+    });
     if (!measurement) {
       throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }

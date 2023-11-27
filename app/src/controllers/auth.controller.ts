@@ -40,7 +40,12 @@ import { EmailVerifiedGuard } from "@app/common/guards/email-verified.guard";
 import { EmailExistGuard } from "@app/common/guards/email-exist.guard";
 import { TokenService } from "@app/services/token.service";
 import { GeneratorSevice } from "@app/services/generator.service";
-import { ACCOUTN_CONFIRMATION, RESEND_CONFIRMATION_RESPONSE, VVERIFICTION_CODE_RESPONSE, RESET_PASSWORD_VERIFICATION_CODE } from "@app/common/constans/constans";
+import {
+  ACCOUTN_CONFIRMATION,
+  RESEND_CONFIRMATION_RESPONSE,
+  VVERIFICTION_CODE_RESPONSE,
+  RESET_PASSWORD_VERIFICATION_CODE,
+} from "@app/common/constans/constans";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -50,7 +55,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
     private readonly tokenService: TokenService,
-    private readonly generatorService: GeneratorSevice,
+    private readonly generatorService: GeneratorSevice
   ) {}
 
   @ApiOperation({ summary: "account confirmation" })

@@ -33,7 +33,9 @@ export class TokenService {
   }
 
   async findUserByRefreshToken(refreshToken: string): Promise<User> {
-    const user: User = await this.userRepository.findOne({ where: { refreshTokens: ArrayContains([refreshToken]) } });
+    const user: User = await this.userRepository.findOne({
+      where: { refreshTokens: ArrayContains([refreshToken]) },
+    });
     if (!user) {
       throw new InvalidRefreshTokenException("invalid refreshToken");
     }

@@ -6,8 +6,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserRepositoryIntrface } from "./interfaces/user.repository.interface";
 
-export class UserRepository extends BaseAbstractRepository<User, CreateUserDto, UpdateUserDto> implements UserRepositoryIntrface {
-    constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
-        super(userRepository, "dddd");
-    }
+export class UserRepository
+  extends BaseAbstractRepository<User, CreateUserDto, UpdateUserDto>
+  implements UserRepositoryIntrface
+{
+  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
+    super(userRepository, "dddd");
+  }
 }

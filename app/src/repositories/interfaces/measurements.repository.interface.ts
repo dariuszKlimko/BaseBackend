@@ -3,4 +3,5 @@ import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.d
 import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
 import { Measurement } from "@app/entities/measurement.entity";
 
-export interface MeasurementRepositoryInterface extends BaseInterfaceRepository<Measurement, CreateMeasurementDto, UpdateMeasurementDto> {}
+export interface MeasurementRepositoryInterface
+  extends BaseInterfaceRepository<Measurement, CreateMeasurementDto, UpdateMeasurementDto> {}

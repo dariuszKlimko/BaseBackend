@@ -6,8 +6,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ProfileRepositoryInterface } from "./interfaces/profile.repository.interface";
 
-export class ProfileRepository extends BaseAbstractRepository<Profile, CreateProfileDto, UpdateProfileDto> implements ProfileRepositoryInterface {
-    constructor(@InjectRepository(Profile) private readonly profileRepository: Repository<Profile>) {
-        super(profileRepository, "dddd");
-    }
+export class ProfileRepository
+  extends BaseAbstractRepository<Profile, CreateProfileDto, UpdateProfileDto>
+  implements ProfileRepositoryInterface
+{
+  constructor(@InjectRepository(Profile) private readonly profileRepository: Repository<Profile>) {
+    super(profileRepository, "dddd");
+  }
 }

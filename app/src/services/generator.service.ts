@@ -12,7 +12,7 @@ export class GeneratorSevice {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   async codeGenerator(email: string): Promise<number> {

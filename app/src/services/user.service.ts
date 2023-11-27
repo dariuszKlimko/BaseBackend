@@ -33,7 +33,6 @@ export class UsersService {
     return user;
   }
 
-  
   // async updateUser()
 
   // async getAllUsersByAdmin() - admin

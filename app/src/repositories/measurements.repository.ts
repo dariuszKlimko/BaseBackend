@@ -6,8 +6,13 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { MeasurementRepositoryInterface } from "./interfaces/measurements.repository.interface";
 
-export class MeasurementsRepository extends BaseAbstractRepository<Measurement, CreateMeasurementDto, UpdateMeasurementDto> implements MeasurementRepositoryInterface {
-    constructor(@InjectRepository(Measurement) private readonly measurementRepository: Repository<Measurement>) {
-        super(measurementRepository, "dddd");
-    }
+export class MeasurementsRepository
+  extends BaseAbstractRepository<Measurement, CreateMeasurementDto, UpdateMeasurementDto>
+  implements MeasurementRepositoryInterface
+{
+  constructor(
+    @InjectRepository(Measurement) private readonly measurementRepository: Repository<Measurement>
+  ) {
+    super(measurementRepository, "dddd");
+  }
 }
