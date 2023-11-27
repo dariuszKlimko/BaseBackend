@@ -1,0 +1,10 @@
+export const DULICATED_EXCEPTION_MESSAGE: string = "user with given email address aldeady exist in database";
+// BadRequestException("Email confirmation token expired");
+// BadRequestException("Bad confirmation token");
+// InvalidRefreshTokenException("invalid refreshToken");
+// UserNotFoundException("user with given email address not exist in database");
+// UserNotVerifiedException("user with given email is not verified");
+// InvalidVerificationCodeException("invalid verification code");
+// UserAuthenticateException("incorrect email address or password");
+// UserNotFoundException("user with given email not exist in database");
+// UserAlreadyConfirmedException("user with given email is already confirmed");

@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
-import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { EmailService } from "@app/services/email.service";
 
 @Injectable()

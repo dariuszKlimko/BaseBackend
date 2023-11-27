@@ -5,7 +5,6 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
-import { randomBytes } from "crypto";
 import { ArrayContains, Repository } from "typeorm";
 
 @Injectable()
@@ -18,11 +17,11 @@ export class TokenService {
 
   async decodeConfirmationToken(token: string): Promise<string> {
     try {
-      const payload = await this.jwtService.verify(token, {
+      const payload: JwtService = await this.jwtService.verify(token, {
         secret: this.configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
       });
       if (typeof payload === "object" && "email" in payload) {
-        return payload.email;
+        return payload.email.toString();
       }
       throw new BadRequestException();
     } catch (error) {
@@ -33,19 +32,20 @@ export class TokenService {
     }
   }
 
-  async findRefreshToken(refreshToken: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { refreshTokens: ArrayContains([refreshToken]) } });
+  async findUserByRefreshToken(refreshToken: string): Promise<User> {
+    const user: User = await this.userRepository.findOne({
+      where: { refreshTokens: ArrayContains([refreshToken]) },
+    });
     if (!user) {
       throw new InvalidRefreshTokenException("invalid refreshToken");
     }
-    const tokenIndex = user.refreshTokens.indexOf(refreshToken);
+    const tokenIndex: number = user.refreshTokens.indexOf(refreshToken);
     user.refreshTokens.splice(tokenIndex, 1);
     return user;
   }
 
-  async tokensResponse(user: User): Promise<LoginResponse> {
+  async tokensResponse(user: User, token: string): Promise<LoginResponse> {
     const payload = { sub: user.id };
-    const token = this.generateToken();
     user.password = undefined;
     user.refreshTokens.push(token);
     await this.userRepository.save(user);
@@ -53,9 +53,5 @@ export class TokenService {
       accessToken: this.jwtService.sign(payload),
       refreshToken: token,
     };
-  }
-
-  private generateToken(): string {
-    return randomBytes(64).toString("hex");
   }
 }

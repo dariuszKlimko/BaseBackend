@@ -15,13 +15,14 @@ import { UsersService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
-import { UserDuplicateException } from "@app/common/exceptions/user/userDuplicate.exception";
+import { UserDuplicatedException } from "@app/common/exceptions/user/userDuplicated.exception";
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GeneratorSevice } from "@app/services/generator.service";
+import { ACCOUTN_CONFIRMATION } from "@app/common/constans/constans";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
@@ -40,12 +41,13 @@ export class UsersController {
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
     try {
       const userPayload: User = await this.usersService.registerUser(user);
-      const text = this.generatorService.verificationEmailText(userPayload.email);
-      const subject = "Account confirmation ✔";
+      const confirmationLink: string = this.generatorService.confirmationLinkGenerate(userPayload.email);
+      const text: string = this.generatorService.verificationEmailText(userPayload.email, confirmationLink);
+      const subject: string = ACCOUTN_CONFIRMATION;
       await this.emailService.sendEmail(userPayload.email, text, subject);
       return userPayload;
     } catch (error) {
-      if (error instanceof UserDuplicateException) {
+      if (error instanceof UserDuplicatedException) {
         throw new ConflictException(error.message);
       }
       throw new InternalServerErrorException(error.message);

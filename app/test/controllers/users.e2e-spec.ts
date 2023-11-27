@@ -34,8 +34,12 @@ describe("Users (e2e)", () => {
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
 
-    user2accessToken = await userLogin("user2@email.com", "Qwert12345!", app).then((res) => res.body.accessToken);
-    user3accessToken = await userLogin("user3@email.com", "Qwert12345!", app).then((res) => res.body.accessToken);
+    user2accessToken = await userLogin("user2@email.com", "Qwert12345!", app).then(
+      (res) => res.body.accessToken
+    );
+    user3accessToken = await userLogin("user3@email.com", "Qwert12345!", app).then(
+      (res) => res.body.accessToken
+    );
   });
 
   describe("/users (POST) - register user", () => {
@@ -80,7 +84,10 @@ describe("Users (e2e)", () => {
     });
 
     it("should not register user with password longer than 24 characters", () => {
-      const user: CreateUserDto = { email: "userNotRegister@email.com", password: "Qwertoklk1234rfSdCSAWmjhb!" };
+      const user: CreateUserDto = {
+        email: "userNotRegister@email.com",
+        password: "Qwertoklk1234rfSdCSAWmjhb!",
+      };
       return userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });

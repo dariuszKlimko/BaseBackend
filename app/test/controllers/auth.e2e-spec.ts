@@ -285,10 +285,12 @@ describe("Auth (e2e)", () => {
 
   describe("/auth/credentials (PATCH) - update user email and password ", () => {
     it("should update user email for user with given accessToken", async () => {
-      await credentialsUpdate(auth13Tokens.accessToken, { email: "authUpdate13@email.com" }, app).then((res) => {
-        expect(res.status).toEqual(HttpStatus.OK);
-        expect(res.body.email).toEqual("authUpdate13@email.com");
-      });
+      await credentialsUpdate(auth13Tokens.accessToken, { email: "authUpdate13@email.com" }, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.OK);
+          expect(res.body.email).toEqual("authUpdate13@email.com");
+        }
+      );
 
       return userRepository.findOneBy({ email: "authUpdate13@email.com" }).then((user) => {
         expect(user.email).toEqual("authUpdate13@email.com");
@@ -296,9 +298,11 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not update user if email is not email", () => {
-      return credentialsUpdate(auth14Tokens.accessToken, { email: "authUpdate14email.com" }, app).then((res) => {
-        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-      });
+      return credentialsUpdate(auth14Tokens.accessToken, { email: "authUpdate14email.com" }, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+        }
+      );
     });
 
     it("should update user password for user with given accessToken", () => {
@@ -314,11 +318,13 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not update user password longer than 24 characters", () => {
-      return credentialsUpdate(auth14Tokens.accessToken, { password: "QwrtfgvbcfrewqwerQQW229disj12!" }, app).then(
-        (res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        }
-      );
+      return credentialsUpdate(
+        auth14Tokens.accessToken,
+        { password: "QwrtfgvbcfrewqwerQQW229disj12!" },
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should not update user password without number", () => {

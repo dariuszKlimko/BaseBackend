@@ -19,7 +19,7 @@ import { AuthService } from "@app/services/auth.service";
 import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { LoginResponse } from "@app/common/types/auth/login-response";
-import { UserNotFoundException } from "@app/common/exceptions/userNotFound.exception";
+import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
@@ -40,6 +40,12 @@ import { EmailVerifiedGuard } from "@app/common/guards/email-verified.guard";
 import { EmailExistGuard } from "@app/common/guards/email-exist.guard";
 import { TokenService } from "@app/services/token.service";
 import { GeneratorSevice } from "@app/services/generator.service";
+import {
+  ACCOUTN_CONFIRMATION,
+  RESEND_CONFIRMATION_RESPONSE,
+  VVERIFICTION_CODE_RESPONSE,
+  RESET_PASSWORD_VERIFICATION_CODE,
+} from "@app/common/constans/constans";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -57,7 +63,7 @@ export class AuthController {
   @Get("confirmation/:token")
   async userConfirmation(@Param("token") token: string): Promise<MessageInfo> {
     try {
-      const email = await this.tokenService.decodeConfirmationToken(token);
+      const email: string = await this.tokenService.decodeConfirmationToken(token);
       return await this.authService.userConfirmation(email);
     } catch (error) {
       if (error instanceof UserNotFoundException) {
@@ -79,10 +85,11 @@ export class AuthController {
   @Post("resend-confirmation")
   async resendConfirmationLink(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
-      const text = this.generatorService.verificationEmailText(userInfo.email);
-      const subject = "Account confirmation ✔";
+      const confirmationLink: string = this.generatorService.confirmationLinkGenerate(userInfo.email);
+      const text: string = this.generatorService.verificationEmailText(userInfo.email, confirmationLink);
+      const subject: string = ACCOUTN_CONFIRMATION;
       await this.emailService.sendEmail(userInfo.email, text, subject);
-      return { status: "ok", message: "confirmation email has been resend" };
+      return RESEND_CONFIRMATION_RESPONSE;
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -96,7 +103,8 @@ export class AuthController {
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
     try {
       const authorizedUser: User = await this.authService.comparePassword(user);
-      return await this.tokenService.tokensResponse(authorizedUser);
+      const newToken: string = this.generatorService.generateToken();
+      return await this.tokenService.tokensResponse(authorizedUser, newToken);
     } catch (error) {
       if (error instanceof UserAuthenticateException) {
         throw new UnauthorizedException(error.message);
@@ -128,8 +136,9 @@ export class AuthController {
   @Patch("tokens")
   async getNewTokens(@Body() token: TokenDto): Promise<LoginResponse> {
     try {
-      const authorizedUser: User = await this.tokenService.findRefreshToken(token.refreshToken);
-      return await this.tokenService.tokensResponse(authorizedUser);
+      const authorizedUser: User = await this.tokenService.findUserByRefreshToken(token.refreshToken);
+      const newToken: string = this.generatorService.generateToken();
+      return await this.tokenService.tokensResponse(authorizedUser, newToken);
     } catch (error) {
       if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
@@ -162,11 +171,11 @@ export class AuthController {
   @Patch("reset-password")
   async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
-      const code = await this.generatorService.codeGenerator(userInfo.email);
-      const text = this.generatorService.resetPasswordEmailText(userInfo.email, code);
-      const subject = "Reset password verification code ✔";
+      const code: number = await this.generatorService.codeGenerator(userInfo.email);
+      const text: string = this.generatorService.resetPasswordEmailText(userInfo.email, code);
+      const subject: string = RESET_PASSWORD_VERIFICATION_CODE;
       await this.emailService.sendEmail(userInfo.email, text, subject);
-      return { status: "ok", message: "verification code has been send" };
+      return VVERIFICTION_CODE_RESPONSE;
     } catch (error) {
       throw new InternalServerErrorException();
     }
