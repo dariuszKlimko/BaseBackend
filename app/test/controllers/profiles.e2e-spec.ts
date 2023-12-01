@@ -6,11 +6,13 @@ import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
 import { Repository } from "typeorm";
 import { userLogin } from "@test/helpers/userLogin";
 import { Profile } from "@app/entities/profile.entity";
+import { ProfileRepository } from "@app/repositories/profile.repository";
 
 describe("Profiles (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactory;
-  let profileRepository: Repository<Profile>;
+  // let profileRepository: Repository<Profile>;
+  let profileRepository: ProfileRepository;
   let profile1accessToken: string;
   let profile2accessToken: string;
   let profile3accessToken: string;
@@ -21,7 +23,7 @@ describe("Profiles (e2e)", () => {
       imports: [AppModule],
     }).compile();
 
-    profileRepository = moduleFixture.get("ProfileRepository");
+    profileRepository = moduleFixture.get(ProfileRepository);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -52,13 +54,13 @@ describe("Profiles (e2e)", () => {
           userId = res.body.userId;
         });
 
-      return profileRepository.findOneBy({ userId }).then((profile) => {
+      return await profileRepository.findOneByCondition({ userId }).then((profile) => {
         expect(profile.height).toEqual(180);
       });
     });
 
-    it("should not update profile height in database for given accessToken if height is number", () => {
-      return request
+    it("should not update profile height in database for given accessToken if height is number", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch("/profiles")
         .set("Authorization", "Bearer someToken")
@@ -67,8 +69,8 @@ describe("Profiles (e2e)", () => {
         });
     });
 
-    it("should not update profile height in database for given accessToken if height is not number", () => {
-      return request
+    it("should not update profile height in database for given accessToken if height is not number", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch("/profiles")
         .set("Authorization", `Bearer ${profile2accessToken}`)
@@ -80,8 +82,8 @@ describe("Profiles (e2e)", () => {
   });
 
   describe("/profiles (GET) - get profile's data", () => {
-    it("should get profile height for given accessToken", () => {
-      return request
+    it("should get profile height for given accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .get("/profiles")
         .set("Authorization", `Bearer ${profile3accessToken}`)
@@ -91,8 +93,8 @@ describe("Profiles (e2e)", () => {
         });
     });
 
-    it("should not get profile height for invalid accessToken", () => {
-      return request
+    it("should not get profile height for invalid accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .get("/profiles")
         .set("Authorization", "Bearer someToken")

@@ -1,19 +1,26 @@
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";
 import { LoginResponse } from "@app/common/types/auth/login-response";
 import { User } from "@app/entities/user.entity";
+import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
+import { UserRepository } from "@app/repositories/user.repository";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
+import { config } from "process";
 import { ArrayContains, Repository } from "typeorm";
 
 @Injectable()
 export class TokenService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
-  ) {}
+  private readonly userRepository: UserRepositoryIntrface;
+  private readonly jwtService: JwtService;
+  private readonly configService: ConfigService;
+
+  constructor(userRepository: UserRepository, jwtService: JwtService, configService: ConfigService) {
+    this.userRepository = userRepository;
+    this.jwtService = jwtService;
+    this.configService = configService;
+  }
 
   async decodeConfirmationToken(token: string): Promise<string> {
     try {
@@ -33,8 +40,8 @@ export class TokenService {
   }
 
   async findUserByRefreshToken(refreshToken: string): Promise<User> {
-    const user: User = await this.userRepository.findOne({
-      where: { refreshTokens: ArrayContains([refreshToken]) },
+    const user: User = await this.userRepository.findOneByCondition({
+     refreshTokens: ArrayContains([refreshToken]) ,
     });
     if (!user) {
       throw new InvalidRefreshTokenException("invalid refreshToken");
@@ -48,10 +55,59 @@ export class TokenService {
     const payload = { sub: user.id };
     user.password = undefined;
     user.refreshTokens.push(token);
-    await this.userRepository.save(user);
+    await this.userRepository.saveOne(user);
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken: token,
     };
   }
 }
+
+// @Injectable()
+// export class TokenService {
+//   constructor(
+//     @InjectRepository(User) private readonly userRepository: Repository<User>,
+//     private readonly jwtService: JwtService,
+//     private readonly configService: ConfigService
+//   ) {}
+
+//   async decodeConfirmationToken(token: string): Promise<string> {
+//     try {
+//       const payload: JwtService = await this.jwtService.verify(token, {
+//         secret: this.configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
+//       });
+//       if (typeof payload === "object" && "email" in payload) {
+//         return payload.email.toString();
+//       }
+//       throw new BadRequestException();
+//     } catch (error) {
+//       if (error?.name === "TokenExpiredError") {
+//         throw new BadRequestException("Email confirmation token expired");
+//       }
+//       throw new BadRequestException("Bad confirmation token");
+//     }
+//   }
+
+//   async findUserByRefreshToken(refreshToken: string): Promise<User> {
+//     const user: User = await this.userRepository.findOne({
+//       where: { refreshTokens: ArrayContains([refreshToken]) },
+//     });
+//     if (!user) {
+//       throw new InvalidRefreshTokenException("invalid refreshToken");
+//     }
+//     const tokenIndex: number = user.refreshTokens.indexOf(refreshToken);
+//     user.refreshTokens.splice(tokenIndex, 1);
+//     return user;
+//   }
+
+//   async tokensResponse(user: User, token: string): Promise<LoginResponse> {
+//     const payload = { sub: user.id };
+//     user.password = undefined;
+//     user.refreshTokens.push(token);
+//     await this.userRepository.save(user);
+//     return {
+//       accessToken: this.jwtService.sign(payload),
+//       refreshToken: token,
+//     };
+//   }
+// }

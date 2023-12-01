@@ -10,11 +10,13 @@ import { Measurement } from "@app/entities/measurement.entity";
 import { userRegister } from "@test/helpers/userRegister";
 import { userLogin } from "@test/helpers/userLogin";
 import { Profile } from "@app/entities/profile.entity";
+import { UserRepository } from "@app/repositories/user.repository";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactory;
-  let userRepository: Repository<User>;
+  // let userRepository: Repository<User>;
+  let userRepository: UserRepository;
   let measurementRepository: Repository<Measurement>;
   let profileRepository: Repository<Profile>;
   let user2accessToken: string;
@@ -26,7 +28,7 @@ describe("Users (e2e)", () => {
       imports: [AppModule],
     }).compile();
 
-    userRepository = moduleFixture.get("UserRepository");
+    userRepository = moduleFixture.get(UserRepository);
     measurementRepository = moduleFixture.get("MeasurementRepository");
     profileRepository = moduleFixture.get("ProfileRepository");
 
@@ -46,85 +48,87 @@ describe("Users (e2e)", () => {
     it("should register user in database", async () => {
       const user: CreateUserDto = { email: "userRegister1@email.com", password: "Qwert12345!" };
       let userId: string;
+      let email: string;
       await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.CREATED);
         expect(res.body.email).toEqual(user.email);
         userId = res.body.id;
+        email = res.body.email
       });
-
-      await userRepository.findOneBy({ email: user.email }).then((userDb) => {
+  
+      await userRepository.findOneByCondition({ email }).then((userDb) => {
         expect(userDb).toBeDefined();
-        expect(userDb.email).toEqual(user.email);
+        expect(userDb.email).toEqual(email);
       });
 
-      return profileRepository.findOneBy({ userId }).then((profile) => {
+      return await profileRepository.findOneBy({ userId }).then((profile) => {
         expect(profile.userId).toEqual(userId);
       });
     });
 
-    it("should not register user which exist in database", () => {
+    it("should not register user which exist in database", async () => {
       const user: CreateUserDto = { email: "user1@email.com", password: "Qwert12345!" };
-      return userRegister(user.email, user.password, app).then((res) => {
+      return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.CONFLICT);
       });
     });
 
-    it("should not register user if email is ot email", () => {
+    it("should not register user if email is ot email", async () => {
       const user: CreateUserDto = { email: "userNotRegisteremail.com", password: "Qwert12345!!" };
-      return userRegister(user.email, user.password, app).then((res) => {
+      return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not register user with password shorter than 8 characters", () => {
+    it("should not register user with password shorter than 8 characters", async () => {
       const user: CreateUserDto = { email: "userNotRegister@email.com", password: "Qw1hb!" };
-      return userRegister(user.email, user.password, app).then((res) => {
+      return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not register user with password longer than 24 characters", () => {
+    it("should not register user with password longer than 24 characters", async () => {
       const user: CreateUserDto = {
         email: "userNotRegister@email.com",
         password: "Qwertoklk1234rfSdCSAWmjhb!",
       };
-      return userRegister(user.email, user.password, app).then((res) => {
+      return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not register user with password without number", () => {
+    it("should not register user with password without number", async () => {
       const user: CreateUserDto = { email: "userNotRegister@email.com", password: "Qwertoklkmjhb!" };
-      return userRegister(user.email, user.password, app).then((res) => {
+      return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not register user with password without special character", () => {
+    it("should not register user with password without special character", async () => {
       const user: CreateUserDto = { email: "userNotRegister@email.com", password: "Qwert12345" };
-      return userRegister(user.email, user.password, app).then((res) => {
+      return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not register user with password without capital letter", () => {
+    it("should not register user with password without capital letter", async () => {
       const user: CreateUserDto = { email: "userNotRegister@email.com", password: "qwert12345!" };
-      return userRegister(user.email, user.password, app).then((res) => {
+      return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not register user with password without small letter", () => {
+    it("should not register user with password without small letter", async () => {
       const user: CreateUserDto = { email: "userNotRegister@email.com", password: "QWERT12345!" };
-      return userRegister(user.email, user.password, app).then((res) => {
+      return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
   });
 
   describe("/users (GET) - get user's data", () => {
-    it("should return user's data for valid accessToken", () => {
-      return request
+    it("should return user's data for valid accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .get("/users")
         .set("Authorization", `Bearer ${user2accessToken}`)
@@ -135,8 +139,8 @@ describe("Users (e2e)", () => {
         });
     });
 
-    it("should not return user's data for invalid accessToken", () => {
-      return request
+    it("should not return user's data for invalid accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .get("/users")
         .set("Authorization", "Bearer someToken")
@@ -164,13 +168,13 @@ describe("Users (e2e)", () => {
         expect(user).toEqual(null);
       });
 
-      return profileRepository.findOneBy({ userId }).then((profile) => {
+      return await profileRepository.findOneBy({ userId }).then((profile) => {
         expect(profile).toEqual(null);
       });
     });
 
-    it("should not delete user account for given accessToken", () => {
-      return request
+    it("should not delete user account for given accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .delete("/users")
         .set("Authorization", "Bearer someToken")

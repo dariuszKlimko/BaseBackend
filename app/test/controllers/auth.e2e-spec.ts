@@ -11,12 +11,14 @@ import { LoginResponse } from "@app/common/types/auth/login-response";
 import { userLogin } from "@test/helpers/userLogin";
 import { credentialsUpdate } from "@test/helpers/credentialsUpdate";
 import { jwtGenerate } from "@test/helpers/jwtGenerate";
+import { UserRepository } from "@app/repositories/user.repository";
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;
   let configService: ConfigService;
   let jwtService: JwtService;
-  let userRepository: Repository<User>;
+  // let userRepository: Repository<User>;
+  let userRepository: UserRepository;
   let tokenSecret: string;
   let tokenExpireTime: number;
 
@@ -38,7 +40,7 @@ describe("Auth (e2e)", () => {
 
     jwtService = moduleFixture.get(JwtService);
     configService = moduleFixture.get(ConfigService);
-    userRepository = moduleFixture.get("UserRepository");
+    userRepository = moduleFixture.get(UserRepository);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -68,14 +70,14 @@ describe("Auth (e2e)", () => {
           expect(res.body.status).toEqual("ok");
         });
 
-      return userRepository.findOneBy({ email: "auth1@email.com" }).then((user) => {
+      return await userRepository.findOneByCondition({ email: "auth1@email.com" }).then((user) => {
         expect(user.verified).toEqual(true);
       });
     });
 
-    it("should not confirm account if user with given token not exist in database", () => {
+    it("should not confirm account if user with given token not exist in database", async () => {
       const token = jwtGenerate("authNotExistInDb@email.com", tokenSecret, tokenExpireTime, jwtService);
-      return request
+      return await request
         .default(app.getHttpServer())
         .get(`/auth/confirmation/${token}`)
         .then((res) => {
@@ -83,9 +85,9 @@ describe("Auth (e2e)", () => {
         });
     });
 
-    it("should not confirm user account if user for given token is already confirmed", () => {
+    it("should not confirm user account if user for given token is already confirmed", async () => {
       const token = jwtGenerate("auth2@email.com", tokenSecret, tokenExpireTime, jwtService);
-      return request
+      return await request
         .default(app.getHttpServer())
         .get(`/auth/confirmation/${token}`)
         .then((res) => {
@@ -93,8 +95,8 @@ describe("Auth (e2e)", () => {
         });
     });
 
-    it("should not confirm user account if given token is not valid", () => {
-      return request
+    it("should not confirm user account if given token is not valid", async () => {
+      return await request
         .default(app.getHttpServer())
         .get("/auth/confirmation/someToken")
         .then((res) => {
@@ -102,9 +104,9 @@ describe("Auth (e2e)", () => {
         });
     });
 
-    it("should not confirm user account if given token is expired", () => {
+    it("should not confirm user account if given token is expired", async () => {
       const token = jwtGenerate("auth3@email.com", tokenSecret, -10, jwtService);
-      return request
+      return await request
         .default(app.getHttpServer())
         .get(`/auth/confirmation/${token}`)
         .then((res) => {
@@ -114,8 +116,8 @@ describe("Auth (e2e)", () => {
   });
 
   describe("/auth/resend-confirmation/ (POST) - resend confirmation link", () => {
-    it("should resend confirmation link if email exist in database", () => {
-      return request
+    it("should resend confirmation link if email exist in database", async () => {
+      return await request
         .default(app.getHttpServer())
         .post("/auth/resend-confirmation")
         .send({ email: "auth4@email.com" })
@@ -125,8 +127,8 @@ describe("Auth (e2e)", () => {
         });
     });
 
-    it("should not resend confirmation link if email not exist in database", () => {
-      return request
+    it("should not resend confirmation link if email not exist in database", async () => {
+      return await request
         .default(app.getHttpServer())
         .post("/auth/resend-confirmation")
         .send({ email: "authNotExistInDb@email.com" })
@@ -149,7 +151,7 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken).toBeDefined();
         });
 
-      return userRepository.findOneBy({ email: user.email }).then((user) => {
+      return await userRepository.findOneByCondition({ email: user.email }).then((user) => {
         expect(user.refreshTokens.length).toEqual(1);
       });
     });
@@ -176,14 +178,14 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken).toBeDefined();
         });
 
-      return userRepository.findOneBy({ email: user.email }).then((user) => {
+      return await userRepository.findOneByCondition({ email: user.email }).then((user) => {
         expect(user.refreshTokens.length).toEqual(2);
       });
     });
 
-    it("should not return tokens if email not exist in database", () => {
+    it("should not return tokens if email not exist in database", async () => {
       const user = { email: "authNotExistInDb@email.com", password: "QWERTqwert1!" };
-      return request
+      return await request
         .default(app.getHttpServer())
         .post("/auth")
         .send(user)
@@ -192,9 +194,9 @@ describe("Auth (e2e)", () => {
         });
     });
 
-    it("should not return tokens if password is incorrect", () => {
+    it("should not return tokens if password is incorrect", async () => {
       const user = { email: "auth6@email.com", password: "Qwert123456789!" };
-      return request
+      return await request
         .default(app.getHttpServer())
         .post("/auth")
         .send(user)
@@ -203,9 +205,9 @@ describe("Auth (e2e)", () => {
         });
     });
 
-    it("should not return tokens if email is not verified", () => {
+    it("should not return tokens if email is not verified", async () => {
       const user = { email: "auth7@email.com", password: "Qwert12345!" };
-      return request
+      return await request
         .default(app.getHttpServer())
         .post("/auth")
         .send(user)
@@ -227,13 +229,13 @@ describe("Auth (e2e)", () => {
           expect(res.body.email).toEqual("auth8@email.com");
         });
 
-      return userRepository.findOneBy({ email: "auth8@email.com" }).then((user) => {
+      return await userRepository.findOneByCondition({ email: "auth8@email.com" }).then((user) => {
         expect(user.refreshTokens).toEqual([]);
       });
     });
 
-    it("should not delete refresh token for user with given accessToken which is not owner of refreshToken", () => {
-      return request
+    it("should not delete refresh token for user with given accessToken which is not owner of refreshToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch("/auth")
         .set("Authorization", `Bearer ${auth9Tokens.accessToken}`)
@@ -243,8 +245,8 @@ describe("Auth (e2e)", () => {
         });
     });
 
-    it("should not delete refresh token for user with given accessToken if resreshToken not exist in database", () => {
-      return request
+    it("should not delete refresh token for user with given accessToken if resreshToken not exist in database", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch("/auth")
         .set("Authorization", `Bearer ${auth11Tokens.accessToken}`)
@@ -267,13 +269,13 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken.length).toBeDefined();
         });
 
-      return userRepository.findOneBy({ email: "auth12@email.com" }).then((user) => {
+      return await userRepository.findOneByCondition({ email: "auth12@email.com" }).then((user) => {
         expect(user.refreshTokens.length).toEqual(1);
       });
     });
 
-    it("should not get new tokens if invalid refreshToken", () => {
-      return request
+    it("should not get new tokens if invalid refreshToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch("/auth/tokens")
         .send({ refreshToken: "someToken" })
@@ -292,33 +294,33 @@ describe("Auth (e2e)", () => {
         }
       );
 
-      return userRepository.findOneBy({ email: "authUpdate13@email.com" }).then((user) => {
+      return await userRepository.findOneByCondition({ email: "authUpdate13@email.com" }).then((user) => {
         expect(user.email).toEqual("authUpdate13@email.com");
       });
     });
 
-    it("should not update user if email is not email", () => {
-      return credentialsUpdate(auth14Tokens.accessToken, { email: "authUpdate14email.com" }, app).then(
+    it("should not update user if email is not email", async () => {
+      return await credentialsUpdate(auth14Tokens.accessToken, { email: "authUpdate14email.com" }, app).then(
         (res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         }
       );
     });
 
-    it("should update user password for user with given accessToken", () => {
-      return credentialsUpdate(auth15Tokens.accessToken, { password: "Qwerty123456!" }, app).then((res) => {
+    it("should update user password for user with given accessToken", async () => {
+      return await credentialsUpdate(auth15Tokens.accessToken, { password: "Qwerty123456!" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
       });
     });
 
-    it("should not update user password shorter than 8 characters", () => {
-      return credentialsUpdate(auth14Tokens.accessToken, { password: "Qw12!" }, app).then((res) => {
+    it("should not update user password shorter than 8 characters", async () => {
+      return await credentialsUpdate(auth14Tokens.accessToken, { password: "Qw12!" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not update user password longer than 24 characters", () => {
-      return credentialsUpdate(
+    it("should not update user password longer than 24 characters", async () => {
+      return await credentialsUpdate(
         auth14Tokens.accessToken,
         { password: "QwrtfgvbcfrewqwerQQW229disj12!" },
         app
@@ -327,26 +329,26 @@ describe("Auth (e2e)", () => {
       });
     });
 
-    it("should not update user password without number", () => {
-      return credentialsUpdate(auth14Tokens.accessToken, { password: "Qwertyjhgfjgf!" }, app).then((res) => {
+    it("should not update user password without number", async () => {
+      return await credentialsUpdate(auth14Tokens.accessToken, { password: "Qwertyjhgfjgf!" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not update user password without special character", () => {
-      return credentialsUpdate(auth14Tokens.accessToken, { password: "Qwerty123456" }, app).then((res) => {
+    it("should not update user password without special character", async () => {
+      return await credentialsUpdate(auth14Tokens.accessToken, { password: "Qwerty123456" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not update user password without capital letter", () => {
-      return credentialsUpdate(auth14Tokens.accessToken, { password: "qwerty123456!" }, app).then((res) => {
+    it("should not update user password without capital letter", async () => {
+      return await credentialsUpdate(auth14Tokens.accessToken, { password: "qwerty123456!" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
-    it("should not update user password without small letter", () => {
-      return credentialsUpdate(auth14Tokens.accessToken, { password: "QWERTY123456!" }, app).then((res) => {
+    it("should not update user password without small letter", async () => {
+      return await credentialsUpdate(auth14Tokens.accessToken, { password: "QWERTY123456!" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
@@ -363,15 +365,15 @@ describe("Auth (e2e)", () => {
           expect(res.body.status).toEqual("ok");
         });
 
-      return userRepository.findOneBy({ email: "auth17@email.com" }).then((user) => {
+      return await userRepository.findOneByCondition({ email: "auth17@email.com" }).then((user) => {
         expect(user.verificationCode).toBeDefined();
         expect(user.verificationCode).toBeGreaterThanOrEqual(100000);
         expect(user.verificationCode).toBeLessThanOrEqual(999999);
       });
     });
 
-    it("should not send email with verification code if user not exist in database", () => {
-      return request
+    it("should not send email with verification code if user not exist in database", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch("/auth/reset-password")
         .send({ email: "authNotExistInDb@email.com" })
@@ -380,8 +382,8 @@ describe("Auth (e2e)", () => {
         });
     });
 
-    it("should not send email with verification code if user is not verified", () => {
-      return request
+    it("should not send email with verification code if user is not verified", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch("/auth/reset-password")
         .send({ email: "auth18@email.com" })
@@ -412,7 +414,7 @@ describe("Auth (e2e)", () => {
         expect(res.body.refreshToken).toBeDefined();
       });
 
-      return userRepository.findOneBy({ email: "auth19@email.com" }).then((user) => {
+      return await userRepository.findOneByCondition({ email: "auth19@email.com" }).then((user) => {
         expect(user.verificationCode).toEqual(null);
       });
     });
@@ -431,7 +433,7 @@ describe("Auth (e2e)", () => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
 
-      return userRepository.findOneBy({ email: "auth20@email.com" }).then((user) => {
+      return await userRepository.findOneByCondition({ email: "auth20@email.com" }).then((user) => {
         expect(user.verificationCode).toEqual(123456);
       });
     });

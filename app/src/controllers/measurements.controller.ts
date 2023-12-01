@@ -62,9 +62,9 @@ export class MeasurementsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAllMeasurements(@CurrentUser() user: CurrentUserDecorator): Promise<Measurement[]> {
+  async getAllMeasurementsByUserId(@CurrentUser() user: CurrentUserDecorator): Promise<Measurement[]> {
     try {
-      return await this.measurementsService.getAllMeasurements(user.id);
+      return await this.measurementsService.getAllMeasurementsByUserId(user.id);
     } catch (error) {
       throw new InternalServerErrorException();
     }

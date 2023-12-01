@@ -22,6 +22,9 @@ import { ProfilesService } from "@app/services/profile.service";
 import { TokenService } from "@app/services/token.service";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { LoggerMiddleware } from "@app/common/middleware/logger.midleware";
+import { UserRepository } from "@app/repositories/user.repository";
+import { MeasurementRepository } from "@app/repositories/measurement.repository";
+import { ProfileRepository } from "@app/repositories/profile.repository";
 
 @Module({
   imports: [
@@ -68,8 +71,12 @@ import { LoggerMiddleware } from "@app/common/middleware/logger.midleware";
     ProfilesService,
     TokenService,
     GeneratorSevice,
+    UserRepository,
+    ProfileRepository,
+    MeasurementRepository,
   ],
 })
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes("*");

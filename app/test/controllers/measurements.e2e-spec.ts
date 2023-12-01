@@ -6,11 +6,13 @@ import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { Repository } from "typeorm";
 import { Measurement } from "@app/entities/measurement.entity";
+import { MeasurementRepository } from "@app/repositories/measurement.repository";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactory;
-  let measurementRepository: Repository<Measurement>;
+  // let measurementRepository: Repository<Measurement>;
+  let measurementRepository: MeasurementRepository;
 
   beforeEach(async () => {
     fixtures = await loadFixtures();
@@ -27,7 +29,7 @@ describe("Measurements (e2e)", () => {
       })
       .compile();
 
-    measurementRepository = moduleFixture.get("MeasurementRepository");
+    measurementRepository = moduleFixture.get(MeasurementRepository);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -57,7 +59,7 @@ describe("Measurements (e2e)", () => {
           id = res.body.id;
         });
 
-      return measurementRepository.findOneBy({ id }).then((measure) => {
+      return await measurementRepository.findOneById(id).then((measure) => {
         expect(measure.measurementDate).toEqual(measurement.measurementDate);
         expect(measure.weight).toEqual(measurement.weight);
         expect(measure.bmi).toEqual(bmi);
@@ -66,8 +68,8 @@ describe("Measurements (e2e)", () => {
   });
 
   describe("/measurements (GET) - get all measurements", () => {
-    it("should get all measurements of user", () => {
-      return request
+    it("should get all measurements of user", async () => {
+      return await request
         .default(app.getHttpServer())
         .get("/measurements")
         .then((res) => {
@@ -78,7 +80,7 @@ describe("Measurements (e2e)", () => {
 
     it("should return empty array if there id no measurements for user", async () => {
       await request.default(app.getHttpServer()).delete("/measurements");
-      return request
+      return await request
         .default(app.getHttpServer())
         .get("/measurements")
         .then((res) => {
@@ -89,8 +91,8 @@ describe("Measurements (e2e)", () => {
   });
 
   describe("/measurements/:id (GET) - get one measurement", () => {
-    it("should get one measurement for user  with given accessToken", () => {
-      return request
+    it("should get one measurement for user  with given accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .get(`/measurements/${fixtures.get("measurement5").id}`)
         .then((res) => {
@@ -100,8 +102,8 @@ describe("Measurements (e2e)", () => {
         });
     });
 
-    it("should not get one measurement for user  with given accessToken which is not owner of measurement", () => {
-      return request
+    it("should not get one measurement for user  with given accessToken which is not owner of measurement", async () => {
+      return await request
         .default(app.getHttpServer())
         .get(`/measurements/${fixtures.get("measurement1").id}`)
         .then((res) => {
@@ -109,8 +111,8 @@ describe("Measurements (e2e)", () => {
         });
     });
 
-    it("should not get one measurement with wrong id for user with given accessToken", () => {
-      return request
+    it("should not get one measurement with wrong id for user with given accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .get("/measurements/fcbe637d-6472-4033-8862-b1553990422f")
         .then((res) => {
@@ -118,8 +120,8 @@ describe("Measurements (e2e)", () => {
         });
     });
 
-    it("should not get one measurement with id not uuid type for user with given accessToken", () => {
-      return request
+    it("should not get one measurement with id not uuid type for user with given accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .get("/measurements/notUUUIDmeasurementId")
         .then((res) => {
@@ -148,7 +150,7 @@ describe("Measurements (e2e)", () => {
           expect(res.body.measurementDate).toEqual(measurement.measurementDate);
         });
 
-      return measurementRepository.findOneBy({ id: fixtures.get("measurement5").id }).then((measure) => {
+      return await measurementRepository.findOneById(fixtures.get("measurement5").id).then((measure) => {
         expect(measure.weight).toEqual(measurement.weight);
         expect(measure.caloriesDelivered).toEqual(measurement.caloriesDelivered);
         expect(measure.distanceTraveled).toEqual(measurement.distanceTraveled);
@@ -156,8 +158,8 @@ describe("Measurements (e2e)", () => {
       });
     });
 
-    it("should not update measurement ith wrong id for user with given accessToken", () => {
-      return request
+    it("should not update measurement ith wrong id for user with given accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement1").id}`)
         .then((res) => {
@@ -165,8 +167,8 @@ describe("Measurements (e2e)", () => {
         });
     });
 
-    it("should not update measurement when weight is not number", () => {
-      return request
+    it("should not update measurement when weight is not number", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send({ weight: "76" })
@@ -175,8 +177,8 @@ describe("Measurements (e2e)", () => {
         });
     });
 
-    it("should not update measurement when caloriesDelivered is not number", () => {
-      return request
+    it("should not update measurement when caloriesDelivered is not number", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send({ caloriesDelivered: "1976" })
@@ -185,8 +187,8 @@ describe("Measurements (e2e)", () => {
         });
     });
 
-    it("should not update measurement when distanceTraveled is not number", () => {
-      return request
+    it("should not update measurement when distanceTraveled is not number", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send({ distanceTraveled: "9" })
@@ -195,8 +197,8 @@ describe("Measurements (e2e)", () => {
         });
     });
 
-    it("should not update measurement when measurementDate is not number", () => {
-      return request
+    it("should not update measurement when measurementDate is not number", async () => {
+      return await request
         .default(app.getHttpServer())
         .patch(`/measurements/${fixtures.get("measurement5").id}`)
         .send({ measurementDate: 567789 })
@@ -216,7 +218,7 @@ describe("Measurements (e2e)", () => {
           expect(res.body.status).toEqual("ok");
         });
 
-      return measurementRepository.findBy({ userId: fixtures.get("user5").id }).then((measurements) => {
+      return await measurementRepository.findAllByCondition({ userId: fixtures.get("user5").id }).then((measurements) => {
         expect(measurements).toEqual([]);
       });
     });
@@ -226,7 +228,7 @@ describe("Measurements (e2e)", () => {
     it("should delete one measurement for user with given accessToken", async () => {
       const userId: string = fixtures.get("user5").id;
       const allMeasurementsLenght: number = await measurementRepository
-        .findBy({ userId })
+        .findAllByCondition({ userId })
         .then((res) => res.length);
       await request
         .default(app.getHttpServer())
@@ -236,13 +238,13 @@ describe("Measurements (e2e)", () => {
           expect(res.body.id).toEqual(fixtures.get("measurement5").id);
         });
 
-      return measurementRepository.findBy({ userId }).then((measurements) => {
+      return await measurementRepository.findAllByCondition({ userId }).then((measurements) => {
         expect(measurements.length).toEqual(allMeasurementsLenght - 1);
       });
     });
 
-    it("should not delete one measurement with incorrect id for user with given accessToken", () => {
-      return request
+    it("should not delete one measurement with incorrect id for user with given accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .delete(`/measurements/${fixtures.get("measurement1").id}`)
         .then((res) => {
@@ -250,8 +252,8 @@ describe("Measurements (e2e)", () => {
         });
     });
 
-    it("should not delete one measurement if id is not uuid type for user with given accessToken", () => {
-      return request
+    it("should not delete one measurement if id is not uuid type for user with given accessToken", async () => {
+      return await request
         .default(app.getHttpServer())
         .delete("/measurements/someNotUUIDmeasurementId")
         .then((res) => {

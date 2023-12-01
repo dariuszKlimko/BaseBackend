@@ -4,15 +4,15 @@ import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.d
 import { Measurement } from "@app/entities/measurement.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { MeasurementRepositoryInterface } from "./interfaces/measurements.repository.interface";
+import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
 
-export class MeasurementsRepository
+export class MeasurementRepository
   extends BaseAbstractRepository<Measurement, CreateMeasurementDto, UpdateMeasurementDto>
   implements MeasurementRepositoryInterface
 {
   constructor(
-    @InjectRepository(Measurement) private readonly measurementRepository: Repository<Measurement>
+    @InjectRepository(Measurement) measurementRepository: Repository<Measurement>
   ) {
-    super(measurementRepository, "dddd");
+    super(measurementRepository, "Measurement not found");
   }
 }

@@ -1,15 +1,24 @@
 import { BaseEntity } from "@app/entities/base.entity";
-import { FindOptionsRelations, FindOptionsWhere } from "typeorm";
+import { DeepPartial, FindOptionsRelations, FindOptionsWhere } from "typeorm";
 
 export interface BaseInterfaceRepository<E extends BaseEntity, CreateDTO, UpdateDTO> {
   findAll(): Promise<E[]>;
-  findAllByIds(ids: string[]): Promise<E[]>;
   findOneById(id: string): Promise<E>;
+  findAllByIds(ids: string[]): Promise<E[]>;
+  findOneByCondition(condition: FindOptionsWhere<E>): Promise<E>;
+  findOneByConditionWithoutThrow(condition: FindOptionsWhere<E>): Promise<E>
+  findAllByCondition(condition: FindOptionsWhere<E>): Promise<E[]>;
   findWithRelation(rel: FindOptionsRelations<E>): Promise<E[]>;
-  findByCondition(condition: FindOptionsWhere<E>): Promise<E[]>;
-  createOne(createEntityDto: CreateDTO): Promise<E>;
-  createMany(createEntityDtos: CreateDTO[]): Promise<E[]>;
-  updateOne(id: string, updateEntityDto: UpdateDTO): Promise<E>;
-  deleteOne(id: string): Promise<E>;
-  deleteMany(ids: string[]): Promise<E[]>;
+  createOne(createEntityDto?: DeepPartial<E>): Promise<E>;
+  createMany(createEntityDtos: DeepPartial<E[]>): Promise<E[]>;
+  saveOne(entity: E): Promise<E>;
+  saveMany(entities: E[]): Promise<E[]>;
+  updateOneById(id: string, updateEntityDto: DeepPartial<E>): Promise<E>;
+  updateOneByCondition(condition: FindOptionsWhere<E>, updateEntityDto: DeepPartial<E>): Promise<E>;
+  deleteOneById(id: string): Promise<E>;
+  deleteManyByIds(ids: string[]): Promise<E[]>;
+  deleteOneByCondition(condition: FindOptionsWhere<E>): Promise<E>;
+  deleteManyByCondition(condition: FindOptionsWhere<E>): Promise<E[]>;
+  countAll(): Promise<number>;
+  countAllWithCondition(condition: FindOptionsWhere<E>): Promise<number>;
 }
