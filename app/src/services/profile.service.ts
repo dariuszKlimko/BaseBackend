@@ -15,7 +15,7 @@ export class ProfilesService {
   }
 
   async getProfile(userId: string): Promise<Profile> {
-    return await this.profileRepository.findOneByCondition({ userId });
+    return await this.profileRepository.findOneByConditionOrThrow({ userId });
   }
 
   async updateProfile(userId: string, profileInfo: UpdateProfileDto): Promise<Profile> {

@@ -11,14 +11,19 @@ import { userRegister } from "@test/helpers/userRegister";
 import { userLogin } from "@test/helpers/userLogin";
 import { Profile } from "@app/entities/profile.entity";
 import { UserRepository } from "@app/repositories/user.repository";
+import { MeasurementRepository } from "@app/repositories/measurement.repository";
+import { ProfileRepository } from "@app/repositories/profile.repository";
+import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.exception";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactory;
   // let userRepository: Repository<User>;
   let userRepository: UserRepository;
-  let measurementRepository: Repository<Measurement>;
-  let profileRepository: Repository<Profile>;
+  // let measurementRepository: Repository<Measurement>;
+  let measurementRepository: MeasurementRepository;
+  // let profileRepository: Repository<Profile>;
+  let profileRepository: ProfileRepository;
   let user2accessToken: string;
   let user3accessToken: string;
 
@@ -29,8 +34,8 @@ describe("Users (e2e)", () => {
     }).compile();
 
     userRepository = moduleFixture.get(UserRepository);
-    measurementRepository = moduleFixture.get("MeasurementRepository");
-    profileRepository = moduleFixture.get("ProfileRepository");
+    measurementRepository = moduleFixture.get(MeasurementRepository);
+    profileRepository = moduleFixture.get(ProfileRepository);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -56,12 +61,12 @@ describe("Users (e2e)", () => {
         email = res.body.email
       });
   
-      await userRepository.findOneByCondition({ email }).then((userDb) => {
+      await userRepository.findOneByConditionOrThrow({ email }).then((userDb) => {
         expect(userDb).toBeDefined();
         expect(userDb.email).toEqual(email);
       });
 
-      return await profileRepository.findOneBy({ userId }).then((profile) => {
+      return await profileRepository.findOneByConditionOrThrow({ userId }).then((profile) => {
         expect(profile.userId).toEqual(userId);
       });
     });
@@ -152,25 +157,21 @@ describe("Users (e2e)", () => {
 
   describe("/users (DELETE) - delete user's account", () => {
     it("should delete user account for given accessToken", async () => {
-      let userId: string;
       await request
         .default(app.getHttpServer())
         .delete("/users")
         .set("Authorization", `Bearer ${user3accessToken}`)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.id).toEqual(fixtures.get("user3").id);
           expect(res.body.email).toEqual(fixtures.get("user3").email);
-          userId = res.body.id;
+          expect(res.body.password).toEqual(fixtures.get("user3").password);
         });
 
-      await measurementRepository.findOneBy({ userId }).then((user) => {
-        expect(user).toEqual(null);
-      });
+        await expect(measurementRepository.findOneByConditionOrThrow({ userId: fixtures.get("user3").id }))
+        .rejects.toThrow(EntityNotFound);
 
-      return await profileRepository.findOneBy({ userId }).then((profile) => {
-        expect(profile).toEqual(null);
-      });
+        await expect(profileRepository.findOneByConditionOrThrow({ userId: fixtures.get("user3").id }))
+        .rejects.toThrow(EntityNotFound);
     });
 
     it("should not delete user account for given accessToken", async () => {

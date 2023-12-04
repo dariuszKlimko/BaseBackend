@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   async userConfirmation(email: string): Promise<MessageInfo> {
-    const user: User = await this.userRepository.findOneByCondition({ email });
+    const user: User = await this.userRepository.findOneByConditionOrThrow({ email });
     if (!user) {
       throw new UserNotFoundException("user with given email not exist in database");
     } else if (user.verified) {
@@ -38,7 +38,7 @@ export class AuthService {
   }
 
   async comparePassword(userInfo: CreateUserDto): Promise<User> {
-    const user: User = await this.userRepository.findOneByCondition({ email: userInfo.email });
+    const user: User = await this.userRepository.findOneByConditionOrThrow({ email: userInfo.email });
     if (!user) {
       throw new UserNotFoundException("user with given email not exist in database");
     }
@@ -52,7 +52,7 @@ export class AuthService {
   }
 
   async logout(id: string, token: string): Promise<LogoutResponse> {
-    const user: User = await this.userRepository.findOneById(id);
+    const user: User = await this.userRepository.findOneByIdOrThrow(id);
     const tokenIndex: number = user.refreshTokens.indexOf(token);
     if (tokenIndex < 0) {
       throw new InvalidRefreshTokenException("invalid refreshToken");
@@ -63,7 +63,7 @@ export class AuthService {
   }
 
   async resetPasswordConfirm(resetPassord: ResetPasswordDto): Promise<MessageInfo> {
-    const user: User = await this.userRepository.findOneByCondition({ email: resetPassord.email });
+    const user: User = await this.userRepository.findOneByConditionOrThrow({ email: resetPassord.email });
     if (user.verificationCode !== resetPassord.verificationCode) {
       throw new InvalidVerificationCodeException("invalid verification code");
     }
@@ -74,7 +74,7 @@ export class AuthService {
   }
 
   async updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User> {
-    const user: User = await this.userRepository.findOneById(id);
+    const user: User = await this.userRepository.findOneByIdOrThrow(id);
     if (userInfo.email) {
       user.email = userInfo.email;
     }

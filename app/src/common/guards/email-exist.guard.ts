@@ -5,12 +5,16 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
-import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { EmailService } from "@app/services/email.service";
+import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.exception";
 
 @Injectable()
 export class EmailExistGuard implements CanActivate {
-  constructor(private readonly emailService: EmailService) {}
+  private readonly emailService: EmailService;
+
+  constructor(emailService: EmailService) {
+    this.emailService= emailService;
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const body = context.switchToHttp().getRequest().body;
@@ -18,7 +22,7 @@ export class EmailExistGuard implements CanActivate {
       const user = await this.emailService.checkIfEmailExist(body.email);
       return !!user;
     } catch (error) {
-      if (error instanceof UserNotFoundException) {
+      if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
       }
       throw new InternalServerErrorException();

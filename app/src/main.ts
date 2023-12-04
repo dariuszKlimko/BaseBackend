@@ -4,7 +4,7 @@ import {
   configureHttpExceptionFilters,
   configureSwagger,
   configureValidator,
-} from "@app/common/config/bootstrapConfiguration";
+} from "@app/bootstrapConfiguration";
 import { ConfigService } from "@nestjs/config";
 import { INestApplication } from "@nestjs/common";
 

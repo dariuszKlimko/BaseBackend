@@ -40,7 +40,7 @@ export class TokenService {
   }
 
   async findUserByRefreshToken(refreshToken: string): Promise<User> {
-    const user: User = await this.userRepository.findOneByCondition({
+    const user: User = await this.userRepository.findOneByConditionOrThrow({
      refreshTokens: ArrayContains([refreshToken]) ,
     });
     if (!user) {

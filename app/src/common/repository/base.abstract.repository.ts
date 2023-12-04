@@ -1,5 +1,5 @@
 import { BaseEntity } from "@app/entities/base.entity";
-import { DeepPartial, FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
+import { DeepPartial, EntityNotFoundError, FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
 import { BaseInterfaceRepository } from "@app/common/repository/base.interface.repository";
 import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.exception";
 
@@ -18,11 +18,14 @@ export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, Up
     return await this.repository.find();
   }
 
-  async findOneById(id: string): Promise<E> {
+  async findOneByIdOrThrow(id: string): Promise<E> {
     try  {
-      return await this.repository.findOneBy({ id } as FindOptionsWhere<E>);
+      return await this.repository.findOneByOrFail({ id } as FindOptionsWhere<E>);
     } catch(error) {
-      throw new EntityNotFound(this.errorMessage);
+      if (error instanceof EntityNotFoundError) {
+        throw new EntityNotFound(this.errorMessage);
+      }
+      throw error;
     }
   }
 
@@ -32,18 +35,18 @@ export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, Up
     });
   }
 
-  async findOneByCondition(condition: FindOptionsWhere<E>): Promise<E> {
-    try  {
-      const rows: E[] = await this.repository.find({
-        where: condition,
-      });
-      return rows[0];
-    } catch(error) {
-      throw new EntityNotFound(this.errorMessage);
+  async findOneByConditionOrThrow(condition: FindOptionsWhere<E>): Promise<E> {
+    try {
+      return await this.repository.findOneByOrFail(condition);
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new EntityNotFound(this.errorMessage);
+      }
+      throw error;
     }
   }
 
-  async findOneByConditionWithoutThrow(condition: FindOptionsWhere<E>): Promise<E> {
+  async findOneByCondition(condition: FindOptionsWhere<E>): Promise<E> {
     const rows: E[] = await this.repository.find({
       where: condition,
     });
@@ -83,19 +86,19 @@ export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, Up
   }
 
   async updateOneById(id: string, updateEntityDto: DeepPartial<E>): Promise<E> {
-    const entity: E = await this.findOneById(id);
+    const entity: E = await this.findOneByIdOrThrow(id);
     this.repository.merge(entity, updateEntityDto);
     return await this.repository.save(entity);
   }
 
   async updateOneByCondition(condition: FindOptionsWhere<E>, updateEntityDto: DeepPartial<E>): Promise<E> {
-    const entity: E = await this.findOneByCondition(condition);
+    const entity: E = await this.findOneByConditionOrThrow(condition);
     this.repository.merge(entity, updateEntityDto);
     return await this.repository.save(entity);
   }
 
   async deleteOneById(id: string): Promise<E> {
-    const entity: E = await this.findOneById(id);
+    const entity: E = await this.findOneByIdOrThrow(id);
     return await this.repository.remove(entity);
   }
 
@@ -105,7 +108,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity, CreateDTO, Up
   }
 
   async deleteOneByCondition(condition: FindOptionsWhere<E>): Promise<E> {
-    const entity: E = await this.findOneByCondition(condition);
+    const entity: E = await this.findOneByConditionOrThrow(condition);
     return await this.repository.remove(entity);
   }
 

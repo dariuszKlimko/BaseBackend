@@ -54,7 +54,7 @@ describe("Profiles (e2e)", () => {
           userId = res.body.userId;
         });
 
-      return await profileRepository.findOneByCondition({ userId }).then((profile) => {
+      return await profileRepository.findOneByConditionOrThrow({ userId }).then((profile) => {
         expect(profile.height).toEqual(180);
       });
     });

@@ -25,11 +25,14 @@ import { MeasurementNotFoundException } from "@app/common/exceptions/measurement
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Measurement } from "@app/entities/measurement.entity";
+import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.exception";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)
 @Controller("measurements")
 export class MeasurementsController {
+
+  
   constructor(private readonly measurementsService: MeasurementsService) {}
 
   @ApiOperation({ summary: "create measuremet" })
@@ -86,7 +89,7 @@ export class MeasurementsController {
     try {
       return await this.measurementsService.getOneMeasurement(user.id, id);
     } catch (error) {
-      if (error instanceof MeasurementNotFoundException) {
+      if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
       }
       throw new InternalServerErrorException();
@@ -111,7 +114,7 @@ export class MeasurementsController {
     try {
       return await this.measurementsService.updateMeasurement(user.id, id, measurement);
     } catch (error) {
-      if (error instanceof MeasurementNotFoundException) {
+      if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
       }
       throw new InternalServerErrorException();
@@ -131,7 +134,7 @@ export class MeasurementsController {
     try {
       return await this.measurementsService.deleteAllMeasurementsByUserId(user.id);
     } catch (error) {
-      if (error instanceof MeasurementNotFoundException) {
+      if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
       }
       throw new InternalServerErrorException();
@@ -154,7 +157,7 @@ export class MeasurementsController {
     try {
       return await this.measurementsService.deleteOneMeasurement(user.id, id);
     } catch (error) {
-      if (error instanceof MeasurementNotFoundException) {
+      if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
       }
       throw new InternalServerErrorException();

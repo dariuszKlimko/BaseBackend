@@ -26,7 +26,7 @@ export class MeasurementsService {
 
   async createMeasurement(userId: string, measurementPayload: CreateMeasurementDto): Promise<Measurement> {
     let bmi: number;
-    const profile: Profile = await this.profileRepository.findOneByCondition({ userId });
+    const profile: Profile = await this.profileRepository.findOneByConditionOrThrow({ userId });
     const measurement: Measurement = await this.measurementsRepository.createOne(measurementPayload);
     measurement.userId = userId;
     if (profile.height) {
@@ -41,7 +41,7 @@ export class MeasurementsService {
   }
 
   async getOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
-    const measurement: Measurement = await this.measurementsRepository.findOneByCondition({
+    const measurement: Measurement = await this.measurementsRepository.findOneByConditionOrThrow({
       userId,
       id: measurementId,
     });
@@ -56,7 +56,7 @@ export class MeasurementsService {
     measurementId: string,
     measurementPayload: UpdateMeasurementDto
   ): Promise<Measurement> {
-    const measurement: Measurement = await this.measurementsRepository.findOneByCondition({
+    const measurement: Measurement = await this.measurementsRepository.findOneByConditionOrThrow({
       userId,
       id: measurementId,
     });
@@ -64,7 +64,7 @@ export class MeasurementsService {
       throw new MeasurementNotFoundException("incorrect measuremet or user id");
     }
     await this.measurementsRepository.updateOneByCondition({ userId, id: measurementId }, measurementPayload);
-    return await this.measurementsRepository.findOneByCondition({ userId, id: measurementId });
+    return await this.measurementsRepository.findOneByConditionOrThrow({ userId, id: measurementId });
   }
 
   async deleteAllMeasurementsByUserId(userId: string): Promise<MessageInfo> {
@@ -77,7 +77,7 @@ export class MeasurementsService {
   }
 
   async deleteOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
-    const measurement: Measurement = await this.measurementsRepository.findOneByCondition({
+    const measurement: Measurement = await this.measurementsRepository.findOneByConditionOrThrow({
       userId,
       id: measurementId,
     });

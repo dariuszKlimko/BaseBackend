@@ -59,7 +59,7 @@ describe("Measurements (e2e)", () => {
           id = res.body.id;
         });
 
-      return await measurementRepository.findOneById(id).then((measure) => {
+      return await measurementRepository.findOneByIdOrThrow(id).then((measure) => {
         expect(measure.measurementDate).toEqual(measurement.measurementDate);
         expect(measure.weight).toEqual(measurement.weight);
         expect(measure.bmi).toEqual(bmi);
@@ -150,7 +150,7 @@ describe("Measurements (e2e)", () => {
           expect(res.body.measurementDate).toEqual(measurement.measurementDate);
         });
 
-      return await measurementRepository.findOneById(fixtures.get("measurement5").id).then((measure) => {
+      return await measurementRepository.findOneByIdOrThrow(fixtures.get("measurement5").id).then((measure) => {
         expect(measure.weight).toEqual(measurement.weight);
         expect(measure.caloriesDelivered).toEqual(measurement.caloriesDelivered);
         expect(measure.distanceTraveled).toEqual(measurement.distanceTraveled);

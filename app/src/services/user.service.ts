@@ -22,12 +22,12 @@ export class UsersService {
   }
 
   async getUser(id: string): Promise<User> {
-    const user: User = await this.userRepository.findOneById(id);
+    const user: User = await this.userRepository.findOneByIdOrThrow(id);
     return user;
   }
 
   async registerUser(userInfo: CreateUserDto): Promise<User> {
-    const user: User = await this.userRepository.findOneByConditionWithoutThrow({ email: userInfo.email });
+    const user: User = await this.userRepository.findOneByCondition({ email: userInfo.email });
     if (user) {
       throw new UserDuplicatedException("user with given email address aldeady exist in database");
     }
@@ -39,9 +39,7 @@ export class UsersService {
   }
 
   async deleteUser(id: string): Promise<User> {
-    const user: User = await this.userRepository.findOneById(id);
-    await this.userRepository.deleteOneById(id);
-    return user;
+    return await this.userRepository.deleteOneById(id);
   }
 
   // async updateUser()

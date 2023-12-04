@@ -46,6 +46,7 @@ import {
   VVERIFICTION_CODE_RESPONSE,
   RESET_PASSWORD_VERIFICATION_CODE,
 } from "@app/common/constans/constans";
+import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.exception";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -66,7 +67,8 @@ export class AuthController {
       const email: string = await this.tokenService.decodeConfirmationToken(token);
       return await this.authService.userConfirmation(email);
     } catch (error) {
-      if (error instanceof UserNotFoundException) {
+      // if (error instanceof UserNotFoundException) {
+      if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
       } else if (error instanceof UserAlreadyConfirmedException) {
         throw new BadRequestException(error.message);
@@ -140,7 +142,7 @@ export class AuthController {
       const newToken: string = this.generatorService.generateToken();
       return await this.tokenService.tokensResponse(authorizedUser, newToken);
     } catch (error) {
-      if (error instanceof InvalidRefreshTokenException) {
+      if (error instanceof EntityNotFound) {
         throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException(error.message);

@@ -70,7 +70,7 @@ describe("Auth (e2e)", () => {
           expect(res.body.status).toEqual("ok");
         });
 
-      return await userRepository.findOneByCondition({ email: "auth1@email.com" }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: "auth1@email.com" }).then((user) => {
         expect(user.verified).toEqual(true);
       });
     });
@@ -151,7 +151,7 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken).toBeDefined();
         });
 
-      return await userRepository.findOneByCondition({ email: user.email }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: user.email }).then((user) => {
         expect(user.refreshTokens.length).toEqual(1);
       });
     });
@@ -178,7 +178,7 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken).toBeDefined();
         });
 
-      return await userRepository.findOneByCondition({ email: user.email }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: user.email }).then((user) => {
         expect(user.refreshTokens.length).toEqual(2);
       });
     });
@@ -229,7 +229,7 @@ describe("Auth (e2e)", () => {
           expect(res.body.email).toEqual("auth8@email.com");
         });
 
-      return await userRepository.findOneByCondition({ email: "auth8@email.com" }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: "auth8@email.com" }).then((user) => {
         expect(user.refreshTokens).toEqual([]);
       });
     });
@@ -269,7 +269,7 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken.length).toBeDefined();
         });
 
-      return await userRepository.findOneByCondition({ email: "auth12@email.com" }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: "auth12@email.com" }).then((user) => {
         expect(user.refreshTokens.length).toEqual(1);
       });
     });
@@ -294,7 +294,7 @@ describe("Auth (e2e)", () => {
         }
       );
 
-      return await userRepository.findOneByCondition({ email: "authUpdate13@email.com" }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: "authUpdate13@email.com" }).then((user) => {
         expect(user.email).toEqual("authUpdate13@email.com");
       });
     });
@@ -365,7 +365,7 @@ describe("Auth (e2e)", () => {
           expect(res.body.status).toEqual("ok");
         });
 
-      return await userRepository.findOneByCondition({ email: "auth17@email.com" }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: "auth17@email.com" }).then((user) => {
         expect(user.verificationCode).toBeDefined();
         expect(user.verificationCode).toBeGreaterThanOrEqual(100000);
         expect(user.verificationCode).toBeLessThanOrEqual(999999);
@@ -414,7 +414,7 @@ describe("Auth (e2e)", () => {
         expect(res.body.refreshToken).toBeDefined();
       });
 
-      return await userRepository.findOneByCondition({ email: "auth19@email.com" }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: "auth19@email.com" }).then((user) => {
         expect(user.verificationCode).toEqual(null);
       });
     });
@@ -433,7 +433,7 @@ describe("Auth (e2e)", () => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
 
-      return await userRepository.findOneByCondition({ email: "auth20@email.com" }).then((user) => {
+      return await userRepository.findOneByConditionOrThrow({ email: "auth20@email.com" }).then((user) => {
         expect(user.verificationCode).toEqual(123456);
       });
     });

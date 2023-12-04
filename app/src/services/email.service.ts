@@ -1,13 +1,10 @@
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
-import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { User } from "@app/entities/user.entity";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 import { UserRepository } from "@app/repositories/user.repository";
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
 
 @Injectable()
 export class EmailService {
@@ -26,18 +23,12 @@ export class EmailService {
   }
 
   async checkIfEmailExist(email: string): Promise<User> {
-    const user: User = await this.userRepository.findOneByCondition({ email });
-    if (!user) {
-      throw new UserNotFoundException("user with given email address not exist in database");
-    }
-    return user;
+   return await this.userRepository.findOneByConditionOrThrow({ email });
   }
 
   async checkIfEmailVerified(email: string): Promise<User> {
-    const user: User = await this.userRepository.findOneByCondition({ email });
-    if (!user) {
-      throw new UserNotFoundException("user with given email address not exist in database");
-    } else if (!user.verified) {
+    const user: User = await this.userRepository.findOneByConditionOrThrow({ email });
+    if (!user.verified) {
       throw new UserNotVerifiedException("user with given email is not verified");
     }
     return user;
