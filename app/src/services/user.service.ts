@@ -1,13 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
 import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { UserDuplicatedException } from "@app/common/exceptions/user/userDuplicated.exception";
 import { Profile } from "@app/entities/profile.entity";
 import { UserRepository } from "@app/repositories/user.repository";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
-import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
 import { ProfileRepository } from "@app/repositories/profile.repository";
 
@@ -22,8 +19,7 @@ export class UsersService {
   }
 
   async getUser(id: string): Promise<User> {
-    const user: User = await this.userRepository.findOneByIdOrThrow(id);
-    return user;
+    return await this.userRepository.findOneByIdOrThrow(id);
   }
 
   async registerUser(userInfo: CreateUserDto): Promise<User> {

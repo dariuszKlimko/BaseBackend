@@ -14,12 +14,11 @@ import {
 import { UsersService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
-import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
+import { UserId } from "@app/common/decorators/userId.decorator";
 import { UserDuplicatedException } from "@app/common/exceptions/user/userDuplicated.exception";
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { ACCOUTN_CONFIRMATION } from "@app/common/constans/constans";
@@ -28,11 +27,19 @@ import { ACCOUTN_CONFIRMATION } from "@app/common/constans/constans";
 @UseFilters(HttpExceptionFilter)
 @Controller("users")
 export class UsersController {
+  private readonly usersService: UsersService;
+  private readonly emailService: EmailService;
+  private readonly generatorService: GeneratorSevice;
+
   constructor(
-    private readonly usersService: UsersService,
-    private readonly emailService: EmailService,
-    private readonly generatorService: GeneratorSevice
-  ) {}
+    usersService: UsersService,
+    emailService: EmailService,
+    generatorService: GeneratorSevice
+  ) {
+    this.usersService = usersService;
+    this.emailService = emailService;
+    this.generatorService = generatorService;
+  }
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
@@ -59,9 +66,9 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getUser(@CurrentUser() user: CurrentUserDecorator): Promise<User> {
+  async getUser(@UserId() userId: string): Promise<User> {
     try {
-      return await this.usersService.getUser(user.id);
+      return await this.usersService.getUser(userId);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -72,9 +79,9 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete()
-  async deleteUser(@CurrentUser() user: CurrentUserDecorator): Promise<User> {
+  async deleteUser(@UserId() userId: string): Promise<User> {
     try {
-      return await this.usersService.deleteUser(user.id);
+      return await this.usersService.deleteUser(userId);
     } catch (error) {
       throw new InternalServerErrorException();
     }

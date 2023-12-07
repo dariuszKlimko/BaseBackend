@@ -8,7 +8,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { LoggerMiddleware } from "@app/common/middleware/logger.midleware";
 import { configureJwtModule, configureMailerModule, configureTypeORMModule } from "@app/bootstrapConfiguration";
 
-import { default as JwtStrategy } from "@app/common/strategies";
+import { default as Strategies } from "@app/common/strategies";
 import { default as Entities } from "@app/entities";
 import { default as Repositories } from "@app/repositories";
 import { default as Services } from "@app/services";
@@ -33,7 +33,7 @@ import { default as Controllers } from "@app/controllers";
     AppConfigModule,
   ],
   controllers: [...Controllers],
-  providers: [...Services, ...JwtStrategy, ...Repositories],
+  providers: [...Services, ...Strategies, ...Repositories],
 })
 
 export class AppModule implements NestModule {

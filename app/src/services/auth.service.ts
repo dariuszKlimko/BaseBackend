@@ -1,10 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { DeepPartial, Repository } from "typeorm";
 import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
-import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";
@@ -15,7 +12,6 @@ import { ResetPasswordDto } from "@app/dtos/auth/password-reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalidVerificationCode.exception ";
 import { PASSWORD_RESET_RESPONSE, USER_VERIFIED_RESPONSE } from "@app/common/constans/constans";
 import { UserRepository } from "@app/repositories/user.repository";
-import { UpdateUserDto } from "@app/dtos/user/update-user.dto";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 
 @Injectable()
@@ -28,9 +24,7 @@ export class AuthService {
 
   async userConfirmation(email: string): Promise<MessageInfo> {
     const user: User = await this.userRepository.findOneByConditionOrThrow({ email });
-    if (!user) {
-      throw new UserNotFoundException("user with given email not exist in database");
-    } else if (user.verified) {
+    if (user.verified) {
       throw new UserAlreadyConfirmedException("user with given email is already confirmed");
     }
     await this.userRepository.updateOneById(user.id, { verified: true } );
@@ -39,9 +33,6 @@ export class AuthService {
 
   async comparePassword(userInfo: CreateUserDto): Promise<User> {
     const user: User = await this.userRepository.findOneByConditionOrThrow({ email: userInfo.email });
-    if (!user) {
-      throw new UserNotFoundException("user with given email not exist in database");
-    }
     const isMatch: boolean = await user.validatePassword(userInfo.password);
     if (!isMatch) {
       throw new UserAuthenticateException("incorrect email address or password");

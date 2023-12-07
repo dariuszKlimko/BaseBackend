@@ -1,4 +1,3 @@
-import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";
 import { LoginResponse } from "@app/common/types/auth/login-response";
 import { User } from "@app/entities/user.entity";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
@@ -6,9 +5,7 @@ import { UserRepository } from "@app/repositories/user.repository";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { InjectRepository } from "@nestjs/typeorm";
-import { config } from "process";
-import { ArrayContains, Repository } from "typeorm";
+import { ArrayContains } from "typeorm";
 
 @Injectable()
 export class TokenService {
@@ -41,11 +38,8 @@ export class TokenService {
 
   async findUserByRefreshToken(refreshToken: string): Promise<User> {
     const user: User = await this.userRepository.findOneByConditionOrThrow({
-     refreshTokens: ArrayContains([refreshToken]) ,
+      refreshTokens: ArrayContains([refreshToken]) ,
     });
-    if (!user) {
-      throw new InvalidRefreshTokenException("invalid refreshToken");
-    }
     const tokenIndex: number = user.refreshTokens.indexOf(refreshToken);
     user.refreshTokens.splice(tokenIndex, 1);
     return user;

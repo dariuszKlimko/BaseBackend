@@ -5,12 +5,14 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, OneToOne } from 
 import * as bcrypt from "bcrypt";
 import { Profile } from "@app/entities/profile.entity";
 import { BaseEntity } from "@app/entities/base.entity";
+import { Role } from "@app/common/constans/role.enum";
 
 @Entity("users")
 export class User extends BaseEntity {
   @ApiProperty()
   @Column({
     type: "text",
+    nullable: false,
     unique: true,
   })
   email: string;
@@ -19,16 +21,23 @@ export class User extends BaseEntity {
   @Exclude({ toPlainOnly: true })
   @Column({
     type: "text",
-    nullable: true,
+    nullable: false,
   })
   password: string;
+
+  @ApiProperty()
+  @Column({
+    type: "enum",
+    enum: Role,
+    nullable: true,
+  })
+  role: string;
 
   @ApiProperty()
   @Exclude({ toPlainOnly: true })
   @Column({
     name: "refresh_tokens",
     type: "text",
-    nullable: true,
     array: true,
     default: [],
   })
@@ -37,6 +46,7 @@ export class User extends BaseEntity {
   @ApiProperty()
   @Column({
     type: "boolean",
+    nullable: false,
     default: false,
   })
   verified: boolean;
@@ -51,12 +61,12 @@ export class User extends BaseEntity {
   verificationCode: number;
 
   @OneToMany(() => Measurement, (measurement: Measurement) => measurement.user, {
-    cascade: ["remove"],
+    cascade: true,
   })
   measurements: Measurement[];
 
   @OneToOne(() => Profile, (profile: Profile) => profile.user, {
-    cascade: ["insert", "remove"],
+    cascade: true,
   })
   profile: Profile;
 

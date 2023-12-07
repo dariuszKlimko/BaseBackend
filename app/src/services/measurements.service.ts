@@ -1,14 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
 import { Measurement } from "@app/entities/measurement.entity";
-import { Repository } from "typeorm";
 import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
 import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
-import { MeasurementNotFoundException } from "@app/common/exceptions/measurement/measurementNotFound.exception";
-import { MessageInfo } from "@app/common/types/messageInfo";
-import { ProfilesService } from "@app/services/profile.service";
 import { Profile } from "@app/entities/profile.entity";
-import { MEASUREMENTS_DELETED_RESPONSE } from "@app/common/constans/constans";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
 import { ProfileRepository } from "@app/repositories/profile.repository";
 import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
@@ -41,14 +35,10 @@ export class MeasurementsService {
   }
 
   async getOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
-    const measurement: Measurement = await this.measurementsRepository.findOneByConditionOrThrow({
+    return await this.measurementsRepository.findOneByConditionOrThrow({
       userId,
       id: measurementId,
     });
-    if (!measurement) {
-      throw new MeasurementNotFoundException("incorrect measuremet or user id");
-    }
-    return measurement;
   }
 
   async updateMeasurement(
@@ -60,32 +50,15 @@ export class MeasurementsService {
       userId,
       id: measurementId,
     });
-    if (!measurement) {
-      throw new MeasurementNotFoundException("incorrect measuremet or user id");
-    }
-    await this.measurementsRepository.updateOneByCondition({ userId, id: measurementId }, measurementPayload);
-    return await this.measurementsRepository.findOneByConditionOrThrow({ userId, id: measurementId });
+    return await this.measurementsRepository.updateOneByCondition({ userId, id: measurementId }, measurementPayload);
   }
 
-  async deleteAllMeasurementsByUserId(userId: string): Promise<MessageInfo> {
-    const measurements: Measurement[] = await this.measurementsRepository.findAllByCondition({ userId });
-    if (measurements.length === 0) {
-      throw new MeasurementNotFoundException("measurements for given user id not found");
-    }
-    await this.measurementsRepository.deleteManyByCondition({ userId });
-    return MEASUREMENTS_DELETED_RESPONSE;
+  async deleteAllMeasurementsByUserId(userId: string): Promise<Measurement[]> {
+    return await this.measurementsRepository.deleteManyByCondition({ userId });
   }
 
   async deleteOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
-    const measurement: Measurement = await this.measurementsRepository.findOneByConditionOrThrow({
-      userId,
-      id: measurementId,
-    });
-    if (!measurement) {
-      throw new MeasurementNotFoundException("incorrect measuremet or user id");
-    }
-    await this.measurementsRepository.deleteOneByCondition({ userId, id: measurementId });
-    return measurement;
+    return await this.measurementsRepository.deleteOneByCondition({ userId, id: measurementId });
   }
 // ---------------------------------------------------------------
 // Admin

@@ -1,13 +1,10 @@
 import { RESET_PASSWORD_MESSAGE, VERIFICATION_EMAIL_MESSAGE } from "@app/common/constans/constans";
-import { User } from "@app/entities/user.entity";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 import { UserRepository } from "@app/repositories/user.repository";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { InjectRepository } from "@nestjs/typeorm";
 import { randomBytes, randomInt } from "crypto";
-import { Repository } from "typeorm";
 
 @Injectable()
 export class GeneratorSevice {

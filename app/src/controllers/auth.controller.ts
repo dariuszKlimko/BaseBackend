@@ -16,15 +16,13 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { AuthService } from "@app/services/auth.service";
-import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
+import { UserId } from "@app/common/decorators/userId.decorator";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { LoginResponse } from "@app/common/types/auth/login-response";
-import { UserNotFoundException } from "@app/common/exceptions/user/userNotFound.exception";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
 import { MessageInfo } from "@app/common/types/messageInfo";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";
-import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { LogoutResponse } from "@app/common/types/auth/logout-response";
 import { TokenDto } from "@app/dtos/auth/token.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -52,12 +50,22 @@ import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.excep
 @UseFilters(HttpExceptionFilter)
 @Controller("auth")
 export class AuthController {
+  private readonly authService: AuthService;
+  private readonly emailService: EmailService;
+  private readonly tokenService: TokenService;
+  private readonly generatorService: GeneratorSevice;
+
   constructor(
-    private readonly authService: AuthService,
-    private readonly emailService: EmailService,
-    private readonly tokenService: TokenService,
-    private readonly generatorService: GeneratorSevice
-  ) {}
+    authService: AuthService,
+    emailService: EmailService,
+    tokenService: TokenService,
+    generatorService: GeneratorSevice
+  ) {
+    this.authService = authService;
+    this.emailService = emailService;
+    this.tokenService = tokenService;
+    this.generatorService = generatorService;
+  }
 
   @ApiOperation({ summary: "account confirmation" })
   @ApiResponse({ status: 200, type: MessageInfo, description: "user has been successfully verified" })
@@ -67,7 +75,6 @@ export class AuthController {
       const email: string = await this.tokenService.decodeConfirmationToken(token);
       return await this.authService.userConfirmation(email);
     } catch (error) {
-      // if (error instanceof UserNotFoundException) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
       } else if (error instanceof UserAlreadyConfirmedException) {
@@ -121,9 +128,9 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @Patch()
-  async logout(@CurrentUser() user: CurrentUserDecorator, @Body() token: TokenDto): Promise<LogoutResponse> {
+  async logout(@UserId() userId: string, @Body() token: TokenDto): Promise<LogoutResponse> {
     try {
-      return await this.authService.logout(user.id, token.refreshToken);
+      return await this.authService.logout(userId, token.refreshToken);
     } catch (error) {
       if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
@@ -156,11 +163,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Patch("credentials")
   async updateCredentials(
-    @CurrentUser() user: CurrentUserDecorator,
+    @UserId() userId: string,
     @Body() userInfo: UpdateCredentialsDto
   ): Promise<User> {
     try {
-      return await this.authService.updateCredentials(user.id, userInfo);
+      return await this.authService.updateCredentials(userId, userInfo);
     } catch (error) {
       throw new InternalServerErrorException();
     }

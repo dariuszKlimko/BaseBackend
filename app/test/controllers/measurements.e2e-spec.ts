@@ -210,12 +210,16 @@ describe("Measurements (e2e)", () => {
 
   describe("/measurements (DELETE) - delete all measurments", () => {
     it("should delete all measurements for user with given accessToken", async () => {
+      const userId: string = fixtures.get("user5").id;
+      const allMeasurementsLenght: number = await measurementRepository
+        .findAllByCondition({ userId })
+        .then((res) => res.length);
       await request
         .default(app.getHttpServer())
         .delete("/measurements")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.status).toEqual("ok");
+          expect(res.body.length).toEqual(allMeasurementsLenght);
         });
 
       return await measurementRepository.findAllByCondition({ userId: fixtures.get("user5").id }).then((measurements) => {
@@ -235,7 +239,7 @@ describe("Measurements (e2e)", () => {
         .delete(`/measurements/${fixtures.get("measurement5").id}`)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.id).toEqual(fixtures.get("measurement5").id);
+          expect(res.body.userId).toEqual(userId);
         });
 
       return await measurementRepository.findAllByCondition({ userId }).then((measurements) => {

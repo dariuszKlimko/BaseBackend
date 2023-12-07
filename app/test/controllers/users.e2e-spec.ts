@@ -168,10 +168,10 @@ describe("Users (e2e)", () => {
         });
 
         await expect(measurementRepository.findOneByConditionOrThrow({ userId: fixtures.get("user3").id }))
-        .rejects.toThrow(EntityNotFound);
+          .rejects.toThrow(EntityNotFound);
 
         await expect(profileRepository.findOneByConditionOrThrow({ userId: fixtures.get("user3").id }))
-        .rejects.toThrow(EntityNotFound);
+          .rejects.toThrow(EntityNotFound);
     });
 
     it("should not delete user account for given accessToken", async () => {

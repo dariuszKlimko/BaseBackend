@@ -17,7 +17,7 @@ import {
 import { MeasurementsService } from "@app/services/measurements.service";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
+import { UserId } from "@app/common/decorators/userId.decorator";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
 import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
@@ -31,9 +31,11 @@ import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.excep
 @UseFilters(HttpExceptionFilter)
 @Controller("measurements")
 export class MeasurementsController {
-
+  private readonly measurementsService: MeasurementsService;
   
-  constructor(private readonly measurementsService: MeasurementsService) {}
+  constructor(measurementsService: MeasurementsService) {
+    this.measurementsService = measurementsService;
+  }
 
   @ApiOperation({ summary: "create measuremet" })
   @ApiResponse({
@@ -46,11 +48,11 @@ export class MeasurementsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async createMeasurement(
-    @CurrentUser() user: CurrentUserDecorator,
+    @UserId() userId: string,
     @Body() measurement: CreateMeasurementDto
   ): Promise<Measurement> {
     try {
-      return await this.measurementsService.createMeasurement(user.id, measurement);
+      return await this.measurementsService.createMeasurement(userId, measurement);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -65,9 +67,9 @@ export class MeasurementsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAllMeasurementsByUserId(@CurrentUser() user: CurrentUserDecorator): Promise<Measurement[]> {
+  async getAllMeasurementsByUserId(@UserId() userId: string): Promise<Measurement[]> {
     try {
-      return await this.measurementsService.getAllMeasurementsByUserId(user.id);
+      return await this.measurementsService.getAllMeasurementsByUserId(userId);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -83,11 +85,11 @@ export class MeasurementsController {
   @UseGuards(JwtAuthGuard)
   @Get(":id")
   async getOneMeasurement(
-    @CurrentUser() user: CurrentUserDecorator,
+    @UserId() userId: string,
     @Param("id", ParseUUIDPipe) id: string
   ): Promise<Measurement> {
     try {
-      return await this.measurementsService.getOneMeasurement(user.id, id);
+      return await this.measurementsService.getOneMeasurement(userId, id);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -107,12 +109,12 @@ export class MeasurementsController {
   @UseGuards(JwtAuthGuard)
   @Patch(":id")
   async updateMeasurement(
-    @CurrentUser() user: CurrentUserDecorator,
+    @UserId() userId: string,
     @Param("id", ParseUUIDPipe) id: string,
     @Body() measurement: UpdateMeasurementDto
   ): Promise<Measurement> {
     try {
-      return await this.measurementsService.updateMeasurement(user.id, id, measurement);
+      return await this.measurementsService.updateMeasurement(userId, id, measurement);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -130,9 +132,9 @@ export class MeasurementsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete()
-  async deleteAllMeasurementsByUserId(@CurrentUser() user: CurrentUserDecorator): Promise<MessageInfo> {
+  async deleteAllMeasurementsByUserId(@UserId() userId: string): Promise<Measurement[]> {
     try {
-      return await this.measurementsService.deleteAllMeasurementsByUserId(user.id);
+      return await this.measurementsService.deleteAllMeasurementsByUserId(userId);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -151,11 +153,11 @@ export class MeasurementsController {
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
   async deleteOneMeasurement(
-    @CurrentUser() user: CurrentUserDecorator,
+    @UserId() userId: string,
     @Param("id", ParseUUIDPipe) id: string
   ): Promise<Measurement> {
     try {
-      return await this.measurementsService.deleteOneMeasurement(user.id, id);
+      return await this.measurementsService.deleteOneMeasurement(userId, id);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);

@@ -1,4 +1,4 @@
-import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
+import { UserId } from "@app/common/decorators/userId.decorator";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
@@ -22,7 +22,11 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 @UseFilters(HttpExceptionFilter)
 @Controller("profiles")
 export class ProfilessController {
-  constructor(private readonly profilesService: ProfilesService) {}
+  private readonly profilesService: ProfilesService;
+
+  constructor(profilesService: ProfilesService) {
+    this.profilesService = profilesService;
+  }
 
   @ApiOperation({ summary: "get profile" })
   @ApiResponse({
@@ -33,9 +37,9 @@ export class ProfilessController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getProfile(@CurrentUser() user: CurrentUserDecorator): Promise<Profile> {
+  async getProfile(@UserId() userId: string): Promise<Profile> {
     try {
-      return await this.profilesService.getProfile(user.id);
+      return await this.profilesService.getProfile(userId);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -52,11 +56,11 @@ export class ProfilessController {
   @UseGuards(JwtAuthGuard)
   @Patch()
   async updateProfile(
-    @CurrentUser() user: CurrentUserDecorator,
+    @UserId() userId: string,
     @Body() profile: UpdateProfileDto
   ): Promise<Profile> {
     try {
-      return await this.profilesService.updateProfile(user.id, profile);
+      return await this.profilesService.updateProfile(userId, profile);
     } catch (error) {
       throw new InternalServerErrorException();
     }
