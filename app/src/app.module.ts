@@ -5,7 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigService } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { MailerModule } from "@nestjs-modules/mailer";
-import { LoggerMiddleware } from "@app/common/loggers/logger.midleware";
+import { RestLogger } from "@app/common/loggers/rest.logger.midleware";
 import { configureJwtModule, configureMailerModule, configureTypeORMModule } from "@app/bootstrap.configuration";
 
 import { default as Strategies } from "@app/common/strategies";
@@ -37,6 +37,6 @@ import { default as Controllers } from "@app/controllers";
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(LoggerMiddleware).forRoutes("*");
+    consumer.apply(RestLogger).forRoutes("*");
   }
 }

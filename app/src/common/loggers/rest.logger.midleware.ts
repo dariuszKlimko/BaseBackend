@@ -2,7 +2,7 @@ import { Logger, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { LoggerDestructure } from "@app/common/types/loggerDestructureType";
 
-export class LoggerMiddleware implements NestMiddleware {
+export class RestLogger implements NestMiddleware {
   private logger: Logger = new Logger("HTTP");
 
   use(request: Request, response: Response, next: NextFunction): void {
