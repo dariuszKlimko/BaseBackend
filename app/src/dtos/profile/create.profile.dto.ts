@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsOptional } from "class-validator";
 
-export class UpdateProfileDto {
+export class CreateProfileDto {
   @ApiProperty()
   @IsNumber()
   @IsOptional()

@@ -1,19 +1,26 @@
-import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";
-import { LoginResponse } from "@app/common/types/auth/login-response";
+import { BAD_CONFIRMATION_TOKEN, CONFIRMATION_TOKEN_EXPIRED } from "@app/common/constans/exceptions.constans";
+import { TokenResponsePayload } from "@app/common/types/tokenResponsePayload";
+import { LoginResponse } from "@app/dtos/auth/login.response";
 import { User } from "@app/entities/user.entity";
+import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
+import { UserRepository } from "@app/repositories/user.repository";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { InjectRepository } from "@nestjs/typeorm";
-import { ArrayContains, Repository } from "typeorm";
+import { JwtPayload, jwtDecode } from "jwt-decode";
+import { ArrayContains } from "typeorm";
 
 @Injectable()
 export class TokenService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
-  ) {}
+  private readonly userRepository: UserRepositoryIntrface;
+  private readonly jwtService: JwtService;
+  private readonly configService: ConfigService;
+
+  constructor(userRepository: UserRepository, jwtService: JwtService, configService: ConfigService) {
+    this.userRepository = userRepository;
+    this.jwtService = jwtService;
+    this.configService = configService;
+  }
 
   async decodeConfirmationToken(token: string): Promise<string> {
     try {
@@ -26,32 +33,33 @@ export class TokenService {
       throw new BadRequestException();
     } catch (error) {
       if (error?.name === "TokenExpiredError") {
-        throw new BadRequestException("Email confirmation token expired");
+        throw new BadRequestException(CONFIRMATION_TOKEN_EXPIRED);
       }
-      throw new BadRequestException("Bad confirmation token");
+      throw new BadRequestException(BAD_CONFIRMATION_TOKEN);
     }
   }
 
   async findUserByRefreshToken(refreshToken: string): Promise<User> {
-    const user: User = await this.userRepository.findOne({
-      where: { refreshTokens: ArrayContains([refreshToken]) },
+    const user: User = await this.userRepository.findOneByConditionOrThrow({
+      refreshTokens: ArrayContains([refreshToken]),
     });
-    if (!user) {
-      throw new InvalidRefreshTokenException("invalid refreshToken");
-    }
     const tokenIndex: number = user.refreshTokens.indexOf(refreshToken);
     user.refreshTokens.splice(tokenIndex, 1);
     return user;
   }
 
   async tokensResponse(user: User, token: string): Promise<LoginResponse> {
-    const payload = { sub: user.id };
+    const payload: TokenResponsePayload = { sub: user.id };
     user.password = undefined;
     user.refreshTokens.push(token);
-    await this.userRepository.save(user);
+    await this.userRepository.saveOne(user);
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken: token,
     };
+  }
+
+  decodeJWTtoken(token: string): JwtPayload {
+    return jwtDecode(token);
   }
 }

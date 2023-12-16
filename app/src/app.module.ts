@@ -1,77 +1,42 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { AppConfigModule } from "@app/common/config/config.module";
-import { UsersController } from "@app/controllers/users.controller";
-import { MeasurementsController } from "@app/controllers/measurements.controller";
-import { AuthController } from "@app/controllers/auth.controller";
-import { UsersService } from "@app/services/user.service";
-import { MeasurementsService } from "@app/services/measurements.service";
-import { AuthService } from "@app/services/auth.service";
-import { EmailService } from "@app/services/email.service";
+import { AppConfigModule } from "@app/config.module";
 import { JwtModule } from "@nestjs/jwt";
-import { User } from "@app/entities/user.entity";
-import { Measurement } from "@app/entities/measurement.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigService } from "@nestjs/config";
-import { dataBaseConfig } from "@app/data-source";
 import { PassportModule } from "@nestjs/passport";
 import { MailerModule } from "@nestjs-modules/mailer";
-import { JwtStrategy } from "@app/common/strategies/jwt.strategy";
-import { Profile } from "@app/entities/profile.entity";
-import { ProfilessController } from "@app/controllers/profile.controller";
-import { ProfilesService } from "@app/services/profile.service";
-import { TokenService } from "@app/services/token.service";
-import { GeneratorSevice } from "@app/services/generator.service";
-import { LoggerMiddleware } from "@app/common/middleware/logger.midleware";
+import { LoggerMiddleware } from "@app/common/loggers/logger.midleware";
+import { configureJwtModule, configureMailerModule, configureTypeORMModule } from "@app/bootstrap.configuration";
+
+import { default as Strategies } from "@app/common/strategies";
+import { default as Entities } from "@app/entities";
+import { default as Repositories } from "@app/repositories";
+import { default as Services } from "@app/services";
+import { default as Controllers } from "@app/controllers";
 
 @Module({
   imports: [
     MailerModule.forRootAsync({
-      useFactory: async (configService: ConfigService) => ({
-        transport: {
-          service: configService.get("SERVICE_NODEMAILER"),
-          secure: true,
-          auth: {
-            user: configService.get("EMAIL_NODEMAILER"),
-            pass: configService.get("PASSWORD_NODEMAILER"),
-          },
-        },
-        defaults: {
-          from: `No Reply <${configService.get("EMAIL_NODEMAILER")}>`,
-        },
-      }),
+      useFactory: configureMailerModule,
       inject: [ConfigService],
     }),
     JwtModule.registerAsync({
-      useFactory: async (configService: ConfigService) => {
-        return {
-          secret: configService.get<string>("JWT_SECRET"),
-          signOptions: { expiresIn: `${configService.get<string>("JWT_EXPIRATION")}s` },
-        };
-      },
+      useFactory: configureJwtModule,
       inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: (serviceConfig: ConfigService) => dataBaseConfig(serviceConfig.get("NODE_ENV")),
+      useFactory: configureTypeORMModule,
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User, Measurement, Profile]),
+    TypeOrmModule.forFeature([...Entities]),
     PassportModule,
     AppConfigModule,
   ],
-  controllers: [UsersController, MeasurementsController, AuthController, ProfilessController],
-  providers: [
-    UsersService,
-    MeasurementsService,
-    AuthService,
-    EmailService,
-    JwtStrategy,
-    ProfilesService,
-    TokenService,
-    GeneratorSevice,
-  ],
+  controllers: [...Controllers],
+  providers: [...Services, ...Strategies, ...Repositories],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer): void {
     consumer.apply(LoggerMiddleware).forRoutes("*");
   }
 }

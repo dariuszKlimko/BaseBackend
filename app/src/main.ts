@@ -1,10 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "@app/app.module";
-import {
-  configureHttpExceptionFilters,
-  configureSwagger,
-  configureValidator,
-} from "@app/common/config/bootstrapConfiguration";
+import { configureHttpExceptionFilters, configureSwagger, configureValidator } from "@app/bootstrap.configuration";
 import { ConfigService } from "@nestjs/config";
 import { INestApplication } from "@nestjs/common";
 

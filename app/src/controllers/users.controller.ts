@@ -10,32 +10,40 @@ import {
   ConflictException,
   UsePipes,
   ValidationPipe,
+  UseInterceptors,
 } from "@nestjs/common";
 import { UsersService } from "@app/services/user.service";
-import { CreateUserDto } from "@app/dtos/user/create-user.dto";
-import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
-import { CurrentUser } from "@app/common/decorators/currentUser.decorator";
-import { UserDuplicatedException } from "@app/common/exceptions/user/userDuplicated.exception";
+import { CreateUserDto } from "@app/dtos/user/create.user.dto";
+import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { UserId } from "@app/common/decorators/user.id.decorator";
+import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";
-import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
+import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { ACCOUTN_CONFIRMATION } from "@app/common/constans/constans";
+import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
 @Controller("users")
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly emailService: EmailService,
-    private readonly generatorService: GeneratorSevice
-  ) {}
+  private readonly usersService: UsersService;
+  private readonly emailService: EmailService;
+  private readonly generatorService: GeneratorSevice;
+
+  constructor(usersService: UsersService, emailService: EmailService, generatorService: GeneratorSevice) {
+    this.usersService = usersService;
+    this.emailService = emailService;
+    this.generatorService = generatorService;
+  }
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
+  // @ApiCreatedResponse()
+  // @ApiConflictResponse()
+  // @ApiInternalServerErrorResponse()
   @UsePipes(ValidationPipe)
   @Post()
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
@@ -55,13 +63,16 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: "get user data" })
-  @ApiResponse({ status: 200, type: User, description: "user's info has been successfully loaded" })
+  @ApiResponse({ status: 200, type: User, description: "user's info has been successfully loaded" }) 
+  // @ApiOkResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Get()
-  async getUser(@CurrentUser() user: CurrentUserDecorator): Promise<User> {
+  async getUser(@UserId() userId: string): Promise<User> {
     try {
-      return await this.usersService.getUser(user.id);
+      return await this.usersService.getUser(userId);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -69,12 +80,14 @@ export class UsersController {
 
   @ApiOperation({ summary: "delete user account with measurement" })
   @ApiResponse({ status: 200, type: User, description: "user has been successfully deleted" })
-  @ApiBearerAuth()
+  // @ApiOkResponse()
+  // @ApiInternalServerErrorResponse()@ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Delete()
-  async deleteUser(@CurrentUser() user: CurrentUserDecorator): Promise<User> {
+  async deleteUser(@UserId() userId: string): Promise<User> {
     try {
-      return await this.usersService.deleteUser(user.id);
+      return await this.usersService.deleteUser(userId);
     } catch (error) {
       throw new InternalServerErrorException();
     }

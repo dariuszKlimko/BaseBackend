@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { config } from "dotenv";
 import path from "path";
-import { IDataSource } from "@app/common/types/database/dataSourceOptions";
+import { IDataSource } from "@app/common/types/dataSourceOptions";
 
 const root: string = path.resolve(__dirname, "../");
 const envpath: string = path.resolve(root, "../");

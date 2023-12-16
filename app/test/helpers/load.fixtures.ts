@@ -1,7 +1,7 @@
 import path from "path";
 import { DataSource } from "typeorm";
 import { Builder, fixturesIterator, IEntity, Loader, Parser, Resolver } from "typeorm-fixtures-cli";
-import { dataBaseConfig } from "@app/data-source";
+import { dataBaseConfig } from "@app/data.source";
 
 const FIXTURES_PATH = "./test/helpers/fixtures/";
 
