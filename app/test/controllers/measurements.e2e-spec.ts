@@ -1,17 +1,16 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { INestApplication, HttpStatus, ValidationPipe, ExecutionContext } from "@nestjs/common";
+import { INestApplication, HttpStatus, ValidationPipe, ExecutionContext, CallHandler } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { Repository } from "typeorm";
-import { Measurement } from "@app/entities/measurement.entity";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
+import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
+import { Request } from "express";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactory;
-  // let measurementRepository: Repository<Measurement>;
   let measurementRepository: MeasurementRepository;
 
   beforeEach(async () => {
@@ -19,14 +18,16 @@ describe("Measurements (e2e)", () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideGuard(JwtAuthGuard)
+      .overrideInterceptor(AddUserToRequest)
       .useValue({
-        canActivate: (context: ExecutionContext) => {
-          const req = context.switchToHttp().getRequest();
-          req.user = { id: fixtures.get("user5").id };
-          return true;
+        intercept: (context: ExecutionContext, next: CallHandler) => {
+          const req: Request = context.switchToHttp().getRequest<Request>();
+          req.body.user = fixtures.get("user5");
+          return next.handle();
         },
       })
+      .overrideGuard(JwtAuthGuard)
+      .useValue(true)
       .compile();
 
     measurementRepository = moduleFixture.get(MeasurementRepository);
@@ -222,9 +223,11 @@ describe("Measurements (e2e)", () => {
           expect(res.body.length).toEqual(allMeasurementsLenght);
         });
 
-      return await measurementRepository.findAllByCondition({ userId: fixtures.get("user5").id }).then((measurements) => {
-        expect(measurements).toEqual([]);
-      });
+      return await measurementRepository
+        .findAllByCondition({ userId: fixtures.get("user5").id })
+        .then((measurements) => {
+          expect(measurements).toEqual([]);
+        });
     });
   });
 

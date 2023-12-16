@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
-import { UserDuplicatedException } from "@app/common/exceptions/user/userDuplicated.exception";
+import { UserDuplicatedException } from "@app/common/exceptions/userDuplicated.exception";
 import { Profile } from "@app/entities/profile.entity";
 import { UserRepository } from "@app/repositories/user.repository";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
 import { ProfileRepository } from "@app/repositories/profile.repository";
+import { DULICATED_EXCEPTION_MESSAGE } from "@app/common/constans/exceptions.constans";
 
 @Injectable()
 export class UsersService {
@@ -25,7 +26,7 @@ export class UsersService {
   async registerUser(userInfo: CreateUserDto): Promise<User> {
     const user: User = await this.userRepository.findOneByCondition({ email: userInfo.email });
     if (user) {
-      throw new UserDuplicatedException("user with given email address aldeady exist in database");
+      throw new UserDuplicatedException(DULICATED_EXCEPTION_MESSAGE);
     }
     const userPayload: User = await this.userRepository.createOne(userInfo);
     const profile: Profile = await this.profileRepository.createOne();
@@ -54,49 +55,3 @@ export class UsersService {
 
   // async updateUserByAdmin() - admin
 }
-
-
-
-// @Injectable()
-// export class UsersService {
-//   constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
-
-//   async getUser(id: string): Promise<User> {
-//     const user: User = await this.userRepository.findOneBy({ id });
-//     return user;
-//   }
-
-//   async registerUser(userInfo: CreateUserDto): Promise<User> {
-//     const user: User = await this.userRepository.findOneBy({ email: userInfo.email });
-//     if (user) {
-//       throw new UserDuplicatedException("user with given email address aldeady exist in database");
-//     }
-//     const userPayload: User = this.userRepository.create(userInfo);
-//     const profile: Profile = new Profile();
-//     userPayload.profile = profile;
-//     await this.userRepository.save(userPayload);
-//     return userPayload;
-//   }
-
-//   async deleteUser(id: string): Promise<User> {
-//     const user: User = await this.userRepository.findOneBy({ id });
-//     await this.userRepository.delete(id);
-//     return user;
-//   }
-
-//   // async updateUser()
-
-//   // async getAllUsersByAdmin() - admin
-
-//   // async getUsersByIdsByAdmin() - admin
-
-//   // async getUsersWithConditionByAdmin()????? - admin
-
-//   // async getUserWithRelationByAdmin() - admin
-
-//   // async deleteUsersByIdsByAdmin() - admin
-
-//   // async createUserByAdmin() - admin
-
-//   // async updateUserByAdmin() - admin
-// }

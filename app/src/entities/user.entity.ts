@@ -5,7 +5,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, OneToOne } from 
 import * as bcrypt from "bcrypt";
 import { Profile } from "@app/entities/profile.entity";
 import { BaseEntity } from "@app/entities/base.entity";
-import { Role } from "@app/common/constans/role.enum";
+import { Role } from "@app/common/types/role.enum";
 
 @Entity("users")
 export class User extends BaseEntity {

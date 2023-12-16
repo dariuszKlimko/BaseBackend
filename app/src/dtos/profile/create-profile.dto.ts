@@ -1,3 +1,9 @@
-import { UpdateProfileDto } from "@app/dtos/profile/update-profile.dto";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNumber, IsOptional } from "class-validator";
 
-export class CreateProfileDto extends UpdateProfileDto {}
+export class CreateProfileDto {
+  @ApiProperty()
+  @IsNumber()
+  @IsOptional()
+  height: number;
+}

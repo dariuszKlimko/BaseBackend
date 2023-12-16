@@ -1,12 +1,11 @@
-import { BaseEntity } from "@app/entities/base.entity";
 import { DeepPartial, FindOptionsRelations, FindOptionsWhere } from "typeorm";
 
-export interface BaseInterfaceRepository<E extends BaseEntity, CreateDTO, UpdateDTO> {
+export interface BaseInterfaceRepository<E> {
   findAll(): Promise<E[]>;
   findOneByIdOrThrow(id: string): Promise<E>;
   findAllByIds(ids: string[]): Promise<E[]>;
   findOneByConditionOrThrow(condition: FindOptionsWhere<E>): Promise<E>;
-  findOneByCondition(condition: FindOptionsWhere<E>): Promise<E>
+  findOneByCondition(condition: FindOptionsWhere<E>): Promise<E>;
   findAllByCondition(condition: FindOptionsWhere<E>): Promise<E[]>;
   findWithRelation(rel: FindOptionsRelations<E>): Promise<E[]>;
   createOne(createEntityDto?: DeepPartial<E>): Promise<E>;

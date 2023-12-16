@@ -3,15 +3,12 @@ import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
-import { Repository } from "typeorm";
 import { userLogin } from "@test/helpers/userLogin";
-import { Profile } from "@app/entities/profile.entity";
 import { ProfileRepository } from "@app/repositories/profile.repository";
 
 describe("Profiles (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactory;
-  // let profileRepository: Repository<Profile>;
   let profileRepository: ProfileRepository;
   let profile1accessToken: string;
   let profile2accessToken: string;

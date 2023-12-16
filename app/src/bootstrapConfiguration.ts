@@ -1,10 +1,5 @@
 import { Reflector } from "@nestjs/core";
-import {
-  BadRequestException,
-  ClassSerializerInterceptor,
-  INestApplication,
-  ValidationPipe,
-} from "@nestjs/common";
+import { BadRequestException, ClassSerializerInterceptor, INestApplication, ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { ConfigService } from "@nestjs/config";
@@ -56,7 +51,7 @@ export async function configureMailerModule(configService: ConfigService): Promi
     defaults: {
       from: `No Reply <${configService.get("EMAIL_NODEMAILER")}>`,
     },
-  }
+  };
 }
 
 export async function configureJwtModule(configService: ConfigService): Promise<JwtModuleOptions> {

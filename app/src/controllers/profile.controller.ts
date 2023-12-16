@@ -1,7 +1,7 @@
 import { UserId } from "@app/common/decorators/userId.decorator";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
+import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
 import { UpdateProfileDto } from "@app/dtos/profile/update-profile.dto";
 import { Profile } from "@app/entities/profile.entity";
 import { ProfilesService } from "@app/services/profile.service";
@@ -13,6 +13,7 @@ import {
   Patch,
   UseFilters,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
@@ -34,8 +35,11 @@ export class ProfilessController {
     type: Profile,
     description: "profile been successfully loaded",
   })
+  // @ApiOkResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Get()
   async getProfile(@UserId() userId: string): Promise<Profile> {
     try {
@@ -51,14 +55,14 @@ export class ProfilessController {
     type: Profile,
     description: "profile has been successfully updated",
   })
+  // @ApiOkResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Patch()
-  async updateProfile(
-    @UserId() userId: string,
-    @Body() profile: UpdateProfileDto
-  ): Promise<Profile> {
+  async updateProfile(@UserId() userId: string, @Body() profile: UpdateProfileDto): Promise<Profile> {
     try {
       return await this.profilesService.updateProfile(userId, profile);
     } catch (error) {

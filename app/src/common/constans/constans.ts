@@ -1,8 +1,11 @@
-export const PASSWORD_REGEX: RegExp = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])(?=.*[a-z]).{8,24}$/;
-export const WEAK_PASSWORD_MESSAGE: string =
+export const PASSWORD_REGEX = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])(?=.*[a-z]).{8,24}$/;
+export const WEAK_PASSWORD_MESSAGE =
   "password should have from 8 to 24 charachters, have at least 1 number, 1 special character, 1 capital letter, 1 small letter ";
-export const ACCOUTN_CONFIRMATION: string = "Account confirmation ✔";
-export const RESET_PASSWORD_VERIFICATION_CODE: string = "Reset password verification code ✔";
+export const ACCOUTN_CONFIRMATION = "Account confirmation ✔";
+export const RESET_PASSWORD_VERIFICATION_CODE = "Reset password verification code ✔";
+export const USER_NOT_FOUND = "User not found";
+export const PROFILE_NOT_FOUND = "Profile not found";
+export const MEASUREMENTS_NOT_FOUND = "Measurement not found";
 export const VVERIFICTION_CODE_RESPONSE = {
   status: "ok",
   message: "verification code has been send",

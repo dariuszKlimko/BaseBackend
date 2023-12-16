@@ -11,6 +11,7 @@ import {
   Post,
   UseFilters,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
@@ -18,21 +19,19 @@ import { MeasurementsService } from "@app/services/measurements.service";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
 import { UserId } from "@app/common/decorators/userId.decorator";
-import { CurrentUserDecorator } from "@app/common/types/currentUserDecorator";
 import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
 import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
-import { MeasurementNotFoundException } from "@app/common/exceptions/measurement/measurementNotFound.exception";
-import { MessageInfo } from "@app/common/types/messageInfo";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Measurement } from "@app/entities/measurement.entity";
-import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.exception";
+import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
+import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)
 @Controller("measurements")
 export class MeasurementsController {
   private readonly measurementsService: MeasurementsService;
-  
+
   constructor(measurementsService: MeasurementsService) {
     this.measurementsService = measurementsService;
   }
@@ -43,9 +42,12 @@ export class MeasurementsController {
     type: Measurement,
     description: "measurement has been successfully created",
   })
+  // @ApiCreatedResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Post()
   async createMeasurement(
     @UserId() userId: string,
@@ -64,8 +66,11 @@ export class MeasurementsController {
     type: [Measurement],
     description: "all measurements has been successfully loaded",
   })
+  // @ApiOkResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Get()
   async getAllMeasurementsByUserId(@UserId() userId: string): Promise<Measurement[]> {
     try {
@@ -81,13 +86,14 @@ export class MeasurementsController {
     type: Measurement,
     description: "one measurement been successfully loaded",
   })
+  // @ApiOkResponse()
+  // @ApiNotFoundResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Get(":id")
-  async getOneMeasurement(
-    @UserId() userId: string,
-    @Param("id", ParseUUIDPipe) id: string
-  ): Promise<Measurement> {
+  async getOneMeasurement(@UserId() userId: string, @Param("id", ParseUUIDPipe) id: string): Promise<Measurement> {
     try {
       return await this.measurementsService.getOneMeasurement(userId, id);
     } catch (error) {
@@ -104,9 +110,13 @@ export class MeasurementsController {
     type: Measurement,
     description: "measurement has been successfully updated",
   })
+  // @ApiOkResponse()
+  // @ApiNotFoundResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Patch(":id")
   async updateMeasurement(
     @UserId() userId: string,
@@ -126,11 +136,15 @@ export class MeasurementsController {
   @ApiOperation({ summary: "delete all measurements for given user" })
   @ApiResponse({
     status: 200,
-    type: MessageInfo,
+    type: [Measurement],
     description: "all user's measurement has been successfully deleted",
   })
+  // @ApiOkResponse()
+  // @ApiNotFoundResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Delete()
   async deleteAllMeasurementsByUserId(@UserId() userId: string): Promise<Measurement[]> {
     try {
@@ -149,8 +163,12 @@ export class MeasurementsController {
     type: Measurement,
     description: "one measurement has been successfully deleted",
   })
+  // @ApiOkResponse()
+  // @ApiNotFoundResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Delete(":id")
   async deleteOneMeasurement(
     @UserId() userId: string,

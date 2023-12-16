@@ -8,7 +8,9 @@ import {
 } from "@nestjs/common";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
 import { EmailService } from "@app/services/email.service";
-import { EntityNotFound } from "@app/common/exceptions/base/entityNotFound.exception";
+import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
+import { User } from "@app/entities/user.entity";
+import { Request } from "express";
 
 @Injectable()
 export class EmailVerifiedGuard implements CanActivate {
@@ -19,9 +21,10 @@ export class EmailVerifiedGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const body = context.switchToHttp().getRequest().body;
+    const request: Request = context.switchToHttp().getRequest<Request>();
+    const email: string = request.body.email;
     try {
-      const user = await this.emailService.checkIfEmailVerified(body.email);
+      const user: User = await this.emailService.checkIfEmailVerified(email);
       return !!user;
     } catch (error) {
       if (error instanceof EntityNotFound) {

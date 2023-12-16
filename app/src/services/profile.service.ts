@@ -26,26 +26,3 @@ export class ProfilesService {
 
   // async getProfilesWithConditionByAdmin()????? - admin
 }
-
-
-// @Injectable()
-// export class ProfilesService {
-//   constructor(@InjectRepository(Profile) private profileRepository: Repository<Profile>) {}
-
-//   async getProfile(userId: string): Promise<Profile> {
-//     const profile: Profile = await this.profileRepository.findOneBy({ userId });
-//     return profile;
-//   }
-
-//   async updateProfile(userId: string, profileInfo: UpdateProfileDto): Promise<Profile> {
-//     await this.profileRepository.update({ userId }, profileInfo);
-//     const profile: Profile = await this.profileRepository.findOneBy({ userId });
-//     return profile;
-//   }
-
-//   // async getAllProfilesByAdmin() - admin
-
-//   // async getProfilesByIdsByAdmin() - admin
-
-//   // async getProfilesWithConditionByAdmin()????? - admin
-// }

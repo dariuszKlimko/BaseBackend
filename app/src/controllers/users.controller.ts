@@ -10,18 +10,20 @@ import {
   ConflictException,
   UsePipes,
   ValidationPipe,
+  UseInterceptors,
 } from "@nestjs/common";
 import { UsersService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create-user.dto";
 import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
 import { UserId } from "@app/common/decorators/userId.decorator";
-import { UserDuplicatedException } from "@app/common/exceptions/user/userDuplicated.exception";
+import { UserDuplicatedException } from "@app/common/exceptions/userDuplicated.exception";
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";
 import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { ACCOUTN_CONFIRMATION } from "@app/common/constans/constans";
+import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
@@ -31,11 +33,7 @@ export class UsersController {
   private readonly emailService: EmailService;
   private readonly generatorService: GeneratorSevice;
 
-  constructor(
-    usersService: UsersService,
-    emailService: EmailService,
-    generatorService: GeneratorSevice
-  ) {
+  constructor(usersService: UsersService, emailService: EmailService, generatorService: GeneratorSevice) {
     this.usersService = usersService;
     this.emailService = emailService;
     this.generatorService = generatorService;
@@ -43,6 +41,9 @@ export class UsersController {
 
   @ApiOperation({ summary: "user registration" })
   @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
+  // @ApiCreatedResponse()
+  // @ApiConflictResponse()
+  // @ApiInternalServerErrorResponse()
   @UsePipes(ValidationPipe)
   @Post()
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
@@ -62,9 +63,12 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: "get user data" })
-  @ApiResponse({ status: 200, type: User, description: "user's info has been successfully loaded" })
+  @ApiResponse({ status: 200, type: User, description: "user's info has been successfully loaded" }) 
+  // @ApiOkResponse()
+  // @ApiInternalServerErrorResponse()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Get()
   async getUser(@UserId() userId: string): Promise<User> {
     try {
@@ -76,8 +80,10 @@ export class UsersController {
 
   @ApiOperation({ summary: "delete user account with measurement" })
   @ApiResponse({ status: 200, type: User, description: "user has been successfully deleted" })
-  @ApiBearerAuth()
+  // @ApiOkResponse()
+  // @ApiInternalServerErrorResponse()@ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
   @Delete()
   async deleteUser(@UserId() userId: string): Promise<User> {
     try {

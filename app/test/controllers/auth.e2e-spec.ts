@@ -5,9 +5,7 @@ import { AppModule } from "@app/app.module";
 import loadFixtures from "@test/helpers/loadFixtures";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { Repository } from "typeorm";
-import { User } from "@app/entities/user.entity";
-import { LoginResponse } from "@app/common/types/auth/login-response";
+import { LoginResponse } from "@app/dtos/auth/login-response";
 import { userLogin } from "@test/helpers/userLogin";
 import { credentialsUpdate } from "@test/helpers/credentialsUpdate";
 import { jwtGenerate } from "@test/helpers/jwtGenerate";
@@ -17,7 +15,6 @@ describe("Auth (e2e)", () => {
   let app: INestApplication;
   let configService: ConfigService;
   let jwtService: JwtService;
-  // let userRepository: Repository<User>;
   let userRepository: UserRepository;
   let tokenSecret: string;
   let tokenExpireTime: number;
@@ -287,12 +284,10 @@ describe("Auth (e2e)", () => {
 
   describe("/auth/credentials (PATCH) - update user email and password ", () => {
     it("should update user email for user with given accessToken", async () => {
-      await credentialsUpdate(auth13Tokens.accessToken, { email: "authUpdate13@email.com" }, app).then(
-        (res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.email).toEqual("authUpdate13@email.com");
-        }
-      );
+      await credentialsUpdate(auth13Tokens.accessToken, { email: "authUpdate13@email.com" }, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.email).toEqual("authUpdate13@email.com");
+      });
 
       return await userRepository.findOneByConditionOrThrow({ email: "authUpdate13@email.com" }).then((user) => {
         expect(user.email).toEqual("authUpdate13@email.com");

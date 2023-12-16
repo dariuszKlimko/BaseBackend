@@ -1,24 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { PartialType } from "@nestjs/swagger";
+import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
 
-export class UpdateMeasurementDto {
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  weight: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  caloriesDelivered: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  distanceTraveled: number;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  measurementDate: string;
-}
+export class UpdateMeasurementDto extends PartialType(CreateMeasurementDto) {}

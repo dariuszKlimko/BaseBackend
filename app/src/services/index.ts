@@ -7,11 +7,11 @@ import { TokenService } from "@app/services/token.service";
 import { UsersService } from "@app/services/user.service";
 
 export default [
-    UsersService, 
-    TokenService, 
-    ProfilesService, 
-    MeasurementsService,
-    GeneratorSevice,
-    EmailService,
-    AuthService,
+  UsersService,
+  TokenService,
+  ProfilesService,
+  MeasurementsService,
+  GeneratorSevice,
+  EmailService,
+  AuthService,
 ];

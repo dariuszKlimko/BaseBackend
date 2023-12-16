@@ -1,16 +1,12 @@
 import { BaseAbstractRepository } from "@app/common/repository/base.abstract.repository";
-import { CreateProfileDto } from "@app/dtos/profile/create-profile.dto";
-import { UpdateProfileDto } from "@app/dtos/profile/update-profile.dto";
 import { Profile } from "@app/entities/profile.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
+import { PROFILE_NOT_FOUND } from "@app/common/constans/constans";
 
-export class ProfileRepository
-  extends BaseAbstractRepository<Profile, CreateProfileDto, UpdateProfileDto>
-  implements ProfileRepositoryInterface
-{
+export class ProfileRepository extends BaseAbstractRepository<Profile> implements ProfileRepositoryInterface {
   constructor(@InjectRepository(Profile) profileRepository: Repository<Profile>) {
-    super(profileRepository, "Profile not found");
+    super(profileRepository, PROFILE_NOT_FOUND);
   }
 }
