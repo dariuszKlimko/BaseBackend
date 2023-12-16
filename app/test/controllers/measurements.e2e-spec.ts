@@ -2,10 +2,10 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe, ExecutionContext, CallHandler } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
-import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
-import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
+import loadFixtures, { FixtureFactory } from "@test/helpers/load.fixtures";
+import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
-import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
+import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 import { Request } from "express";
 
 describe("Measurements (e2e)", () => {

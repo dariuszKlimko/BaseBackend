@@ -2,14 +2,14 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
-import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
-import { CreateUserDto } from "@app/dtos/user/create-user.dto";
-import { userRegister } from "@test/helpers/userRegister";
-import { userLogin } from "@test/helpers/userLogin";
+import loadFixtures, { FixtureFactory } from "@test/helpers/load.fixtures";
+import { CreateUserDto } from "@app/dtos/user/create.user.dto";
+import { userRegister } from "@test/helpers/user.register";
+import { userLogin } from "@test/helpers/user.login";
 import { UserRepository } from "@app/repositories/user.repository";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
 import { ProfileRepository } from "@app/repositories/profile.repository";
-import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;

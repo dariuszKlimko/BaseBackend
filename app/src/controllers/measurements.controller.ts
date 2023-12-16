@@ -16,15 +16,15 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { MeasurementsService } from "@app/services/measurements.service";
-import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
-import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { UserId } from "@app/common/decorators/userId.decorator";
-import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
-import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
+import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
+import { UserId } from "@app/common/decorators/user.id.decorator";
+import { CreateMeasurementDto } from "@app/dtos/measurement/create.measurement.dto";
+import { UpdateMeasurementDto } from "@app/dtos/measurement/update.measurement.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Measurement } from "@app/entities/measurement.entity";
-import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
-import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
+import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)

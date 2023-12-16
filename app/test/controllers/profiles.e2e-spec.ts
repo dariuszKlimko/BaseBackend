@@ -2,8 +2,8 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
-import loadFixtures, { FixtureFactory } from "@test/helpers/loadFixtures";
-import { userLogin } from "@test/helpers/userLogin";
+import loadFixtures, { FixtureFactory } from "@test/helpers/load.fixtures";
+import { userLogin } from "@test/helpers/user.login";
 import { ProfileRepository } from "@app/repositories/profile.repository";
 
 describe("Profiles (e2e)", () => {

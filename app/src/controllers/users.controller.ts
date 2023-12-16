@@ -13,17 +13,17 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { UsersService } from "@app/services/user.service";
-import { CreateUserDto } from "@app/dtos/user/create-user.dto";
-import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
-import { UserId } from "@app/common/decorators/userId.decorator";
-import { UserDuplicatedException } from "@app/common/exceptions/userDuplicated.exception";
+import { CreateUserDto } from "@app/dtos/user/create.user.dto";
+import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { UserId } from "@app/common/decorators/user.id.decorator";
+import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";
-import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
+import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { ACCOUTN_CONFIRMATION } from "@app/common/constans/constans";
-import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
+import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)

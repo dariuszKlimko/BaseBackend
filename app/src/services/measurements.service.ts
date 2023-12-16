@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Measurement } from "@app/entities/measurement.entity";
-import { CreateMeasurementDto } from "@app/dtos/measurement/create-measurement.dto";
-import { UpdateMeasurementDto } from "@app/dtos/measurement/update-measurement.dto";
+import { CreateMeasurementDto } from "@app/dtos/measurement/create.measurement.dto";
+import { UpdateMeasurementDto } from "@app/dtos/measurement/update.measurement.dto";
 import { Profile } from "@app/entities/profile.entity";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
 import { ProfileRepository } from "@app/repositories/profile.repository";

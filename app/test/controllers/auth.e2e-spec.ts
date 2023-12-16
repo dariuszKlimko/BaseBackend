@@ -2,13 +2,13 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "@app/app.module";
-import loadFixtures from "@test/helpers/loadFixtures";
+import loadFixtures from "@test/helpers/load.fixtures";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { LoginResponse } from "@app/dtos/auth/login-response";
-import { userLogin } from "@test/helpers/userLogin";
-import { credentialsUpdate } from "@test/helpers/credentialsUpdate";
-import { jwtGenerate } from "@test/helpers/jwtGenerate";
+import { LoginResponse } from "@app/dtos/auth/login.response";
+import { userLogin } from "@test/helpers/user.login";
+import { credentialsUpdate } from "@test/helpers/credentials.update";
+import { jwtGenerate } from "@test/helpers/jwt.generate";
 import { UserRepository } from "@app/repositories/user.repository";
 
 describe("Auth (e2e)", () => {

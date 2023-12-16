@@ -17,26 +17,26 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { AuthService } from "@app/services/auth.service";
-import { UserId } from "@app/common/decorators/userId.decorator";
-import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
-import { LoginResponse } from "@app/dtos/auth/login-response";
-import { UserAuthenticateException } from "@app/common/exceptions/auth/userAuthenticate.exception";
-import { MessageInfo } from "@app/dtos/auth/message-info-response";
-import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalidRefreshToken.exception";
-import { LogoutResponse } from "@app/dtos/auth/logout-response";
+import { UserId } from "@app/common/decorators/user.id.decorator";
+import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { LoginResponse } from "@app/dtos/auth/login.response";
+import { UserAuthenticateException } from "@app/common/exceptions/auth/user.authenticate.exception";
+import { MessageInfo } from "@app/dtos/auth/message.info.response";
+import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
+import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalid.refresh.token.exception";
+import { LogoutResponse } from "@app/dtos/auth/logout.response";
 import { TokenDto } from "@app/dtos/auth/token.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LoginDto } from "@app/dtos/auth/login.dto";
 import { EmailDto } from "@app/dtos/auth/email.dto";
 import { EmailService } from "@app/services/email.service";
-import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/userAlreadyConfirmed.exception";
+import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/user.already.confirmed.exception";
 import { User } from "@app/entities/user.entity";
-import { UpdateCredentialsDto } from "@app/dtos/auth/update-creadentials.dto";
-import { ResetPasswordDto } from "@app/dtos/auth/password-reset.dto";
-import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalidVerificationCode.exception ";
-import { EmailVerifiedGuard } from "@app/common/guards/email-verified.guard";
-import { EmailExistGuard } from "@app/common/guards/email-exist.guard";
+import { UpdateCredentialsDto } from "@app/dtos/auth/update.creadentials.dto";
+import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
+import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception ";
+import { EmailVerifiedGuard } from "@app/common/guards/email.verified.guard";
+import { EmailExistGuard } from "@app/common/guards/email.exist.guard";
 import { TokenService } from "@app/services/token.service";
 import { GeneratorSevice } from "@app/services/generator.service";
 import {
@@ -45,8 +45,8 @@ import {
   VVERIFICTION_CODE_RESPONSE,
   RESET_PASSWORD_VERIFICATION_CODE,
 } from "@app/common/constans/constans";
-import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
-import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
+import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)

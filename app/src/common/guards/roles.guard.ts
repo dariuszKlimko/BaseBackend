@@ -10,7 +10,7 @@ import {
   InternalServerErrorException,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { Request } from "express";
 
 @Injectable()

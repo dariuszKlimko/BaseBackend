@@ -5,7 +5,7 @@ import { ConfigService } from "@nestjs/config";
 import { PayloadJwt } from "@app/common/types/payloadJwt";
 import { UsersService } from "@app/services/user.service";
 import { User } from "@app/entities/user.entity";
-import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Profile } from "@app/entities/profile.entity";
-import { UpdateProfileDto } from "@app/dtos/profile/update-profile.dto";
+import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
 import { ProfileRepository } from "@app/repositories/profile.repository";
 import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
 

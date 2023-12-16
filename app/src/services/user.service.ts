@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@app/entities/user.entity";
-import { CreateUserDto } from "@app/dtos/user/create-user.dto";
-import { UserDuplicatedException } from "@app/common/exceptions/userDuplicated.exception";
+import { CreateUserDto } from "@app/dtos/user/create.user.dto";
+import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
 import { Profile } from "@app/entities/profile.entity";
 import { UserRepository } from "@app/repositories/user.repository";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";

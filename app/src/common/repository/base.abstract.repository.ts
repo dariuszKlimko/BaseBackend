@@ -1,7 +1,7 @@
 import { BaseEntity } from "@app/entities/base.entity";
 import { DeepPartial, EntityNotFoundError, FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
 import { BaseInterfaceRepository } from "@app/common/repository/base.interface.repository";
-import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 
 export abstract class BaseAbstractRepository<E extends BaseEntity> implements BaseInterfaceRepository<E> {
   private readonly errorMessage: string;

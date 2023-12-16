@@ -8,7 +8,7 @@ import {
   InternalServerErrorException,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
-import { EntityNotFound } from "@app/common/exceptions/entityNotFound.exception";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { UsersService } from "@app/services/user.service";
 import { Request } from "express";
 import { TokenService } from "@app/services/token.service";

@@ -1,5 +1,5 @@
 import { USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED } from "@app/common/constans/exceptions.constans";
-import { UserNotVerifiedException } from "@app/common/exceptions/auth/userNotVerified.exception";
+import { UserNotVerifiedException } from "@app/common/exceptions/auth/user.not.verified.exception";
 import { User } from "@app/entities/user.entity";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 import { UserRepository } from "@app/repositories/user.repository";

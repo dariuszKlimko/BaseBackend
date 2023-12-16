@@ -1,8 +1,8 @@
-import { UserId } from "@app/common/decorators/userId.decorator";
-import { HttpExceptionFilter } from "@app/common/filter/HttpException.filter";
-import { JwtAuthGuard } from "@app/common/guards/jwt-auth.guard";
-import { AddUserToRequest } from "@app/common/interceptors/addUserToRequest.interceptor";
-import { UpdateProfileDto } from "@app/dtos/profile/update-profile.dto";
+import { UserId } from "@app/common/decorators/user.id.decorator";
+import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
+import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
+import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
 import { Profile } from "@app/entities/profile.entity";
 import { ProfilesService } from "@app/services/profile.service";
 import {
