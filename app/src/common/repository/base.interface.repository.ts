@@ -1,13 +1,13 @@
 import { DeepPartial, FindOptionsRelations, FindOptionsWhere } from "typeorm";
 
 export interface BaseInterfaceRepository<E> {
-  findAll(): Promise<E[]>;
+  findAll(skip?: number, take?: number): Promise<[E[], number]>;
   findOneByIdOrThrow(id: string): Promise<E>;
-  findAllByIds(ids: string[]): Promise<E[]>;
+  findAllByIds(ids: string[], skip?: number, take?: number): Promise<[E[], number]>;
   findOneByConditionOrThrow(condition: FindOptionsWhere<E>): Promise<E>;
   findOneByCondition(condition: FindOptionsWhere<E>): Promise<E>;
-  findAllByCondition(condition: FindOptionsWhere<E>): Promise<E[]>;
-  findWithRelation(rel: FindOptionsRelations<E>): Promise<E[]>;
+  findAllByCondition(condition: FindOptionsWhere<E>, skip?: number, take?: number): Promise<[E[], number]>;
+  findWithRelation(rel: FindOptionsRelations<E>, skip?: number, take?: number): Promise<[E[], number]>;
   createOne(createEntityDto?: DeepPartial<E>): Promise<E>;
   createMany(createEntityDtos: DeepPartial<E[]>): Promise<E[]>;
   saveOne(entity: E): Promise<E>;

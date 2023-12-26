@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
   ParseUUIDPipe,
@@ -30,6 +31,7 @@ import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.i
 @UseFilters(HttpExceptionFilter)
 @Controller("measurements")
 export class MeasurementsController {
+  private readonly logger: Logger = new Logger(MeasurementsController.name);
   private readonly measurementsService: MeasurementsService;
 
   constructor(measurementsService: MeasurementsService) {
@@ -72,7 +74,7 @@ export class MeasurementsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Get()
-  async getAllMeasurementsByUserId(@UserId() userId: string): Promise<Measurement[]> {
+  async getAllMeasurementsByUserId(@UserId() userId: string): Promise<[Measurement[], number]> {
     try {
       return await this.measurementsService.getAllMeasurementsByUserId(userId);
     } catch (error) {

@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
   Patch,
@@ -52,6 +53,7 @@ import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.i
 @UseFilters(HttpExceptionFilter)
 @Controller("auth")
 export class AuthController {
+  private readonly logger: Logger = new Logger(AuthController.name);
   private readonly authService: AuthService;
   private readonly emailService: EmailService;
   private readonly tokenService: TokenService;

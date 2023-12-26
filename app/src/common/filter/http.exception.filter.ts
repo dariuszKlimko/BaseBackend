@@ -4,6 +4,7 @@ import { ErrorResponse } from "@app/common/types/httpExceptionFilter";
 
 @Catch(HttpException)
 export class HttpExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
   catch(exception: HttpException, context: ExecutionContext): void {
     const request: Request = context.switchToHttp().getRequest<Request>();
     const response: Response = context.switchToHttp().getResponse<Response>();
@@ -18,8 +19,7 @@ export class HttpExceptionFilter {
       message: exception.message || null,
     };
 
-    Logger.error(`${request.method} ${request.url}`, JSON.stringify(errorResponse), "ExceptionFilter");
-
+    this.logger.error(`${request.method} ${request.url}`, JSON.stringify(errorResponse));
     response.status(status).json(errorResponse);
   }
 }

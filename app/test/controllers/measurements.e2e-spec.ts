@@ -75,7 +75,7 @@ describe("Measurements (e2e)", () => {
         .get("/measurements")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.length).toEqual(4);
+          expect(res.body[0].length).toEqual(4);
         });
     });
 
@@ -86,7 +86,7 @@ describe("Measurements (e2e)", () => {
         .get("/measurements")
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body).toEqual([]);
+          expect(res.body).toEqual([[], 0]);
         });
     });
   });
@@ -214,7 +214,7 @@ describe("Measurements (e2e)", () => {
       const userId: string = fixtures.get("user5").id;
       const allMeasurementsLenght: number = await measurementRepository
         .findAllByCondition({ userId })
-        .then((res) => res.length);
+        .then((res) => res[0].length);
       await request
         .default(app.getHttpServer())
         .delete("/measurements")
@@ -226,7 +226,7 @@ describe("Measurements (e2e)", () => {
       return await measurementRepository
         .findAllByCondition({ userId: fixtures.get("user5").id })
         .then((measurements) => {
-          expect(measurements).toEqual([]);
+          expect(measurements[0]).toEqual([]);
         });
     });
   });
@@ -236,7 +236,7 @@ describe("Measurements (e2e)", () => {
       const userId: string = fixtures.get("user5").id;
       const allMeasurementsLenght: number = await measurementRepository
         .findAllByCondition({ userId })
-        .then((res) => res.length);
+        .then((res) => res[0].length);
       await request
         .default(app.getHttpServer())
         .delete(`/measurements/${fixtures.get("measurement5").id}`)
@@ -246,7 +246,7 @@ describe("Measurements (e2e)", () => {
         });
 
       return await measurementRepository.findAllByCondition({ userId }).then((measurements) => {
-        expect(measurements.length).toEqual(allMeasurementsLenght - 1);
+        expect(measurements[0].length).toEqual(allMeasurementsLenght - 1);
       });
     });
 
