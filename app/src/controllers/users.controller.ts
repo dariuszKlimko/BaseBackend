@@ -11,6 +11,7 @@ import {
   UsePipes,
   ValidationPipe,
   UseInterceptors,
+  Logger,
 } from "@nestjs/common";
 import { UsersService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
@@ -29,6 +30,7 @@ import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.i
 @UseFilters(HttpExceptionFilter)
 @Controller("users")
 export class UsersController {
+  private readonly logger: Logger = new Logger(UsersController.name);
   private readonly usersService: UsersService;
   private readonly emailService: EmailService;
   private readonly generatorService: GeneratorSevice;

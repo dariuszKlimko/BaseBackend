@@ -30,7 +30,7 @@ export class MeasurementsService {
     return await this.measurementsRepository.saveOne(measurement);
   }
 
-  async getAllMeasurementsByUserId(userId: string): Promise<Measurement[]> {
+  async getAllMeasurementsByUserId(userId: string): Promise<[Measurement[], number]> {
     return await this.measurementsRepository.findAllByCondition({ userId });
   }
 
@@ -63,11 +63,11 @@ export class MeasurementsService {
   }
   // ---------------------------------------------------------------
   // Admin
-  async getAllMeasurementsByAdmin(): Promise<Measurement[]> {
+  async getAllMeasurementsByAdmin(): Promise<[Measurement[], number]> {
     return await this.measurementsRepository.findAll();
   }
   // Admin
-  async getAllMeasurementsByIdsByAdmin(ids: string[]): Promise<Measurement[]> {
+  async getAllMeasurementsByIdsByAdmin(ids: string[]): Promise<[Measurement[], number]> {
     return await this.measurementsRepository.findAllByIds(ids);
   }
   // Admin

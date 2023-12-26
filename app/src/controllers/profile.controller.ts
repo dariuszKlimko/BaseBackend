@@ -10,6 +10,7 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
+  Logger,
   Patch,
   UseFilters,
   UseGuards,
@@ -23,6 +24,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 @UseFilters(HttpExceptionFilter)
 @Controller("profiles")
 export class ProfilessController {
+  private readonly logger: Logger = new Logger(ProfilessController.name);
   private readonly profilesService: ProfilesService;
 
   constructor(profilesService: ProfilesService) {

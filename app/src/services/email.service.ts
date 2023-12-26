@@ -32,11 +32,16 @@ export class EmailService {
   }
 
   async sendEmail(email: string, text: string, subject: string): Promise<void> {
-    await this.mailerService.sendMail({
-      to: email,
-      from: this.configService.get<string>("EMAIL_NODEMAILER"),
-      subject,
-      text,
-    });
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        from: this.configService.get<string>("EMAIL_NODEMAILER"),
+        subject,
+        text,
+      });
+    } catch (error) {
+      throw error;
+    }
+
   }
 }

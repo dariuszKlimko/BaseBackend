@@ -12,8 +12,8 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
     this.repository = repository;
   }
 
-  async findAll(): Promise<E[]> {
-    return await this.repository.find();
+  async findAll(skip?: number, take?: number): Promise<[E[], number]> {
+    return await this.repository.findAndCount({skip, take});
   }
 
   async findOneByIdOrThrow(id: string): Promise<E> {
@@ -27,9 +27,11 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
     }
   }
 
-  async findAllByIds(ids: string[]): Promise<E[]> {
-    return await this.repository.find({
+  async findAllByIds(ids: string[], skip?: number, take?: number): Promise<[E[], number]> {
+    return await this.repository.findAndCount({
       where: { id: In(ids) } as FindOptionsWhere<E>,
+      skip,
+      take,
     });
   }
 
@@ -55,15 +57,19 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
     }
   }
 
-  async findAllByCondition(condition: FindOptionsWhere<E>): Promise<E[]> {
-    return await this.repository.find({
+  async findAllByCondition(condition: FindOptionsWhere<E>, skip?: number, take?: number): Promise<[E[], number]> {
+    return await this.repository.findAndCount({
       where: condition,
+      skip,
+      take,
     });
   }
 
-  async findWithRelation(rel: FindOptionsRelations<E>): Promise<E[]> {
-    return await this.repository.find({
+  async findWithRelation(rel: FindOptionsRelations<E>, skip?: number, take?: number): Promise<[E[], number]> {
+    return await this.repository.findAndCount({
       relations: rel,
+      skip,
+      take,
     });
   }
 
@@ -101,7 +107,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
   }
 
   async deleteManyByIds(ids: string[]): Promise<E[]> {
-    const entities: E[] = await this.findAllByIds(ids);
+    const [entities]: [E[], number] = await this.findAllByIds(ids);
     return await this.repository.remove(entities);
   }
 
@@ -111,7 +117,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
   }
 
   async deleteManyByCondition(condition: FindOptionsWhere<E>): Promise<E[]> {
-    const entities: E[] = await this.findAllByCondition(condition);
+    const [entities]: [E[], number] = await this.findAllByCondition(condition);
     return await this.repository.remove(entities);
   }
 
