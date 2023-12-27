@@ -12,15 +12,18 @@ import {
 import { Reflector } from "@nestjs/core";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { Request } from "express";
+import { UsersService } from "@app/services/user.service";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   private reflector: Reflector;
   private readonly tokenService: TokenService;
+  private readonly userService: UsersService
 
-  constructor(reflector: Reflector, tokenService: TokenService) {
+  constructor(reflector: Reflector, tokenService: TokenService, userService: UsersService) {
     this.reflector = reflector;
     this.tokenService = tokenService;
+    this.userService = userService;
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -30,9 +33,10 @@ export class RolesGuard implements CanActivate {
     }
     const request: Request = context.switchToHttp().getRequest<Request>();
     const authorization: string = request.headers.authorization;
-    const token: string = authorization.split(" ")[1];
+    const accessToken: string = authorization.split(" ")[1];
     try {
-      const user: User = await this.tokenService.findUserByRefreshToken(token);
+      const userId: string = await this.tokenService.decodeJWTtoken(accessToken).sub;
+      const user: User = await this.userService.getUser(userId);
       return roles.includes(user.role);
     } catch (error) {
       if (error instanceof ForbiddenException) {

@@ -27,8 +27,8 @@ export class AddUserToRequest implements NestInterceptor {
     const request: Request = context.switchToHttp().getRequest<Request>();
     if (request.headers.authorization) {
       const authorization: string = request.headers.authorization;
-      const token: string = authorization.split(" ")[1];
-      const userId: string = this.tokenService.decodeJWTtoken(token).sub;
+      const accessToken: string = authorization.split(" ")[1];
+      const userId: string = this.tokenService.decodeJWTtoken(accessToken).sub;
       try {
         const user: User = await this.userService.getUser(userId);
         request.body.user = user;
