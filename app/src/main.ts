@@ -3,10 +3,11 @@ import { AppModule } from "@app/app.module";
 import { configureHttpExceptionFilters, configureSwagger, configureValidator } from "@app/bootstrap.configuration";
 import { ConfigService } from "@nestjs/config";
 import { INestApplication } from "@nestjs/common";
+import cookieParser from 'cookie-parser';
 
 async function bootstrap(): Promise<void> {
   const app: INestApplication = await NestFactory.create(AppModule);
-
+  app.use(cookieParser());
   const config: ConfigService = app.get(ConfigService);
   const port: number = config.get<number>("PORT");
   const docker_port: number = config.get<number>("DOCKER_PORT");

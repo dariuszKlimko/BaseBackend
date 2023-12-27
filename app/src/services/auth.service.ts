@@ -43,9 +43,9 @@ export class AuthService {
     return user;
   }
 
-  async logout(id: string, token: string): Promise<LogoutResponse> {
+  async logout(id: string, refreshToken: string): Promise<LogoutResponse> {
     const user: User = await this.userRepository.findOneByIdOrThrow(id);
-    const tokenIndex: number = user.refreshTokens.indexOf(token);
+    const tokenIndex: number = user.refreshTokens.indexOf(refreshToken);
     if (tokenIndex < 0) {
       throw new InvalidRefreshTokenException(INVALID_REFRESH_TOKEN);
     }

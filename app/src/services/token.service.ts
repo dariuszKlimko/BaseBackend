@@ -22,9 +22,9 @@ export class TokenService {
     this.configService = configService;
   }
 
-  async decodeConfirmationToken(token: string): Promise<string> {
+  async decodeConfirmationToken(confirmationToken: string): Promise<string> {
     try {
-      const payload: JwtService = await this.jwtService.verify(token, {
+      const payload: JwtService = await this.jwtService.verify(confirmationToken, {
         secret: this.configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
       });
       if (typeof payload === "object" && "email" in payload) {
@@ -48,18 +48,14 @@ export class TokenService {
     return user;
   }
 
-  async tokensResponse(user: User, token: string): Promise<LoginResponse> {
-    const payload: TokenResponsePayload = { sub: user.id };
+  async saveRefreshTokenToDB(user: User, refreshToken: string): Promise<string> {
     user.password = undefined;
-    user.refreshTokens.push(token);
+    user.refreshTokens.push(refreshToken);
     await this.userRepository.saveOne(user);
-    return {
-      accessToken: this.jwtService.sign(payload),
-      refreshToken: token,
-    };
+    return refreshToken;
   }
 
-  decodeJWTtoken(token: string): JwtPayload {
-    return jwtDecode(token);
+  decodeJWTtoken(accessToken: string): JwtPayload {
+    return jwtDecode(accessToken);
   }
 }
