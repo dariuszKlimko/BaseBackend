@@ -125,7 +125,7 @@ export class AuthController {
   // @ApiInternalServerErrorResponse()
   @UseGuards(EmailVerifiedGuard)
   @UsePipes(ValidationPipe)
-  @Post()
+  @Post("login")
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
     try {
       const authorizedUser: User = await this.authService.comparePassword(user);
@@ -176,7 +176,7 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
-  @Patch()
+  @Patch("logout")
   async logout(@UserId() userId: string, @Body() payload: TokenDto): Promise<LogoutResponse> {
     try {
       return await this.authService.logout(userId, payload.refreshToken);
@@ -313,3 +313,59 @@ export class AuthController {
     }
   }
 }
+
+
+
+
+
+// @Post()
+// @ApiCreatedResponse({
+//   description: "Success.",
+//   type: PickType(Data, ["id"]),
+// })
+// @ApiBadRequestResponse({
+//   description: "Invalid request body.",
+//   schema: { $ref: getSchemaPath(ValidationErrorResponseDto) },
+// })
+// @ApiConsumes("multipart/form-data")
+// @ApiBody({
+//   schema: {
+//     type: "object",
+//     properties: {
+//       file: {
+//         type: "string",
+//         format: "binary",
+//       },
+//     },
+//   },
+// })
+
+
+// @Get("/:id/status")
+// @ApiOkResponse({
+//   description: "Success.",
+//   type: PickType(Data, ["progress"]),
+// })
+// @ApiNotFoundResponse({
+//   description: "Data not found.",
+//   schema: { $ref: getSchemaPath(ErrorResponseDto) },
+// })
+
+
+// @Get("/:id")
+// @ApiOkResponse({
+//   description: "Success.",
+//   schema: {
+//     type: "array",
+//     items: {
+//       type: "array",
+//       items: {
+//         type: "string",
+//       },
+//     },
+//   },
+// })
+// @ApiNotFoundResponse({
+//   description: "Data not found.",
+//   schema: { $ref: getSchemaPath(ErrorResponseDto) },
+// })

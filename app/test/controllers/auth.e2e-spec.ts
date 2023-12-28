@@ -140,7 +140,7 @@ describe("Auth (e2e)", () => {
       const user = { email: "auth5@email.com", password: "Qwert12345!" };
       await request
         .default(app.getHttpServer())
-        .post("/auth")
+        .post("/auth/login")
         .send(user)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.CREATED);
@@ -157,7 +157,7 @@ describe("Auth (e2e)", () => {
       const user = { email: "auth16@email.com", password: "Qwert12345!" };
       await request
         .default(app.getHttpServer())
-        .post("/auth")
+        .post("/auth/login")
         .send(user)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.CREATED);
@@ -167,7 +167,7 @@ describe("Auth (e2e)", () => {
 
       await request
         .default(app.getHttpServer())
-        .post("/auth")
+        .post("/auth/login")
         .send(user)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.CREATED);
@@ -184,7 +184,7 @@ describe("Auth (e2e)", () => {
       const user = { email: "authNotExistInDb@email.com", password: "QWERTqwert1!" };
       return await request
         .default(app.getHttpServer())
-        .post("/auth")
+        .post("/auth/login")
         .send(user)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -195,7 +195,7 @@ describe("Auth (e2e)", () => {
       const user = { email: "auth6@email.com", password: "Qwert123456789!" };
       return await request
         .default(app.getHttpServer())
-        .post("/auth")
+        .post("/auth/login")
         .send(user)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
@@ -206,7 +206,7 @@ describe("Auth (e2e)", () => {
       const user = { email: "auth7@email.com", password: "Qwert12345!" };
       return await request
         .default(app.getHttpServer())
-        .post("/auth")
+        .post("/auth/login")
         .send(user)
         .then((res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -218,7 +218,7 @@ describe("Auth (e2e)", () => {
     it("should delete refresh token for user with given accessToken and refreshToken", async () => {
       await request
         .default(app.getHttpServer())
-        .patch("/auth")
+        .patch("/auth/logout")
         .set("Authorization", `Bearer ${auth8Tokens.accessToken}`)
         .send({ refreshToken: auth8Tokens.refreshToken })
         .then((res) => {
@@ -234,7 +234,7 @@ describe("Auth (e2e)", () => {
     it("should not delete refresh token for user with given accessToken which is not owner of refreshToken", async () => {
       return await request
         .default(app.getHttpServer())
-        .patch("/auth")
+        .patch("/auth/logout")
         .set("Authorization", `Bearer ${auth9Tokens.accessToken}`)
         .send({ refreshToken: auth10Tokens.refreshToken })
         .then((res) => {
@@ -245,7 +245,7 @@ describe("Auth (e2e)", () => {
     it("should not delete refresh token for user with given accessToken if resreshToken not exist in database", async () => {
       return await request
         .default(app.getHttpServer())
-        .patch("/auth")
+        .patch("/auth/logout")
         .set("Authorization", `Bearer ${auth11Tokens.accessToken}`)
         .send({ refreshToken: "someToken" })
         .then((res) => {

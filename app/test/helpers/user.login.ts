@@ -8,7 +8,7 @@ export async function userLogin(
 ): Promise<request.Response> {
   return request
     .default(app.getHttpServer())
-    .post("/auth")
+    .post("/auth/login")
     .send({ email, password })
     .then((res) => res);
 }
