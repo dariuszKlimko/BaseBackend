@@ -22,7 +22,7 @@ import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { UserId } from "@app/common/decorators/user.id.decorator";
 import { CreateMeasurementDto } from "@app/dtos/measurement/create.measurement.dto";
 import { UpdateMeasurementDto } from "@app/dtos/measurement/update.measurement.dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Measurement } from "@app/entities/measurement.entity";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
@@ -38,14 +38,14 @@ export class MeasurementsController {
     this.measurementsService = measurementsService;
   }
 
-  @ApiOperation({ summary: "create measuremet" })
-  @ApiResponse({
-    status: 201,
-    type: Measurement,
-    description: "measurement has been successfully created",
-  })
-  // @ApiCreatedResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Create measuremet." })
+  // @ApiResponse({
+  //   status: 201,
+  //   type: Measurement,
+  //   description: "measurement has been successfully created",
+  // })
+  @ApiCreatedResponse({ description: "Success.", type: Measurement })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -62,14 +62,14 @@ export class MeasurementsController {
     }
   }
 
-  @ApiOperation({ summary: "get all measurement for given user" })
-  @ApiResponse({
-    status: 200,
-    type: [Measurement],
-    description: "all measurements has been successfully loaded",
-  })
-  // @ApiOkResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Get all measurement for given user." })
+  // @ApiResponse({
+  //   status: 200,
+  //   type: [Measurement],
+  //   description: "all measurements has been successfully loaded",
+  // })
+  @ApiOkResponse({ description: "Success.", type: [Measurement] })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
@@ -82,15 +82,15 @@ export class MeasurementsController {
     }
   }
 
-  @ApiOperation({ summary: "get measurement by id" })
-  @ApiResponse({
-    status: 200,
-    type: Measurement,
-    description: "one measurement been successfully loaded",
-  })
-  // @ApiOkResponse()
-  // @ApiNotFoundResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Get measurement by id." })
+  // @ApiResponse({
+  //   status: 200,
+  //   type: Measurement,
+  //   description: "one measurement been successfully loaded",
+  // })
+  @ApiOkResponse({ description: "Success.", type: Measurement })
+  @ApiNotFoundResponse({ description: "Measurement not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
@@ -106,15 +106,15 @@ export class MeasurementsController {
     }
   }
 
-  @ApiOperation({ summary: "update measurement by id" })
-  @ApiResponse({
-    status: 200,
-    type: Measurement,
-    description: "measurement has been successfully updated",
-  })
-  // @ApiOkResponse()
-  // @ApiNotFoundResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Update measurement by id." })
+  // @ApiResponse({
+  //   status: 200,
+  //   type: Measurement,
+  //   description: "measurement has been successfully updated",
+  // })
+  @ApiOkResponse({ description: "Success.", type: Measurement })
+  @ApiNotFoundResponse({ description: "Measurement not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -135,15 +135,15 @@ export class MeasurementsController {
     }
   }
 
-  @ApiOperation({ summary: "delete all measurements for given user" })
-  @ApiResponse({
-    status: 200,
-    type: [Measurement],
-    description: "all user's measurement has been successfully deleted",
-  })
-  // @ApiOkResponse()
-  // @ApiNotFoundResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Delete all measurements for given user." })
+  // @ApiResponse({
+  //   status: 200,
+  //   type: [Measurement],
+  //   description: "all user's measurement has been successfully deleted",
+  // })
+  @ApiOkResponse({ description: "Success.", type: [Measurement] })
+  @ApiNotFoundResponse({ description: "Measurements not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
@@ -159,15 +159,15 @@ export class MeasurementsController {
     }
   }
 
-  @ApiOperation({ summary: "delete measurement by id" })
-  @ApiResponse({
-    status: 200,
-    type: Measurement,
-    description: "one measurement has been successfully deleted",
-  })
-  // @ApiOkResponse()
-  // @ApiNotFoundResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Delete measurement by id." })
+  // @ApiResponse({
+  //   status: 200,
+  //   type: Measurement,
+  //   description: "one measurement has been successfully deleted",
+  // })
+  @ApiOkResponse({ description: "Success.", type: Measurement })
+  @ApiNotFoundResponse({ description: "Measurement not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
