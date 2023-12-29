@@ -29,7 +29,7 @@ import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalid.refresh.token.exception";
 import { LogoutResponse } from "@app/dtos/auth/logout.response";
 import { TokenDto } from "@app/dtos/auth/token.dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { LoginDto } from "@app/dtos/auth/login.dto";
 import { EmailDto } from "@app/dtos/auth/email.dto";
 import { EmailService } from "@app/services/email.service";
@@ -75,12 +75,12 @@ export class AuthController {
     this.generatorService = generatorService;
   }
 
-  @ApiOperation({ summary: "account confirmation" })
-  @ApiResponse({ status: 200, type: MessageInfo, description: "user has been successfully verified" })
-  // @ApiOkResponse()
-  // @ApiNotFoundResponse()
-  // @ApiBadRequestResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Account confirmation." })
+  // @ApiResponse({ status: 200, type: MessageInfo, description: "user has been successfully verified" })
+  @ApiOkResponse({ description: "Success.", type: MessageInfo })
+  @ApiNotFoundResponse({ description: "User not found." })
+  @ApiBadRequestResponse({ description: "Confirmation token bad request." })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @Get("confirmation/:confirmationToken")
   async userConfirmation(@Param("confirmationToken") confirmationToken: string): Promise<MessageInfo> {
     try {
@@ -98,10 +98,10 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "user registration" })
-  @ApiResponse({ status: 201, type: MessageInfo, description: "confirmation email has been resend" })
-  // @ApiCreatedResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "User registration." })
+  // @ApiResponse({ status: 201, type: MessageInfo, description: "confirmation email has been resend" })
+  @ApiCreatedResponse({ description: "Success.", type: MessageInfo })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailExistGuard)
   @UsePipes(ValidationPipe)
   @HttpCode(200)
@@ -118,11 +118,11 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "user login" })
-  @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
-  // @ApiCreatedResponse()
-  // @ApiUnauthorizedResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "User login." })
+  // @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
+  @ApiCreatedResponse({ description: "Success.", type: LoginResponse })
+  @ApiUnauthorizedResponse({ description: "User unauthorized." })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailVerifiedGuard)
   @UsePipes(ValidationPipe)
   @Post("login")
@@ -141,11 +141,11 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "user login" })
-  @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
-  // @ApiCreatedResponse()
-  // @ApiUnauthorizedResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "User login-cookies." })
+  // @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
+  @ApiCreatedResponse({ description: "Success.", type: LoginResponseCookies })
+  @ApiUnauthorizedResponse({ description: "User unauthorized." })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailVerifiedGuard)
   @UsePipes(ValidationPipe)
   @Post("login-cookies")
@@ -168,10 +168,10 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "user logout" })
-  @ApiResponse({ status: 200, type: LogoutResponse, description: "user has been successfully logged out" })
-  // @ApiOkResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "User logout." })
+  // @ApiResponse({ status: 200, type: LogoutResponse, description: "user has been successfully logged out" })
+  @ApiOkResponse({ description: "Success.", type: LogoutResponse})
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -188,10 +188,10 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "user logout" })
-  @ApiResponse({ status: 200, type: LogoutResponse, description: "user has been successfully logged out" })
-  // @ApiOkResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "User logout-cookies." })
+  // @ApiResponse({ status: 200, type: LogoutResponse, description: "user has been successfully logged out" })
+  @ApiOkResponse({ description: "Success.", type: LogoutResponse })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -209,11 +209,11 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "get new access and refresh tokens" })
-  @ApiResponse({ status: 200, type: LoginResponse, description: "tokens has been successfully refreshed" })
-  // @ApiOkResponse()
-  // @ApiBadRequestResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Get new access and refresh tokens." })
+  // @ApiResponse({ status: 200, type: LoginResponse, description: "tokens has been successfully refreshed" })
+  @ApiOkResponse({ description: "Success.", type: LoginResponse })
+  @ApiBadRequestResponse({ description: "Refresh token bad request." })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UsePipes(ValidationPipe)
   @Patch("tokens")
   async getNewTokens(@Body() payload: TokenDto): Promise<LoginResponse> {
@@ -231,11 +231,11 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "get new access and refresh tokens" })
-  @ApiResponse({ status: 200, type: LoginResponse, description: "tokens has been successfully refreshed" })
-  // @ApiOkResponse()
-  // @ApiBadRequestResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Get new access and refresh tokens-cookies." })
+  // @ApiResponse({ status: 200, type: LoginResponseCookies, description: "tokens has been successfully refreshed" })
+  @ApiOkResponse({ description: "Success." })
+  @ApiBadRequestResponse({ description: "Refresh token bad request." })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UsePipes(ValidationPipe)
   @Patch("tokens-cookie")
   async getNewTokensCookies(@Req() request: Request, @Res() response: Response): Promise<LoginResponseCookies> {
@@ -258,10 +258,10 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "update credentials" })
-  @ApiResponse({ status: 200, type: User, description: "credentials has been successfully updated" })
-  // @ApiOkResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Update credentials." })
+  // @ApiResponse({ status: 200, type: User, description: "credentials has been successfully updated" })
+  @ApiOkResponse({ description: "Success.", type: User })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
@@ -275,10 +275,10 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "reset password" })
-  @ApiResponse({ status: 200, type: MessageInfo, description: "verification code has been send" })
-  // @ApiOkResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Reset password." })
+  // @ApiResponse({ status: 200, type: MessageInfo, description: "verification code has been send" })
+  @ApiOkResponse({ description: "Success.", type: MessageInfo})
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UsePipes(ValidationPipe)
   @UseGuards(EmailVerifiedGuard)
   @Patch("reset-password")
@@ -294,11 +294,11 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: "reset password confirmation" })
-  @ApiResponse({ status: 200, type: MessageInfo, description: "password has been reset" })
-  // @ApiOkResponse()
-  // @ApiBadRequestResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Reset password confirmation." })
+  // @ApiResponse({ status: 200, type: MessageInfo, description: "password has been reset" })
+  @ApiOkResponse({ description: "Success."})
+  @ApiBadRequestResponse({ description: "Invalid verification code." })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UsePipes(ValidationPipe)
   @UseGuards(EmailVerifiedGuard)
   @Patch("reset-password-confirm")
@@ -313,59 +313,3 @@ export class AuthController {
     }
   }
 }
-
-
-
-
-
-// @Post()
-// @ApiCreatedResponse({
-//   description: "Success.",
-//   type: PickType(Data, ["id"]),
-// })
-// @ApiBadRequestResponse({
-//   description: "Invalid request body.",
-//   schema: { $ref: getSchemaPath(ValidationErrorResponseDto) },
-// })
-// @ApiConsumes("multipart/form-data")
-// @ApiBody({
-//   schema: {
-//     type: "object",
-//     properties: {
-//       file: {
-//         type: "string",
-//         format: "binary",
-//       },
-//     },
-//   },
-// })
-
-
-// @Get("/:id/status")
-// @ApiOkResponse({
-//   description: "Success.",
-//   type: PickType(Data, ["progress"]),
-// })
-// @ApiNotFoundResponse({
-//   description: "Data not found.",
-//   schema: { $ref: getSchemaPath(ErrorResponseDto) },
-// })
-
-
-// @Get("/:id")
-// @ApiOkResponse({
-//   description: "Success.",
-//   schema: {
-//     type: "array",
-//     items: {
-//       type: "array",
-//       items: {
-//         type: "string",
-//       },
-//     },
-//   },
-// })
-// @ApiNotFoundResponse({
-//   description: "Data not found.",
-//   schema: { $ref: getSchemaPath(ErrorResponseDto) },
-// })

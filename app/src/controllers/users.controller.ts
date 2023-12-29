@@ -41,11 +41,11 @@ export class UsersController {
     this.generatorService = generatorService;
   }
 
-  @ApiOperation({ summary: "user registration" })
-  @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
-  // @ApiCreatedResponse()
-  // @ApiConflictResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "User registration." })
+  // @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
+  @ApiCreatedResponse({ description: "Success.", type: User })
+  @ApiConflictResponse({ description: "User exist in database." })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UsePipes(ValidationPipe)
   @Post()
   async registerUser(@Body() user: CreateUserDto): Promise<User> {
@@ -64,10 +64,10 @@ export class UsersController {
     }
   }
 
-  @ApiOperation({ summary: "get user data" })
-  @ApiResponse({ status: 200, type: User, description: "user's info has been successfully loaded" }) 
-  // @ApiOkResponse()
-  // @ApiInternalServerErrorResponse()
+  @ApiOperation({ summary: "Get user data." })
+  // @ApiResponse({ status: 200, type: User, description: "user's info has been successfully loaded" }) 
+  @ApiOkResponse({ description: "Success.", type: User })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
@@ -80,10 +80,11 @@ export class UsersController {
     }
   }
 
-  @ApiOperation({ summary: "delete user account with measurement" })
-  @ApiResponse({ status: 200, type: User, description: "user has been successfully deleted" })
-  // @ApiOkResponse()
-  // @ApiInternalServerErrorResponse()@ApiBearerAuth()
+  @ApiOperation({ summary: "Delete user account with measurement." })
+  // @ApiResponse({ status: 200, type: User, description: "user has been successfully deleted" })
+  @ApiOkResponse({ description: "Success.", type: User })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Delete()
