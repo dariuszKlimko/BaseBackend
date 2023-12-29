@@ -7,9 +7,10 @@ import { MeasurementRepository } from "@app/repositories/measurement.repository"
 import { ProfileRepository } from "@app/repositories/profile.repository";
 import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
 import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
+import { MeasurementServiceIntrface } from "@app/services/interfaces/measurement.service.interface";
 
 @Injectable()
-export class MeasurementsService {
+export class MeasurementsService implements MeasurementServiceIntrface {
   private readonly measurementsRepository: MeasurementRepositoryInterface;
   private readonly profileRepository: ProfileRepositoryInterface;
 

@@ -8,9 +8,10 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { randomBytes, randomInt } from "crypto";
+import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
 
 @Injectable()
-export class GeneratorSevice {
+export class GeneratorSevice implements GeneratorServiceIntrface {
   private readonly userRepository: UserRepositoryIntrface;
   private readonly jwtService: JwtService;
   private readonly configService: ConfigService;
