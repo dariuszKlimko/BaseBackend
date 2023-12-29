@@ -6,9 +6,9 @@ import { CreateUserDto } from "@app/dtos/user/create.user.dto";
 import { User } from "@app/entities/user.entity";
 
 export interface AuthServiceIntrface {
-    userConfirmation(email: string): Promise<MessageInfo>;
-    comparePassword(userInfo: CreateUserDto): Promise<User>;
-    logout(id: string, refreshToken: string): Promise<LogoutResponse>;
-    resetPasswordConfirm(resetPassord: ResetPasswordDto): Promise<MessageInfo>;
-    updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User>;
+  userConfirmation(email: string): Promise<MessageInfo>;
+  comparePassword(userInfo: CreateUserDto): Promise<User>;
+  logout(id: string, refreshToken: string): Promise<LogoutResponse>;
+  resetPasswordConfirm(resetPassord: ResetPasswordDto): Promise<MessageInfo>;
+  updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User>;
 }
