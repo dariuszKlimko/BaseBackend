@@ -46,10 +46,11 @@ export class MeasurementsService {
     measurementId: string,
     measurementPayload: UpdateMeasurementDto
   ): Promise<Measurement> {
-    return await this.measurementsRepository.updateOneByCondition({ 
-      userId, 
-      id: measurementId 
-    },
+    return await this.measurementsRepository.updateOneByCondition(
+      {
+        userId,
+        id: measurementId,
+      },
       measurementPayload
     );
   }

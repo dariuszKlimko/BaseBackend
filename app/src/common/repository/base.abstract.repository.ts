@@ -13,7 +13,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
   }
 
   async findAll(skip?: number, take?: number): Promise<[E[], number]> {
-    return await this.repository.findAndCount({skip, take});
+    return await this.repository.findAndCount({ skip, take });
   }
 
   async findOneByIdOrThrow(id: string): Promise<E> {

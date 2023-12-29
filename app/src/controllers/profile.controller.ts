@@ -18,7 +18,13 @@ import {
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from "@nestjs/swagger";
 
 @ApiTags("profiles")
 @UseFilters(HttpExceptionFilter)
@@ -32,11 +38,6 @@ export class ProfilessController {
   }
 
   @ApiOperation({ summary: "Get profile." })
-  // @ApiResponse({
-  //   status: 200,
-  //   type: Profile,
-  //   description: "profile been successfully loaded",
-  // })
   @ApiOkResponse({ description: "Success.", type: Profile })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
@@ -52,11 +53,6 @@ export class ProfilessController {
   }
 
   @ApiOperation({ summary: "Update profile." })
-  // @ApiResponse({
-  //   status: 200,
-  //   type: Profile,
-  //   description: "profile has been successfully updated",
-  // })
   @ApiOkResponse({ description: "Success.", type: Profile })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()

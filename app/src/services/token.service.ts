@@ -1,6 +1,4 @@
 import { BAD_CONFIRMATION_TOKEN, CONFIRMATION_TOKEN_EXPIRED } from "@app/common/constans/exceptions.constans";
-import { TokenResponsePayload } from "@app/common/types/tokenResponsePayload";
-import { LoginResponse } from "@app/dtos/auth/login.response";
 import { User } from "@app/entities/user.entity";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 import { UserRepository } from "@app/repositories/user.repository";

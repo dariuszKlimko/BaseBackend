@@ -50,6 +50,6 @@ export class GeneratorSevice {
 
   generateAccessToken(user: User): string {
     const payload: TokenResponsePayload = { sub: user.id };
-    return this.jwtService.sign(payload)
+    return this.jwtService.sign(payload);
   }
 }

@@ -29,7 +29,17 @@ import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalid.refresh.token.exception";
 import { LogoutResponse } from "@app/dtos/auth/logout.response";
 import { TokenDto } from "@app/dtos/auth/token.dto";
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from "@nestjs/swagger";
 import { LoginDto } from "@app/dtos/auth/login.dto";
 import { EmailDto } from "@app/dtos/auth/email.dto";
 import { EmailService } from "@app/services/email.service";
@@ -76,7 +86,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Account confirmation." })
-  // @ApiResponse({ status: 200, type: MessageInfo, description: "user has been successfully verified" })
   @ApiOkResponse({ description: "Success.", type: MessageInfo })
   @ApiNotFoundResponse({ description: "User not found." })
   @ApiBadRequestResponse({ description: "Confirmation token bad request." })
@@ -99,7 +108,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "User registration." })
-  // @ApiResponse({ status: 201, type: MessageInfo, description: "confirmation email has been resend" })
   @ApiCreatedResponse({ description: "Success.", type: MessageInfo })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailExistGuard)
@@ -119,7 +127,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "User login." })
-  // @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
   @ApiCreatedResponse({ description: "Success.", type: LoginResponse })
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
@@ -142,7 +149,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "User login-cookies." })
-  // @ApiResponse({ status: 201, type: LoginResponse, description: "user has been successfully logged in" })
   @ApiCreatedResponse({ description: "Success.", type: LoginResponseCookies })
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
@@ -155,8 +161,8 @@ export class AuthController {
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToDB(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
-      response.cookie('refreshToken', refreshToken, {
-        sameSite: 'strict',
+      response.cookie("refreshToken", refreshToken, {
+        sameSite: "strict",
         httpOnly: true,
       });
       return { accessToken };
@@ -169,8 +175,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "User logout." })
-  // @ApiResponse({ status: 200, type: LogoutResponse, description: "user has been successfully logged out" })
-  @ApiOkResponse({ description: "Success.", type: LogoutResponse})
+  @ApiOkResponse({ description: "Success.", type: LogoutResponse })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
@@ -189,7 +194,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "User logout-cookies." })
-  // @ApiResponse({ status: 200, type: LogoutResponse, description: "user has been successfully logged out" })
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
@@ -199,7 +203,7 @@ export class AuthController {
   @Patch("logout-cookies")
   async logoutCookie(@UserId() userId: string, @Req() request: Request): Promise<LogoutResponse> {
     try {
-      const refreshToken: string = request.cookies['cookieKey'];
+      const refreshToken: string = request.cookies["cookieKey"];
       return await this.authService.logout(userId, refreshToken);
     } catch (error) {
       if (error instanceof InvalidRefreshTokenException) {
@@ -210,7 +214,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Get new access and refresh tokens." })
-  // @ApiResponse({ status: 200, type: LoginResponse, description: "tokens has been successfully refreshed" })
   @ApiOkResponse({ description: "Success.", type: LoginResponse })
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
@@ -232,7 +235,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Get new access and refresh tokens-cookies." })
-  // @ApiResponse({ status: 200, type: LoginResponseCookies, description: "tokens has been successfully refreshed" })
   @ApiOkResponse({ description: "Success." })
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
@@ -240,13 +242,13 @@ export class AuthController {
   @Patch("tokens-cookie")
   async getNewTokensCookies(@Req() request: Request, @Res() response: Response): Promise<LoginResponseCookies> {
     try {
-      const refreshTokenCookies: string = request.cookies['cookieKey'];
+      const refreshTokenCookies: string = request.cookies["cookieKey"];
       const authorizedUser: User = await this.tokenService.findUserByRefreshToken(refreshTokenCookies);
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToDB(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
-      response.cookie('refreshToken', refreshToken, {
-        sameSite: 'strict',
+      response.cookie("refreshToken", refreshToken, {
+        sameSite: "strict",
         httpOnly: true,
       });
       return { accessToken };
@@ -259,7 +261,6 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Update credentials." })
-  // @ApiResponse({ status: 200, type: User, description: "credentials has been successfully updated" })
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
@@ -276,8 +277,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Reset password." })
-  // @ApiResponse({ status: 200, type: MessageInfo, description: "verification code has been send" })
-  @ApiOkResponse({ description: "Success.", type: MessageInfo})
+  @ApiOkResponse({ description: "Success.", type: MessageInfo })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UsePipes(ValidationPipe)
   @UseGuards(EmailVerifiedGuard)
@@ -295,8 +295,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Reset password confirmation." })
-  // @ApiResponse({ status: 200, type: MessageInfo, description: "password has been reset" })
-  @ApiOkResponse({ description: "Success."})
+  @ApiOkResponse({ description: "Success." })
   @ApiBadRequestResponse({ description: "Invalid verification code." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UsePipes(ValidationPipe)

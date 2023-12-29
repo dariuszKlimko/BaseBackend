@@ -13,7 +13,13 @@ import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/in
 import { PASSWORD_RESET_RESPONSE, USER_VERIFIED_RESPONSE } from "@app/common/constans/constans";
 import { UserRepository } from "@app/repositories/user.repository";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
-import { INCORRECT_EMAIL_ADDRES_OR_PASSWORD, INVALID_REFRESH_TOKEN, INVALID_VERIFICATION_CODE, USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED, USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED } from "@app/common/constans/exceptions.constans";
+import {
+  INCORRECT_EMAIL_ADDRES_OR_PASSWORD,
+  INVALID_REFRESH_TOKEN,
+  INVALID_VERIFICATION_CODE,
+  USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED,
+  USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED,
+} from "@app/common/constans/exceptions.constans";
 
 @Injectable()
 export class AuthService {

@@ -1,3 +1,3 @@
 export type LinkGeneratePayload = {
- email: string;
+  email: string;
 };

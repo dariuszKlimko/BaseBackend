@@ -18,7 +18,7 @@ import { UsersService } from "@app/services/user.service";
 export class RolesGuard implements CanActivate {
   private reflector: Reflector;
   private readonly tokenService: TokenService;
-  private readonly userService: UsersService
+  private readonly userService: UsersService;
 
   constructor(reflector: Reflector, tokenService: TokenService, userService: UsersService) {
     this.reflector = reflector;

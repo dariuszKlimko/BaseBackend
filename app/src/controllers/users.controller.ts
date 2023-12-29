@@ -21,7 +21,15 @@ import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
-import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from "@nestjs/swagger";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { ACCOUTN_CONFIRMATION } from "@app/common/constans/constans";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
@@ -42,7 +50,6 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: "User registration." })
-  // @ApiResponse({ status: 201, type: User, description: "user has been successfully created" })
   @ApiCreatedResponse({ description: "Success.", type: User })
   @ApiConflictResponse({ description: "User exist in database." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
@@ -65,7 +72,6 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: "Get user data." })
-  // @ApiResponse({ status: 200, type: User, description: "user's info has been successfully loaded" }) 
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
@@ -81,7 +87,6 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: "Delete user account with measurement." })
-  // @ApiResponse({ status: 200, type: User, description: "user has been successfully deleted" })
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
