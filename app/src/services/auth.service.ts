@@ -20,9 +20,10 @@ import {
   USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED,
   USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED,
 } from "@app/common/constans/exceptions.constans";
+import { AuthServiceIntrface } from "@app/services/interfaces/auth.service.interface";
 
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthServiceIntrface {
   private readonly userRepository: UserRepositoryIntrface;
 
   constructor(userRepository: UserRepository) {

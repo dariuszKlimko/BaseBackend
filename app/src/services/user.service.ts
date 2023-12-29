@@ -8,9 +8,10 @@ import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.reposi
 import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
 import { ProfileRepository } from "@app/repositories/profile.repository";
 import { DULICATED_EXCEPTION_MESSAGE } from "@app/common/constans/exceptions.constans";
+import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
 
 @Injectable()
-export class UsersService {
+export class UsersService implements UserServiceIntrface {
   private readonly userRepository: UserRepositoryIntrface;
   private readonly profileRepository: ProfileRepositoryInterface;
 

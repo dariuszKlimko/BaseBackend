@@ -7,9 +7,10 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { ArrayContains } from "typeorm";
+import { TokenServiceIntrface } from "@app/services/interfaces/token.service.interface";
 
 @Injectable()
-export class TokenService {
+export class TokenService implements TokenServiceIntrface {
   private readonly userRepository: UserRepositoryIntrface;
   private readonly jwtService: JwtService;
   private readonly configService: ConfigService;
