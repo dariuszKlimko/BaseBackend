@@ -9,6 +9,7 @@ import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile
 import { ProfileRepository } from "@app/repositories/profile.repository";
 import { DULICATED_EXCEPTION_MESSAGE } from "@app/common/constans/exceptions.constans";
 import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { UpdateUserDto } from "@app/dtos/user/update.user.dto";
 
 @Injectable()
 export class UsersService implements UserServiceIntrface {
@@ -39,20 +40,32 @@ export class UsersService implements UserServiceIntrface {
   async deleteUser(id: string): Promise<User> {
     return await this.userRepository.deleteOneById(id);
   }
-
-  // async updateUser()
+// --------------------------------------------------------------------
+  // async updateUser() - user
+  async updateUser(id: string, userInfo: UpdateUserDto): Promise<User> {
+    return await this.userRepository.updateOneById(id, userInfo);
+  }
 
   // async getAllUsersByAdmin() - admin
+  async getAllUsersByAdmin(skip?: number, take?: number): Promise<[User[], number]> {
+    return this.userRepository.findAll(skip, take);
+  }
 
   // async getUsersByIdsByAdmin() - admin
+  async getUsersByIdsByAdmin(ids: string[], skip?: number, take?: number): Promise<[User[], number]> {
+    return this.userRepository.findAllByIds(ids, skip, take);
+  }
 
   // async getUsersWithConditionByAdmin()????? - admin
 
   // async getUserWithRelationByAdmin() - admin
 
   // async deleteUsersByIdsByAdmin() - admin
+  async deleteUsersByIdsByAdmin(ids: string[]): Promise<User[]> {
+    return this.userRepository.deleteManyByIds(ids);
+  }
 
-  // async createUserByAdmin() - admin
+  // async createUserByAdmin() - admin - use registerUser(userInfo: CreateUserDto)
 
   // async updateUserByAdmin() - admin
 }

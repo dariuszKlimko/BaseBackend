@@ -1,4 +1,4 @@
-import { DeepPartial, FindOptionsRelations, FindOptionsWhere } from "typeorm";
+import { DeepPartial, FindManyOptions, FindOptionsRelations, FindOptionsWhere } from "typeorm";
 
 export interface BaseInterfaceRepository<E> {
   findAll(skip?: number, take?: number): Promise<[E[], number]>;
@@ -8,6 +8,7 @@ export interface BaseInterfaceRepository<E> {
   findOneByCondition(condition: FindOptionsWhere<E>): Promise<E>;
   findAllByCondition(condition: FindOptionsWhere<E>, skip?: number, take?: number): Promise<[E[], number]>;
   findWithRelation(rel: FindOptionsRelations<E>, skip?: number, take?: number): Promise<[E[], number]>;
+  openFindQuery(query: FindManyOptions<E>): Promise<[E[], number]>;
   createOne(createEntityDto?: DeepPartial<E>): Promise<E>;
   createMany(createEntityDtos: DeepPartial<E[]>): Promise<E[]>;
   saveOne(entity: E): Promise<E>;

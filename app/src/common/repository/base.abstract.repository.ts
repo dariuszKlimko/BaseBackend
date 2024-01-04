@@ -1,5 +1,5 @@
 import { BaseEntity } from "@app/entities/base.entity";
-import { DeepPartial, EntityNotFoundError, FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
+import { DeepPartial, EntityNotFoundError, FindManyOptions, FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
 import { BaseInterfaceRepository } from "@app/common/repository/base.interface.repository";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 
@@ -71,6 +71,10 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
       skip,
       take,
     });
+  }
+
+  async openFindQuery(query: FindManyOptions<E>): Promise<[E[], number]> {
+    return await this.repository.findAndCount(query);
   }
 
   async createOne(createEntityDto?: DeepPartial<E>): Promise<E> {
