@@ -7,9 +7,11 @@ import {
   Logger,
   NotFoundException,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -34,6 +36,9 @@ import {
 import { Measurement } from "@app/entities/measurement.entity";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
+import { RolesGuard } from "@app/common/guards/roles.guard";
+import { Roles } from "@app/common/decorators/roles.decorator";
+import { Role } from "@app/common/types/role.enum";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)
@@ -74,7 +79,7 @@ export class MeasurementsController {
   @Get()
   async getAllMeasurementsByUserId(@UserId() userId: string): Promise<[Measurement[], number]> {
     try {
-      return await this.measurementsService.getAllMeasurementsByUserId(userId);
+      return await this.measurementsService.findAllByCondition({ userId });
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -90,7 +95,10 @@ export class MeasurementsController {
   @Get(":id")
   async getOneMeasurement(@UserId() userId: string, @Param("id", ParseUUIDPipe) id: string): Promise<Measurement> {
     try {
-      return await this.measurementsService.getOneMeasurement(userId, id);
+      return await this.measurementsService.findOneByConditionOrThrow({
+        userId,
+        id,
+      });
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -133,7 +141,10 @@ export class MeasurementsController {
   @Delete()
   async deleteAllMeasurementsByUserId(@UserId() userId: string): Promise<Measurement[]> {
     try {
-      return await this.measurementsService.deleteAllMeasurementsByUserId(userId);
+      const [measurements]: [Measurement[], number] = await this.measurementsService.findAllByCondition({
+        userId,
+      });
+      return await this.measurementsService.deleteManyByEntities(measurements);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -155,7 +166,11 @@ export class MeasurementsController {
     @Param("id", ParseUUIDPipe) id: string
   ): Promise<Measurement> {
     try {
-      return await this.measurementsService.deleteOneMeasurement(userId, id);
+      const measurement: Measurement = await this.measurementsService.findOneByConditionOrThrow({
+        userId,
+        id,
+      });
+      return await this.measurementsService.deleteOneByEntity(measurement);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -163,4 +178,101 @@ export class MeasurementsController {
       throw new InternalServerErrorException();
     }
   }
+// ----------------------------------------------------------------------------
+  @ApiOperation({ summary: "Get all measurement." })
+  @ApiOkResponse({ description: "Success.", type: [Measurement] })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Get("getallmeasurements")
+  async getAllMeasurementsByAdmin(
+    @Query("skip", ParseIntPipe) skip: number,
+    @Query("take", ParseIntPipe) take: number
+  ): Promise<[Measurement[], number]> {
+    try {
+      return await this.measurementsService.findAll(skip, take);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "Get all measurement by ids." })
+  @ApiOkResponse({ description: "Success.", type: [Measurement] })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Get("getallmeasurementsbyids")
+  async getAllMeasurementsByIdsByAdmin(@Body() ids: string[]): Promise<[Measurement[], number]> {
+    try {
+      return await this.measurementsService.findAllByIds(ids);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "Delete all measurements by ids." })
+  @ApiOkResponse({ description: "Success.", type: [Measurement] })
+  @ApiNotFoundResponse({ description: "Measurements not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Delete("daletemeasurementsbyids")
+  async deleteAllMeasurementsByIdsByAdmin(@Body() ids: string[]): Promise<Measurement[]> {
+    try {
+      const [measurements]: [Measurement[], number] = await this.measurementsService.findAllByIds(ids);
+      return await this.measurementsService.deleteManyByEntities(measurements);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "Delete all measurements by user id." })
+  @ApiOkResponse({ description: "Success.", type: [Measurement] })
+  @ApiNotFoundResponse({ description: "Measurements not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Delete("daletemeasurementsbyuserid")
+  async deleteMeasurementsByUserIdByAdmi(@Query("userid", ParseUUIDPipe) userId: string): Promise<Measurement[]> {
+    try {
+      const [measurements]: [Measurement[], number] = await this.measurementsService.findAllByCondition({
+        userId,
+      });
+      return await this.measurementsService.deleteManyByEntities(measurements);
+    } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "Update measurement by id." })
+  @ApiOkResponse({ description: "Success.", type: [Measurement] })
+  @ApiNotFoundResponse({ description: "Measurements not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Delete("updatemeasurementbyidbyadmin")
+  async updateMeasurementByIdByAdmin(
+    @Query("id", ParseUUIDPipe) id: string,
+    @Body() measurementPayload: UpdateMeasurementDto
+  ): Promise<Measurement> {
+    try {
+      const measurement: Measurement = await this.measurementsService.findOneByIdOrThrow(id);
+      await this.measurementsService.updateOne(measurement.id, measurementPayload);
+      return await this.measurementsService.findOneByIdOrThrow(measurement.id);
+    } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
 }

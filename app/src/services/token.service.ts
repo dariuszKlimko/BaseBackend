@@ -48,9 +48,8 @@ export class TokenService implements TokenServiceIntrface {
   }
 
   async saveRefreshTokenToDB(user: User, refreshToken: string): Promise<string> {
-    user.password = undefined;
     user.refreshTokens.push(refreshToken);
-    await this.userRepository.saveOne(user);
+    await this.userRepository.updateOne(user.id, { refreshTokens: user.refreshTokens });
     return refreshToken;
   }
 

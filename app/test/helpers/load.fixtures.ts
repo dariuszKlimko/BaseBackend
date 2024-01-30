@@ -2,6 +2,7 @@ import path from "path";
 import { DataSource } from "typeorm";
 import { Builder, fixturesIterator, IEntity, Loader, Parser, Resolver } from "typeorm-fixtures-cli";
 import { dataBaseConfig } from "@app/data.source";
+import { Logger } from "@nestjs/common";
 
 const FIXTURES_PATH = "./test/helpers/fixtures/";
 
@@ -39,7 +40,7 @@ const loadFixtures = async (): Promise<FixtureFactory> => {
       },
     };
   } catch (error) {
-    console.log("loadFixture error: ", error);
+    Logger.error("loadFixture error: ", error);
   }
 };
 

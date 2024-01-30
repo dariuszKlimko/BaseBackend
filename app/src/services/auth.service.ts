@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/user.authenticate.exception";
@@ -25,6 +25,7 @@ import { AuthServiceIntrface } from "@app/services/interfaces/auth.service.inter
 @Injectable()
 export class AuthService implements AuthServiceIntrface {
   private readonly userRepository: UserRepositoryIntrface;
+  private readonly logger: Logger = new Logger(AuthService.name);
 
   constructor(userRepository: UserRepository) {
     this.userRepository = userRepository;
@@ -35,7 +36,7 @@ export class AuthService implements AuthServiceIntrface {
     if (user.verified) {
       throw new UserAlreadyConfirmedException(USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED);
     }
-    await this.userRepository.updateOneById(user.id, { verified: true });
+    await this.userRepository.updateOne(user.id, { verified: true });
     return USER_VERIFIED_RESPONSE;
   }
 
@@ -57,7 +58,14 @@ export class AuthService implements AuthServiceIntrface {
       throw new InvalidRefreshTokenException(INVALID_REFRESH_TOKEN);
     }
     user.refreshTokens.splice(tokenIndex, 1);
-    await this.userRepository.saveOne(user);
+    await this.userRepository.updateOne(user.id, { refreshTokens: user.refreshTokens });
+    return { email: user.email };
+  }
+
+  async forceLogout(id: string): Promise<LogoutResponse> {
+    const user: User = await this.userRepository.findOneByIdOrThrow(id);
+    user.refreshTokens = [];
+    await this.userRepository.updateOne(user.id, { refreshTokens: user.refreshTokens });
     return { email: user.email };
   }
 
@@ -68,18 +76,15 @@ export class AuthService implements AuthServiceIntrface {
     }
     user.password = resetPassord.password;
     user.verificationCode = null;
-    await this.userRepository.saveOne(user);
+    await this.userRepository.updateOne(user.id, user);
     return PASSWORD_RESET_RESPONSE;
   }
 
   async updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User> {
     const user: User = await this.userRepository.findOneByIdOrThrow(id);
-    if (userInfo.email) {
-      user.email = userInfo.email;
-    }
-    if (user.password) {
-      user.password = userInfo.password;
-    }
-    return await this.userRepository.saveOne(user);
+    this.userRepository.mergeEntity(user, userInfo);
+    // return await this.userRepository.saveOneByEntity(user);
+    await this.userRepository.updateOne(user.id, user);
+    return await this.userRepository.findOneByIdOrThrow(user.id);
   }
 }

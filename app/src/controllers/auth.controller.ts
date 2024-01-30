@@ -8,8 +8,10 @@ import {
   Logger,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
   Res,
   UnauthorizedException,
@@ -62,6 +64,9 @@ import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exceptio
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 import { Request, Response } from "express";
 import { LoginResponseCookies } from "@app/dtos/auth/login.response.cookies";
+import { RolesGuard } from "@app/common/guards/roles.guard";
+import { Roles } from "@app/common/decorators/roles.decorator";
+import { Role } from "@app/common/types/role.enum";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -176,6 +181,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "User logout." })
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
+  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
@@ -186,7 +192,9 @@ export class AuthController {
     try {
       return await this.authService.logout(userId, payload.refreshToken);
     } catch (error) {
-      if (error instanceof InvalidRefreshTokenException) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      } else if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException();
@@ -195,6 +203,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "User logout-cookies." })
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
+  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
@@ -206,13 +215,35 @@ export class AuthController {
       const refreshToken: string = request.cookies["cookieKey"];
       return await this.authService.logout(userId, refreshToken);
     } catch (error) {
-      if (error instanceof InvalidRefreshTokenException) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      } else if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException();
     }
   }
-
+  // -------------------------------------------------------------------------
+  @ApiOperation({ summary: "User force logout." })
+  @ApiOkResponse({ description: "Success.", type: LogoutResponse })
+  @ApiNotFoundResponse({ description: "User not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AddUserToRequest)
+  @Patch("forcelogout")
+  async forceLogout(@UserId() userId: string): Promise<LogoutResponse> {
+    try {
+      return await this.authService.forceLogout(userId);
+    } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+  // -------------------------------------------------------------------------
   @ApiOperation({ summary: "Get new access and refresh tokens." })
   @ApiOkResponse({ description: "Success.", type: LoginResponse })
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
@@ -225,6 +256,7 @@ export class AuthController {
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToDB(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
+
       return { accessToken, refreshToken };
     } catch (error) {
       if (error instanceof EntityNotFound) {
@@ -307,6 +339,27 @@ export class AuthController {
     } catch (error) {
       if (error instanceof InvalidVerificationCodeException) {
         throw new BadRequestException(error.message);
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  @ApiOperation({ summary: "User force logout." })
+  @ApiOkResponse({ description: "Success.", type: LogoutResponse })
+  @ApiNotFoundResponse({ description: "User not found" })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Patch("forcelogoutbyadmin")
+  async forceLogoutbyadmin(@Query("userid", ParseUUIDPipe) userId: string): Promise<LogoutResponse> {
+    try {
+      return await this.authService.forceLogout(userId);
+    } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
       }
       throw new InternalServerErrorException();
     }

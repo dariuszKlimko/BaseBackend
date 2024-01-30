@@ -50,10 +50,14 @@ describe("Users (e2e)", () => {
         email = res.body.email;
       });
 
-      await userRepository.findOneByConditionOrThrow({ email }).then((userDb) => {
-        expect(userDb).toBeDefined();
-        expect(userDb.email).toEqual(email);
-      });
+      await userRepository
+        .findOpenQuery({
+          where: { email },
+        })
+        .then(([usersDb]) => {
+          expect(usersDb[0]).toBeDefined();
+          expect(usersDb[0].email).toEqual(email);
+        });
 
       return await profileRepository.findOneByConditionOrThrow({ userId }).then((profile) => {
         expect(profile.userId).toEqual(userId);

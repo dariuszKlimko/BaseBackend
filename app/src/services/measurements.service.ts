@@ -8,6 +8,7 @@ import { ProfileRepository } from "@app/repositories/profile.repository";
 import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
 import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
 import { MeasurementServiceIntrface } from "@app/services/interfaces/measurement.service.interface";
+import { FindOptionsWhere, UpdateResult } from "typeorm";
 
 @Injectable()
 export class MeasurementsService implements MeasurementServiceIntrface {
@@ -28,18 +29,7 @@ export class MeasurementsService implements MeasurementServiceIntrface {
       bmi = measurementPayload.weight / Math.pow(profile.height / 100, 2);
       measurement.bmi = +bmi.toFixed(2);
     }
-    return await this.measurementsRepository.saveOne(measurement);
-  }
-
-  async getAllMeasurementsByUserId(userId: string): Promise<[Measurement[], number]> {
-    return await this.measurementsRepository.findAllByCondition({ userId });
-  }
-
-  async getOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
-    return await this.measurementsRepository.findOneByConditionOrThrow({
-      userId,
-      id: measurementId,
-    });
+    return await this.measurementsRepository.saveOneByEntity(measurement);
   }
 
   async updateMeasurement(
@@ -47,41 +37,43 @@ export class MeasurementsService implements MeasurementServiceIntrface {
     measurementId: string,
     measurementPayload: UpdateMeasurementDto
   ): Promise<Measurement> {
-    return await this.measurementsRepository.updateOneByCondition(
-      {
-        userId,
-        id: measurementId,
-      },
-      measurementPayload
-    );
-  }
-
-  async deleteAllMeasurementsByUserId(userId: string): Promise<Measurement[]> {
-    return await this.measurementsRepository.deleteManyByCondition({ userId });
-  }
-
-  async deleteOneMeasurement(userId: string, measurementId: string): Promise<Measurement> {
-    return await this.measurementsRepository.deleteOneByCondition({ userId, id: measurementId });
+    const measurement: Measurement = await this.measurementsRepository.findOneByConditionOrThrow({
+      userId,
+      id: measurementId,
+    });
+    await this.measurementsRepository.updateOne(measurement.id, measurementPayload);
+    return this.measurementsRepository.findOneByIdOrThrow(measurement.id);
   }
   // ---------------------------------------------------------------
-  // Admin
-  async getAllMeasurementsByAdmin(): Promise<[Measurement[], number]> {
-    return await this.measurementsRepository.findAll();
+  async findAllByCondition(condition: FindOptionsWhere<Measurement>): Promise<[Measurement[], number]> {
+    return await this.measurementsRepository.findAllByCondition(condition);
   }
-  // Admin
-  async getAllMeasurementsByIdsByAdmin(ids: string[]): Promise<[Measurement[], number]> {
+
+  async deleteOneByEntity(measurement: Measurement): Promise<Measurement> {
+    return await this.measurementsRepository.deleteOneByEntity(measurement);
+  }
+  
+  async findOneByConditionOrThrow(condition: FindOptionsWhere<Measurement>): Promise<Measurement> {
+    return await this.measurementsRepository.findOneByConditionOrThrow(condition);
+  }
+
+  async findOneByIdOrThrow(id: string): Promise<Measurement> {
+    return await this.measurementsRepository.findOneByIdOrThrow(id);
+  }
+
+  async updateOne(id: string, measurementInfo: UpdateMeasurementDto): Promise<UpdateResult> {
+    return await this.measurementsRepository.updateOne(id, measurementInfo);
+  }
+
+  async findAllByIds(ids: string[]): Promise<[Measurement[], number]> {
     return await this.measurementsRepository.findAllByIds(ids);
   }
-  // Admin
-  async deleteMeasurementsByIdsByAdmin(ids: string[]): Promise<Measurement[]> {
-    return await this.measurementsRepository.deleteManyByIds(ids);
+
+  async deleteManyByEntities(measurements: Measurement[]): Promise<Measurement[]> {
+    return await this.measurementsRepository.deleteManyByEntities(measurements);
   }
-  // Admin
-  async deleteMeasurementsByUserIdByAdmin(userId: string): Promise<Measurement[]> {
-    return await this.measurementsRepository.deleteManyByCondition({ userId });
-  }
-  // Admin
-  async updateMeasurementByIdByAdmin(id: string, measurementPayload: UpdateMeasurementDto): Promise<Measurement> {
-    return await this.measurementsRepository.updateOneById(id, measurementPayload);
+
+  async findAll(skip: number, take: number): Promise<[Measurement[], number]> {
+    return await this.measurementsRepository.findAll(skip, take);
   }
 }

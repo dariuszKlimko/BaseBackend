@@ -33,7 +33,8 @@ export class GeneratorSevice implements GeneratorServiceIntrface {
 
   async codeGenerator(email: string): Promise<number> {
     const code: number = randomInt(100000, 999999);
-    await this.userRepository.updateOneByCondition({ email: email }, { verificationCode: code });
+    const user: User = await this.userRepository.findOneByConditionOrThrow({ email: email });
+    await this.userRepository.updateOne(user.id, { verificationCode: code });
     return code;
   }
 

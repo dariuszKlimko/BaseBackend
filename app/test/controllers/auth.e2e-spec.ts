@@ -67,9 +67,13 @@ describe("Auth (e2e)", () => {
           expect(res.body.status).toEqual("ok");
         });
 
-      return await userRepository.findOneByConditionOrThrow({ email: "auth1@email.com" }).then((user) => {
-        expect(user.verified).toEqual(true);
-      });
+      return await userRepository
+        .findOpenQuery({
+          where: { email: "auth1@email.com" },
+        })
+        .then(([users]) => {
+          expect(users[0].verified).toEqual(true);
+        });
     });
 
     it("should not confirm account if user with given token not exist in database", async () => {
@@ -148,9 +152,13 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken).toBeDefined();
         });
 
-      return await userRepository.findOneByConditionOrThrow({ email: user.email }).then((user) => {
-        expect(user.refreshTokens.length).toEqual(1);
-      });
+      return await userRepository
+        .findOpenQuery({
+          where: { email: user.email },
+        })
+        .then(([users]) => {
+          expect(users[0].refreshTokens.length).toEqual(1);
+        });
     });
 
     it("should login one user twice", async () => {
@@ -175,9 +183,13 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken).toBeDefined();
         });
 
-      return await userRepository.findOneByConditionOrThrow({ email: user.email }).then((user) => {
-        expect(user.refreshTokens.length).toEqual(2);
-      });
+      return await userRepository
+        .findOpenQuery({
+          where: { email: user.email },
+        })
+        .then(([users]) => {
+          expect(users[0].refreshTokens.length).toEqual(2);
+        });
     });
 
     it("should not return tokens if email not exist in database", async () => {
@@ -226,8 +238,8 @@ describe("Auth (e2e)", () => {
           expect(res.body.email).toEqual("auth8@email.com");
         });
 
-      return await userRepository.findOneByConditionOrThrow({ email: "auth8@email.com" }).then((user) => {
-        expect(user.refreshTokens).toEqual([]);
+      return await userRepository.findOpenQuery({ where: { email: "auth8@email.com" } }).then(([users]) => {
+        expect(users[0].refreshTokens).toEqual([]);
       });
     });
 
@@ -266,8 +278,8 @@ describe("Auth (e2e)", () => {
           expect(res.body.refreshToken.length).toBeDefined();
         });
 
-      return await userRepository.findOneByConditionOrThrow({ email: "auth12@email.com" }).then((user) => {
-        expect(user.refreshTokens.length).toEqual(1);
+      return await userRepository.findOpenQuery({ where: { email: "auth12@email.com" } }).then(([users]) => {
+        expect(users[0].refreshTokens.length).toEqual(1);
       });
     });
 
@@ -289,9 +301,13 @@ describe("Auth (e2e)", () => {
         expect(res.body.email).toEqual("authUpdate13@email.com");
       });
 
-      return await userRepository.findOneByConditionOrThrow({ email: "authUpdate13@email.com" }).then((user) => {
-        expect(user.email).toEqual("authUpdate13@email.com");
-      });
+      return await userRepository
+        .findOpenQuery({
+          where: { email: "authUpdate13@email.com" },
+        })
+        .then(([users]) => {
+          expect(users[0].email).toEqual("authUpdate13@email.com");
+        });
     });
 
     it("should not update user if email is not email", async () => {
@@ -360,11 +376,15 @@ describe("Auth (e2e)", () => {
           expect(res.body.status).toEqual("ok");
         });
 
-      return await userRepository.findOneByConditionOrThrow({ email: "auth17@email.com" }).then((user) => {
-        expect(user.verificationCode).toBeDefined();
-        expect(user.verificationCode).toBeGreaterThanOrEqual(100000);
-        expect(user.verificationCode).toBeLessThanOrEqual(999999);
-      });
+      return await userRepository
+        .findOpenQuery({
+          where: { email: "auth17@email.com" },
+        })
+        .then(([users]) => {
+          expect(users[0].verificationCode).toBeDefined();
+          expect(users[0].verificationCode).toBeGreaterThanOrEqual(100000);
+          expect(users[0].verificationCode).toBeLessThanOrEqual(999999);
+        });
     });
 
     it("should not send email with verification code if user not exist in database", async () => {
@@ -409,9 +429,13 @@ describe("Auth (e2e)", () => {
         expect(res.body.refreshToken).toBeDefined();
       });
 
-      return await userRepository.findOneByConditionOrThrow({ email: "auth19@email.com" }).then((user) => {
-        expect(user.verificationCode).toEqual(null);
-      });
+      return await userRepository
+        .findOpenQuery({
+          where: { email: "auth19@email.com" },
+        })
+        .then(([users]) => {
+          expect(users[0].verificationCode).toEqual(null);
+        });
     });
 
     it("should not reset password with invalid verification code", async () => {
@@ -428,9 +452,13 @@ describe("Auth (e2e)", () => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         });
 
-      return await userRepository.findOneByConditionOrThrow({ email: "auth20@email.com" }).then((user) => {
-        expect(user.verificationCode).toEqual(123456);
-      });
+      return await userRepository
+        .findOpenQuery({
+          where: { email: "auth20@email.com" },
+        })
+        .then(([users]) => {
+          expect(users[0].verificationCode).toEqual(123456);
+        });
     });
   });
 });
