@@ -6,5 +6,5 @@ export class UpdateUserByAdminDto {
   @ApiProperty()
   @IsEnum(Role, { each: true })
   @IsString()
-  role: Role.Admin_0 | Role.Admin_1 | Role.Admin_2;
+  role: Role.Admin_1 | Role.Admin_2;
 }

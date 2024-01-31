@@ -7,7 +7,8 @@ import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.i
 import { Role } from "@app/common/types/role.enum";
 import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
 import { Profile } from "@app/entities/profile.entity";
-import { ProfilesService } from "@app/services/profile.service";
+import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
+import { ProfileService } from "@app/services/profile.service";
 import {
   Body,
   Controller,
@@ -30,16 +31,17 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import { In } from "typeorm";
 
 @ApiTags("profiles")
 @UseFilters(HttpExceptionFilter)
 @Controller("profiles")
-export class ProfilessController {
-  private readonly logger: Logger = new Logger(ProfilessController.name);
-  private readonly profilesService: ProfilesService;
+export class ProfileController {
+  private readonly logger: Logger = new Logger(ProfileController.name);
+  private readonly profileService: ProfileServiceIntrface;
 
-  constructor(profilesService: ProfilesService) {
-    this.profilesService = profilesService;
+  constructor(profileService: ProfileService) {
+    this.profileService = profileService;
   }
 
   @ApiOperation({ summary: "Get profile." })
@@ -51,7 +53,7 @@ export class ProfilessController {
   @Get()
   async getProfile(@UserId() userId: string): Promise<Profile> {
     try {
-      return await this.profilesService.getProfile(userId);
+      return await this.profileService.findOneByConditionOrThrow({ userId });
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -67,9 +69,9 @@ export class ProfilessController {
   @Patch()
   async updateProfile(@UserId() userId: string, @Body() profile: UpdateProfileDto): Promise<Profile> {
     try {
-      const profileDb: Profile = await this.profilesService.findByProfileByUserId(userId);
-      await this.profilesService.updateProfile(profileDb.id, profile);
-      return await this.profilesService.findProfileById(profileDb.id);
+      const profileDb: Profile = await this.profileService.findOneByConditionOrThrow({ userId });
+      await this.profileService.updateOne(profileDb.id, profile);
+      return await this.profileService.findOneByIdOrThrow(profileDb.id);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -88,7 +90,7 @@ export class ProfilessController {
     @Query("take", ParseIntPipe) take: number
   ): Promise<[Profile[], number]> {
     try {
-      return await this.profilesService.getAllProfilesByAdmin(skip, take);
+      return await this.profileService.findAll(skip, take);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -104,7 +106,7 @@ export class ProfilessController {
   @Get("getprofilesbyids")
   async getProfilesByIdsByAdmin(@Body() ids: string[]): Promise<[Profile[], number]> {
     try {
-      return await this.profilesService.getProfilesByIdsByAdmin(ids);
+      return await this.profileService.findAllByIds(ids);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -120,7 +122,7 @@ export class ProfilessController {
   @Get("getprofilesbyuserids")
   async getProfilesByUserIdsByAdmin(@Body() userIds: string[]): Promise<[Profile[], number]> {
     try {
-      return await this.profilesService.getProfilesByUserIdsByAdmin(userIds);
+      return await this.profileService.findAllByCondition({ userId: In(userIds) });
     } catch (error) {
       throw new InternalServerErrorException();
     }

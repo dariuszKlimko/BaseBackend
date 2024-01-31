@@ -4,12 +4,13 @@ import { User } from "@app/entities/user.entity";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 import { UserRepository } from "@app/repositories/user.repository";
 import { MailerService } from "@nestjs-modules/mailer";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { EmailServiceIntrface } from "@app/services/interfaces/email.service.interface";
 
 @Injectable()
 export class EmailService implements EmailServiceIntrface {
+  private readonly logger: Logger = new Logger(EmailService.name);
   private readonly userRepository: UserRepositoryIntrface;
   private readonly configService: ConfigService;
   private readonly mailerService: MailerService;

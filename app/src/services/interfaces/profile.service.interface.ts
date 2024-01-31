@@ -1,14 +1,14 @@
+import { CreateProfileDto } from "@app/dtos/profile/create.profile.dto";
 import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
 import { Profile } from "@app/entities/profile.entity";
-import { UpdateResult } from "typeorm";
+import { FindOptionsWhere, UpdateResult } from "typeorm";
 
 export interface ProfileServiceIntrface {
-  getProfile(userId: string): Promise<Profile>;
-  // ---------------------------------------
-  findByProfileByUserId(userId: string): Promise<Profile>;
-  findProfileById(id: string): Promise<Profile>;
-  updateProfile(profileId: string, profileInfo: UpdateProfileDto): Promise<UpdateResult>;
-  getAllProfilesByAdmin(skip: number, take: number): Promise<[Profile[], number]>;
-  getProfilesByIdsByAdmin(ids: string[]): Promise<[Profile[], number]>;
-  getProfilesByUserIdsByAdmin(ids: string[]): Promise<[Profile[], number]>;
+  findOneByConditionOrThrow(condition: FindOptionsWhere<Profile>): Promise<Profile>;
+  updateOne(id: string, profileInfo: UpdateProfileDto): Promise<UpdateResult>;
+  findOneByIdOrThrow(id: string): Promise<Profile>;
+  findAll(skip: number, take: number): Promise<[Profile[], number]>;
+  findAllByIds(ids: string[]): Promise<[Profile[], number]>;
+  findAllByCondition(condition: FindOptionsWhere<Profile>): Promise<[Profile[], number]>;
+  createOne(profileInfo?: CreateProfileDto): Promise<Profile>;
 }

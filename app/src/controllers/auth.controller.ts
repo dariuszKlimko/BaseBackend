@@ -67,24 +67,33 @@ import { LoginResponseCookies } from "@app/dtos/auth/login.response.cookies";
 import { RolesGuard } from "@app/common/guards/roles.guard";
 import { Roles } from "@app/common/decorators/roles.decorator";
 import { Role } from "@app/common/types/role.enum";
+import { AuthServiceIntrface } from "@app/services/interfaces/auth.service.interface";
+import { EmailServiceIntrface } from "@app/services/interfaces/email.service.interface";
+import { TokenServiceIntrface } from "@app/services/interfaces/token.service.interface";
+import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
+import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { UserService } from "@app/services/user.service";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
 @Controller("auth")
 export class AuthController {
   private readonly logger: Logger = new Logger(AuthController.name);
-  private readonly authService: AuthService;
-  private readonly emailService: EmailService;
-  private readonly tokenService: TokenService;
-  private readonly generatorService: GeneratorSevice;
+  private readonly authService: AuthServiceIntrface;
+  private readonly userService: UserServiceIntrface;
+  private readonly emailService: EmailServiceIntrface;
+  private readonly tokenService: TokenServiceIntrface;
+  private readonly generatorService: GeneratorServiceIntrface;
 
   constructor(
     authService: AuthService,
+    userService: UserService,
     emailService: EmailService,
     tokenService: TokenService,
     generatorService: GeneratorSevice
   ) {
     this.authService = authService;
+    this.userService = userService;
     this.emailService = emailService;
     this.tokenService = tokenService;
     this.generatorService = generatorService;
@@ -142,7 +151,7 @@ export class AuthController {
     try {
       const authorizedUser: User = await this.authService.comparePassword(user);
       const refreshToken: string = this.generatorService.generateRefreshToken();
-      await this.tokenService.saveRefreshTokenToDB(authorizedUser, refreshToken);
+      await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
       return { accessToken, refreshToken };
     } catch (error) {
@@ -164,7 +173,7 @@ export class AuthController {
     try {
       const authorizedUser: User = await this.authService.comparePassword(user);
       const refreshToken: string = this.generatorService.generateRefreshToken();
-      await this.tokenService.saveRefreshTokenToDB(authorizedUser, refreshToken);
+      await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
       response.cookie("refreshToken", refreshToken, {
         sameSite: "strict",
@@ -190,7 +199,9 @@ export class AuthController {
   @Patch("logout")
   async logout(@UserId() userId: string, @Body() payload: TokenDto): Promise<LogoutResponse> {
     try {
-      return await this.authService.logout(userId, payload.refreshToken);
+      const user: User = await this.userService.findOneByIdOrThrow(userId);
+      await this.tokenService.deleteRefreshTokenFromUser(user, payload.refreshToken);
+      return { email: user.email };
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -213,7 +224,9 @@ export class AuthController {
   async logoutCookie(@UserId() userId: string, @Req() request: Request): Promise<LogoutResponse> {
     try {
       const refreshToken: string = request.cookies["cookieKey"];
-      return await this.authService.logout(userId, refreshToken);
+      const user: User = await this.userService.findOneByIdOrThrow(userId);
+      await this.tokenService.deleteRefreshTokenFromUser(user, refreshToken);
+      return { email: user.email };
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -235,7 +248,8 @@ export class AuthController {
   @Patch("forcelogout")
   async forceLogout(@UserId() userId: string): Promise<LogoutResponse> {
     try {
-      return await this.authService.forceLogout(userId);
+      // return await this.authService.forceLogout(userId);
+      return await this.tokenService.deleteAllRefreshTokensFromUser(userId);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -253,13 +267,16 @@ export class AuthController {
   async getNewTokens(@Body() payload: TokenDto): Promise<LoginResponse> {
     try {
       const authorizedUser: User = await this.tokenService.findUserByRefreshToken(payload.refreshToken);
+      this.tokenService.deleteRefreshTokenFromUser(authorizedUser, payload.refreshToken);
       const refreshToken: string = this.generatorService.generateRefreshToken();
-      await this.tokenService.saveRefreshTokenToDB(authorizedUser, refreshToken);
+      await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
 
       return { accessToken, refreshToken };
     } catch (error) {
       if (error instanceof EntityNotFound) {
+        throw new BadRequestException(error.message);
+      } else if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException(error.message);
@@ -276,8 +293,9 @@ export class AuthController {
     try {
       const refreshTokenCookies: string = request.cookies["cookieKey"];
       const authorizedUser: User = await this.tokenService.findUserByRefreshToken(refreshTokenCookies);
+      this.tokenService.deleteRefreshTokenFromUser(authorizedUser, refreshTokenCookies);
       const refreshToken: string = this.generatorService.generateRefreshToken();
-      await this.tokenService.saveRefreshTokenToDB(authorizedUser, refreshToken);
+      await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
       response.cookie("refreshToken", refreshToken, {
         sameSite: "strict",
@@ -286,6 +304,8 @@ export class AuthController {
       return { accessToken };
     } catch (error) {
       if (error instanceof EntityNotFound) {
+        throw new BadRequestException(error.message);
+      } else if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException(error.message);
@@ -316,7 +336,9 @@ export class AuthController {
   @Patch("reset-password")
   async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
-      const code: number = await this.generatorService.codeGenerator(userInfo.email);
+      const user: User = await this.userService.findOneByConditionOrThrow({ email: userInfo.email });
+      const code: number = this.generatorService.codeGenerator();
+      await this.userService.updateVerificationCode(user.id, { verificationCode: code });
       const text: string = this.generatorService.resetPasswordEmailText(userInfo.email, code);
       const subject: string = RESET_PASSWORD_VERIFICATION_CODE;
       await this.emailService.sendEmail(userInfo.email, text, subject);
@@ -356,7 +378,8 @@ export class AuthController {
   @Patch("forcelogoutbyadmin")
   async forceLogoutbyadmin(@Query("userid", ParseUUIDPipe) userId: string): Promise<LogoutResponse> {
     try {
-      return await this.authService.forceLogout(userId);
+      // return await this.authService.forceLogout(userId);
+      return await this.tokenService.deleteAllRefreshTokensFromUser(userId);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);

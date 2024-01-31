@@ -12,15 +12,17 @@ import {
 import { Reflector } from "@nestjs/core";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { Request } from "express";
-import { UsersService } from "@app/services/user.service";
+import { UserService } from "@app/services/user.service";
+import { TokenServiceIntrface } from "@app/services/interfaces/token.service.interface";
+import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   private reflector: Reflector;
-  private readonly tokenService: TokenService;
-  private readonly userService: UsersService;
+  private readonly tokenService: TokenServiceIntrface;
+  private readonly userService: UserServiceIntrface;
 
-  constructor(reflector: Reflector, tokenService: TokenService, userService: UsersService) {
+  constructor(reflector: Reflector, tokenService: TokenService, userService: UserService) {
     this.reflector = reflector;
     this.tokenService = tokenService;
     this.userService = userService;
@@ -36,7 +38,7 @@ export class RolesGuard implements CanActivate {
     const accessToken: string = authorization.split(" ")[1];
     try {
       const userId: string = await this.tokenService.decodeJWTtoken(accessToken).sub;
-      const user: User = await this.userService.getUser(userId);
+      const user: User = await this.userService.findOneByIdOrThrow(userId);
       return roles.includes(user.role);
     } catch (error) {
       if (error instanceof ForbiddenException) {

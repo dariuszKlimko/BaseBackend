@@ -1,16 +1,23 @@
-import { BAD_CONFIRMATION_TOKEN, CONFIRMATION_TOKEN_EXPIRED } from "@app/common/constans/exceptions.constans";
+import {
+  BAD_CONFIRMATION_TOKEN,
+  CONFIRMATION_TOKEN_EXPIRED,
+  INVALID_REFRESH_TOKEN,
+} from "@app/common/constans/exceptions.constans";
 import { User } from "@app/entities/user.entity";
 import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 import { UserRepository } from "@app/repositories/user.repository";
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { ArrayContains } from "typeorm";
 import { TokenServiceIntrface } from "@app/services/interfaces/token.service.interface";
+import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalid.refresh.token.exception";
+import { LogoutResponse } from "@app/dtos/auth/logout.response";
 
 @Injectable()
 export class TokenService implements TokenServiceIntrface {
+  private readonly logger: Logger = new Logger(TokenService.name);
   private readonly userRepository: UserRepositoryIntrface;
   private readonly jwtService: JwtService;
   private readonly configService: ConfigService;
@@ -42,12 +49,26 @@ export class TokenService implements TokenServiceIntrface {
     const user: User = await this.userRepository.findOneByConditionOrThrow({
       refreshTokens: ArrayContains([refreshToken]),
     });
-    const tokenIndex: number = user.refreshTokens.indexOf(refreshToken);
-    user.refreshTokens.splice(tokenIndex, 1);
     return user;
   }
 
-  async saveRefreshTokenToDB(user: User, refreshToken: string): Promise<string> {
+  async deleteRefreshTokenFromUser(user: User, refreshToken: string): Promise<void> {
+    const tokenIndex: number = user.refreshTokens.indexOf(refreshToken);
+    if (tokenIndex < 0) {
+      throw new InvalidRefreshTokenException(INVALID_REFRESH_TOKEN);
+    }
+    user.refreshTokens.splice(tokenIndex, 1);
+    await this.userRepository.updateOne(user.id, { refreshTokens: user.refreshTokens });
+  }
+
+  async deleteAllRefreshTokensFromUser(id: string): Promise<LogoutResponse> {
+    const user: User = await this.userRepository.findOneByIdOrThrow(id);
+    user.refreshTokens = [];
+    await this.userRepository.updateOne(user.id, { refreshTokens: user.refreshTokens });
+    return { email: user.email };
+  }
+
+  async saveRefreshTokenToUser(user: User, refreshToken: string): Promise<string> {
     user.refreshTokens.push(refreshToken);
     await this.userRepository.updateOne(user.id, { refreshTokens: user.refreshTokens });
     return refreshToken;

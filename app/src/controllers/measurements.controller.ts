@@ -18,7 +18,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
-import { MeasurementsService } from "@app/services/measurements.service";
+import { MeasurementService } from "@app/services/measurement.service";
 import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { UserId } from "@app/common/decorators/user.id.decorator";
@@ -39,16 +39,26 @@ import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.i
 import { RolesGuard } from "@app/common/guards/roles.guard";
 import { Roles } from "@app/common/decorators/roles.decorator";
 import { Role } from "@app/common/types/role.enum";
+import { ProfileService } from "@app/services/profile.service";
+import { Profile } from "@app/entities/profile.entity";
+import { MathSevice } from "@app/services/math.service";
+import { MeasurementServiceIntrface } from "@app/services/interfaces/measurement.service.interface";
+import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
+import { MathServiceIntrface } from "@app/services/interfaces/math.service.interface";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)
 @Controller("measurements")
-export class MeasurementsController {
-  private readonly logger: Logger = new Logger(MeasurementsController.name);
-  private readonly measurementsService: MeasurementsService;
+export class MeasurementController {
+  private readonly logger: Logger = new Logger(MeasurementController.name);
+  private readonly measurementService: MeasurementServiceIntrface;
+  private readonly profileService: ProfileServiceIntrface;
+  private readonly mathService: MathServiceIntrface;
 
-  constructor(measurementsService: MeasurementsService) {
-    this.measurementsService = measurementsService;
+  constructor(measurementService: MeasurementService, profileService: ProfileService, mathService: MathSevice) {
+    this.measurementService = measurementService;
+    this.profileService = profileService;
+    this.mathService = mathService;
   }
 
   @ApiOperation({ summary: "Create measuremet." })
@@ -61,10 +71,18 @@ export class MeasurementsController {
   @Post()
   async createMeasurement(
     @UserId() userId: string,
-    @Body() measurement: CreateMeasurementDto
+    @Body() measurementPayload: CreateMeasurementDto
   ): Promise<Measurement> {
     try {
-      return await this.measurementsService.createMeasurement(userId, measurement);
+      let bmi: number;
+      const profile: Profile = await this.profileService.findOneByConditionOrThrow({ userId });
+      const measurement: Measurement = await this.measurementService.createOne(measurementPayload);
+      measurement.userId = userId;
+      if (profile.height) {
+        bmi = measurementPayload.weight / this.mathService.powValue(profile.height / 100, 2);
+        measurement.bmi = this.mathService.roundValue(bmi, 2);
+      }
+      return await this.measurementService.saveOneByEntity(measurement);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -79,7 +97,7 @@ export class MeasurementsController {
   @Get()
   async getAllMeasurementsByUserId(@UserId() userId: string): Promise<[Measurement[], number]> {
     try {
-      return await this.measurementsService.findAllByCondition({ userId });
+      return await this.measurementService.findAllByCondition({ userId });
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -95,7 +113,7 @@ export class MeasurementsController {
   @Get(":id")
   async getOneMeasurement(@UserId() userId: string, @Param("id", ParseUUIDPipe) id: string): Promise<Measurement> {
     try {
-      return await this.measurementsService.findOneByConditionOrThrow({
+      return await this.measurementService.findOneByConditionOrThrow({
         userId,
         id,
       });
@@ -119,10 +137,15 @@ export class MeasurementsController {
   async updateMeasurement(
     @UserId() userId: string,
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() measurement: UpdateMeasurementDto
+    @Body() measurementPayload: UpdateMeasurementDto
   ): Promise<Measurement> {
     try {
-      return await this.measurementsService.updateMeasurement(userId, id, measurement);
+      const measurement: Measurement = await this.measurementService.findOneByConditionOrThrow({
+        userId,
+        id,
+      });
+      await this.measurementService.updateOne(measurement.id, measurementPayload);
+      return this.measurementService.findOneByIdOrThrow(measurement.id);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -141,10 +164,10 @@ export class MeasurementsController {
   @Delete()
   async deleteAllMeasurementsByUserId(@UserId() userId: string): Promise<Measurement[]> {
     try {
-      const [measurements]: [Measurement[], number] = await this.measurementsService.findAllByCondition({
+      const [measurements]: [Measurement[], number] = await this.measurementService.findAllByCondition({
         userId,
       });
-      return await this.measurementsService.deleteManyByEntities(measurements);
+      return await this.measurementService.deleteManyByEntities(measurements);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -166,11 +189,11 @@ export class MeasurementsController {
     @Param("id", ParseUUIDPipe) id: string
   ): Promise<Measurement> {
     try {
-      const measurement: Measurement = await this.measurementsService.findOneByConditionOrThrow({
+      const measurement: Measurement = await this.measurementService.findOneByConditionOrThrow({
         userId,
         id,
       });
-      return await this.measurementsService.deleteOneByEntity(measurement);
+      return await this.measurementService.deleteOneByEntity(measurement);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -178,7 +201,7 @@ export class MeasurementsController {
       throw new InternalServerErrorException();
     }
   }
-// ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
   @ApiOperation({ summary: "Get all measurement." })
   @ApiOkResponse({ description: "Success.", type: [Measurement] })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
@@ -191,7 +214,7 @@ export class MeasurementsController {
     @Query("take", ParseIntPipe) take: number
   ): Promise<[Measurement[], number]> {
     try {
-      return await this.measurementsService.findAll(skip, take);
+      return await this.measurementService.findAll(skip, take);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -206,7 +229,7 @@ export class MeasurementsController {
   @Get("getallmeasurementsbyids")
   async getAllMeasurementsByIdsByAdmin(@Body() ids: string[]): Promise<[Measurement[], number]> {
     try {
-      return await this.measurementsService.findAllByIds(ids);
+      return await this.measurementService.findAllByIds(ids);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -222,8 +245,8 @@ export class MeasurementsController {
   @Delete("daletemeasurementsbyids")
   async deleteAllMeasurementsByIdsByAdmin(@Body() ids: string[]): Promise<Measurement[]> {
     try {
-      const [measurements]: [Measurement[], number] = await this.measurementsService.findAllByIds(ids);
-      return await this.measurementsService.deleteManyByEntities(measurements);
+      const [measurements]: [Measurement[], number] = await this.measurementService.findAllByIds(ids);
+      return await this.measurementService.deleteManyByEntities(measurements);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -239,10 +262,10 @@ export class MeasurementsController {
   @Delete("daletemeasurementsbyuserid")
   async deleteMeasurementsByUserIdByAdmi(@Query("userid", ParseUUIDPipe) userId: string): Promise<Measurement[]> {
     try {
-      const [measurements]: [Measurement[], number] = await this.measurementsService.findAllByCondition({
+      const [measurements]: [Measurement[], number] = await this.measurementService.findAllByCondition({
         userId,
       });
-      return await this.measurementsService.deleteManyByEntities(measurements);
+      return await this.measurementService.deleteManyByEntities(measurements);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -264,9 +287,9 @@ export class MeasurementsController {
     @Body() measurementPayload: UpdateMeasurementDto
   ): Promise<Measurement> {
     try {
-      const measurement: Measurement = await this.measurementsService.findOneByIdOrThrow(id);
-      await this.measurementsService.updateOne(measurement.id, measurementPayload);
-      return await this.measurementsService.findOneByIdOrThrow(measurement.id);
+      const measurement: Measurement = await this.measurementService.findOneByIdOrThrow(id);
+      await this.measurementService.updateOne(measurement.id, measurementPayload);
+      return await this.measurementService.findOneByIdOrThrow(measurement.id);
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -274,5 +297,4 @@ export class MeasurementsController {
       throw new InternalServerErrorException();
     }
   }
-
 }
