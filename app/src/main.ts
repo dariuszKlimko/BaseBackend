@@ -2,7 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "@app/app.module";
 import { configureHttpExceptionFilters, configureSwagger, configureValidator } from "@app/bootstrap.configuration";
 import { ConfigService } from "@nestjs/config";
-import { INestApplication } from "@nestjs/common";
+import { INestApplication, Logger } from "@nestjs/common";
 import cookieParser from "cookie-parser";
 
 async function bootstrap(): Promise<void> {
@@ -16,6 +16,6 @@ async function bootstrap(): Promise<void> {
   configureValidator(app);
   configureHttpExceptionFilters(app);
 
-  await app.listen(port, () => console.log(`App listening on port ${port} or docker on ${docker_port}`));
+  await app.listen(port, () => Logger.log(`App listening on port ${port} or docker on ${docker_port}`));
 }
 bootstrap();

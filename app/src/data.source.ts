@@ -2,6 +2,7 @@ import { DataSource, DataSourceOptions } from "typeorm";
 import { config } from "dotenv";
 import path from "path";
 import { IDataSource } from "@app/common/types/dataSourceOptions";
+import { Logger } from "@nestjs/common";
 
 const root: string = path.resolve(__dirname, "../");
 const envpath: string = path.resolve(root, "../");
@@ -48,10 +49,10 @@ const dataSource: DataSource = new DataSource(dataBaseConfig(process.env.NODE_EN
 dataSource
   .initialize()
   .then(() => {
-    console.log("Data Source has been initialized!");
+    Logger.log("Data Source has been initialized!");
   })
   .catch((err) => {
-    console.error("Error during Data Source initialization", err);
+    Logger.error("Error during Data Source initialization", err);
   });
 
 export default dataSource;

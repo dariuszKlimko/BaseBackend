@@ -1,17 +1,25 @@
+import { Roles } from "@app/common/decorators/roles.decorator";
 import { UserId } from "@app/common/decorators/user.id.decorator";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
+import { RolesGuard } from "@app/common/guards/roles.guard";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
+import { Role } from "@app/common/types/role.enum";
 import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
 import { Profile } from "@app/entities/profile.entity";
-import { ProfilesService } from "@app/services/profile.service";
+import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
+import { ProfileService } from "@app/services/profile.service";
 import {
   Body,
   Controller,
   Get,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
+  ParseIntPipe,
   Patch,
+  Query,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -21,24 +29,29 @@ import {
 import {
   ApiBearerAuth,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import { ThrottlerGuard } from "@nestjs/throttler";
+import { In } from "typeorm";
 
 @ApiTags("profiles")
 @UseFilters(HttpExceptionFilter)
+@UseGuards(ThrottlerGuard)
 @Controller("profiles")
-export class ProfilessController {
-  private readonly logger: Logger = new Logger(ProfilessController.name);
-  private readonly profilesService: ProfilesService;
+export class ProfileController {
+  private readonly logger: Logger = new Logger(ProfileController.name);
+  private readonly profileService: ProfileServiceIntrface;
 
-  constructor(profilesService: ProfilesService) {
-    this.profilesService = profilesService;
+  constructor(profileService: ProfileService) {
+    this.profileService = profileService;
   }
 
   @ApiOperation({ summary: "Get profile." })
   @ApiOkResponse({ description: "Success.", type: Profile })
+  @ApiNotFoundResponse({ description: "Profile not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -46,14 +59,18 @@ export class ProfilessController {
   @Get()
   async getProfile(@UserId() userId: string): Promise<Profile> {
     try {
-      return await this.profilesService.getProfile(userId);
+      return await this.profileService.findOneByConditionOrThrow({ userId });
     } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }
 
   @ApiOperation({ summary: "Update profile." })
   @ApiOkResponse({ description: "Success.", type: Profile })
+  @ApiNotFoundResponse({ description: "Profile not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
@@ -62,7 +79,63 @@ export class ProfilessController {
   @Patch()
   async updateProfile(@UserId() userId: string, @Body() profile: UpdateProfileDto): Promise<Profile> {
     try {
-      return await this.profilesService.updateProfile(userId, profile);
+      const profileDb: Profile = await this.profileService.findOneByConditionOrThrow({ userId });
+      await this.profileService.updateOne(profileDb.id, profile);
+      return await this.profileService.findOneByIdOrThrow(profileDb.id);
+    } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+  // -------------------------------------------------------
+  @ApiOperation({ summary: "Get profiles - admin." })
+  @ApiOkResponse({ description: "Success.", type: [Profile] })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Get("getallprofiles")
+  async getProfilesByAdmin(
+    @Query("skip", ParseIntPipe) skip: number,
+    @Query("take", ParseIntPipe) take: number
+  ): Promise<[Profile[], number]> {
+    try {
+      return await this.profileService.findAll(skip, take);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "Get profiles data by ids - admin." })
+  @ApiOkResponse({ description: "Success.", type: [Profile] })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Get("getprofilesbyids")
+  async getProfilesByIdsByAdmin(@Body() ids: string[]): Promise<[Profile[], number]> {
+    try {
+      return await this.profileService.findAllByIds(ids);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @ApiOperation({ summary: "Get profiles data by userIds - admin." })
+  @ApiOkResponse({ description: "Success.", type: [Profile] })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @ApiBearerAuth()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin_0)
+  @Get("getprofilesbyuserids")
+  async getProfilesByUserIdsByAdmin(@Body() userIds: string[]): Promise<[Profile[], number]> {
+    try {
+      return await this.profileService.findAllByCondition({ userId: In(userIds) });
     } catch (error) {
       throw new InternalServerErrorException();
     }

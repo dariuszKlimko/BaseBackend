@@ -1,7 +1,4 @@
-import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
+import { BaseInterfaceService } from "@app/common/service/base.interface.service";
 import { Profile } from "@app/entities/profile.entity";
 
-export interface ProfileServiceIntrface {
-  getProfile(userId: string): Promise<Profile>;
-  updateProfile(userId: string, profileInfo: UpdateProfileDto): Promise<Profile>;
-}
+export interface ProfileServiceIntrface extends BaseInterfaceService<Profile> {}

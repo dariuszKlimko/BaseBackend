@@ -1,29 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { Profile } from "@app/entities/profile.entity";
-import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
 import { ProfileRepository } from "@app/repositories/profile.repository";
-import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
 import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
+import { BaseAbstractService } from "@app/common/service/base.abstract.service";
 
 @Injectable()
-export class ProfilesService implements ProfileServiceIntrface {
-  private readonly profileRepository: ProfileRepositoryInterface;
-
+export class ProfileService extends BaseAbstractService<Profile> implements ProfileServiceIntrface {
   constructor(profileRepository: ProfileRepository) {
-    this.profileRepository = profileRepository;
+    super(profileRepository);
   }
-
-  async getProfile(userId: string): Promise<Profile> {
-    return await this.profileRepository.findOneByConditionOrThrow({ userId });
-  }
-
-  async updateProfile(userId: string, profileInfo: UpdateProfileDto): Promise<Profile> {
-    return await this.profileRepository.updateOneByCondition({ userId }, profileInfo);
-  }
-
-  // async getAllProfilesByAdmin() - admin
-
-  // async getProfilesByIdsByAdmin() - admin
-
-  // async getProfilesWithConditionByAdmin()????? - admin
 }

@@ -1,17 +1,19 @@
 import { AuthService } from "@app/services/auth.service";
 import { EmailService } from "@app/services/email.service";
 import { GeneratorSevice } from "@app/services/generator.service";
-import { MeasurementsService } from "@app/services/measurements.service";
-import { ProfilesService } from "@app/services/profile.service";
+import { MeasurementService } from "@app/services/measurement.service";
+import { ProfileService } from "@app/services/profile.service";
 import { TokenService } from "@app/services/token.service";
-import { UsersService } from "@app/services/user.service";
+import { UserService } from "@app/services/user.service";
+import { MathSevice } from "@app/services/math.service";
 
 export default [
-  UsersService,
+  UserService,
   TokenService,
-  ProfilesService,
-  MeasurementsService,
+  ProfileService,
+  MeasurementService,
   GeneratorSevice,
   EmailService,
   AuthService,
+  MathSevice,
 ];

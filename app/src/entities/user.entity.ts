@@ -1,6 +1,6 @@
 import { Measurement } from "@app/entities/measurement.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { Exclude } from "class-transformer";
+import { Exclude, Expose } from "class-transformer";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, OneToOne } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Profile } from "@app/entities/profile.entity";
@@ -26,6 +26,7 @@ export class User extends BaseEntity {
   password: string;
 
   @ApiProperty()
+  @Expose({ groups: [Role.Admin_0] })
   @Column({
     type: "enum",
     enum: Role,
