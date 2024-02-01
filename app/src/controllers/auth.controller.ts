@@ -74,6 +74,7 @@ import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.ser
 import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
 import { UserService } from "@app/services/user.service";
 import { ThrottlerGuard } from "@nestjs/throttler";
+import { CurrentUser } from "@app/common/decorators/user.decorator";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -192,7 +193,6 @@ export class AuthController {
 
   @ApiOperation({ summary: "User logout." })
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
-  @ApiNotFoundResponse({ description: "User not found" })
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
@@ -200,15 +200,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch("logout")
-  async logout(@UserId() userId: string, @Body() payload: TokenDto): Promise<LogoutResponse> {
+  async logout(@CurrentUser() user: User, @Body() payload: TokenDto): Promise<LogoutResponse> {
     try {
-      const user: User = await this.userService.findOneByIdOrThrow(userId);
       await this.tokenService.deleteRefreshTokenFromUser(user, payload.refreshToken);
       return { email: user.email };
     } catch (error) {
-      if (error instanceof EntityNotFound) {
-        throw new NotFoundException(error.message);
-      } else if (error instanceof InvalidRefreshTokenException) {
+      if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException();
@@ -217,7 +214,6 @@ export class AuthController {
 
   @ApiOperation({ summary: "User logout-cookies." })
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
-  @ApiNotFoundResponse({ description: "User not found" })
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
@@ -225,16 +221,13 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch("logout-cookies")
-  async logoutCookie(@UserId() userId: string, @Req() request: Request): Promise<LogoutResponse> {
+  async logoutCookie(@UserId() userId: string, @CurrentUser() user: User, @Req() request: Request): Promise<LogoutResponse> {
     try {
       const refreshToken: string = request.cookies["cookieKey"];
-      const user: User = await this.userService.findOneByIdOrThrow(userId);
       await this.tokenService.deleteRefreshTokenFromUser(user, refreshToken);
       return { email: user.email };
     } catch (error) {
-      if (error instanceof EntityNotFound) {
-        throw new NotFoundException(error.message);
-      } else if (error instanceof InvalidRefreshTokenException) {
+      if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException();
@@ -243,7 +236,6 @@ export class AuthController {
   // -------------------------------------------------------------------------
   @ApiOperation({ summary: "User force logout." })
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
-  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
@@ -254,9 +246,6 @@ export class AuthController {
     try {
       return await this.tokenService.deleteAllRefreshTokensFromUser(userId);
     } catch (error) {
-      if (error instanceof EntityNotFound) {
-        throw new NotFoundException(error.message);
-      }
       throw new InternalServerErrorException();
     }
   }
@@ -335,6 +324,7 @@ export class AuthController {
 
   @ApiOperation({ summary: "Reset password." })
   @ApiOkResponse({ description: "Success.", type: MessageInfo })
+  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UsePipes(ValidationPipe)
   @UseGuards(EmailVerifiedGuard)
@@ -349,6 +339,9 @@ export class AuthController {
       await this.emailService.sendEmail(userInfo.email, text, subject);
       return VVERIFICTION_CODE_RESPONSE;
     } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }

@@ -10,6 +10,7 @@ import { UserRepository } from "@app/repositories/user.repository";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
 import { ProfileRepository } from "@app/repositories/profile.repository";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
+// import { User } from "@app/entities/user.entity";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
@@ -40,7 +41,10 @@ describe("Users (e2e)", () => {
 
   describe("/users (POST) - register user", () => {
     it("should register user in database", async () => {
-      const user: CreateUserDto = { email: "userRegister1@email.com", password: "Qwert12345!" };
+      const user: CreateUserDto = { 
+        email: "userRegister1@email.com", 
+        password: "Qwert12345!" 
+      };
       let userId: string;
       let email: string;
       await userRegister(user.email, user.password, app).then((res) => {
@@ -50,13 +54,9 @@ describe("Users (e2e)", () => {
         email = res.body.email;
       });
 
-      await userRepository
-        .findOpenQuery({
-          where: { email },
-        })
-        .then(([usersDb]) => {
-          expect(usersDb[0]).toBeDefined();
-          expect(usersDb[0].email).toEqual(email);
+      await userRepository.findOneByConditionOrThrow({ email }).then((user) => {
+          expect(user).toBeDefined();
+          expect(user.email).toEqual(email);
         });
 
       return await profileRepository.findOneByConditionOrThrow({ userId }).then((profile) => {
@@ -64,7 +64,7 @@ describe("Users (e2e)", () => {
       });
     });
 
-    it("should not register user which exist in database", async () => {
+    it("should not register user if exist in database", async () => {
       const user: CreateUserDto = { email: "user1@email.com", password: "Qwert12345!" };
       return await userRegister(user.email, user.password, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.CONFLICT);
@@ -178,5 +178,9 @@ describe("Users (e2e)", () => {
           expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
         });
     });
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });

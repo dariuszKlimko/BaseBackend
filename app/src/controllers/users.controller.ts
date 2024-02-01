@@ -52,6 +52,7 @@ import { EmailServiceIntrface } from "@app/services/interfaces/email.service.int
 import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
 import { In } from "typeorm";
 import { ThrottlerGuard } from "@nestjs/throttler";
+import { CurrentUser } from "@app/common/decorators/user.decorator";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
@@ -93,61 +94,47 @@ export class UserController {
 
   @ApiOperation({ summary: "Get user data." })
   @ApiOkResponse({ description: "Success.", type: User })
-  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Get()
-  async getUser(@UserId() userId: string): Promise<User> {
+  async getUser(@CurrentUser() user: User): Promise<User> {
     try {
-      return await this.userService.findOneByIdOrThrow(userId);
+      return user;
     } catch (error) {
-      if (error instanceof EntityNotFound) {
-        throw new NotFoundException(error.message);
-      }
       throw new InternalServerErrorException();
     }
   }
 
   @ApiOperation({ summary: "Delete user account with measurement." })
   @ApiOkResponse({ description: "Success.", type: User })
-  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Delete()
-  async deleteUser(@UserId() userId: string): Promise<User> {
+  async deleteUser(@UserId() userId: string, @CurrentUser() user: User): Promise<User> {
     try {
-      const user: User = await this.userService.findOneByIdOrThrow(userId);
       return await this.userService.deleteOneByEntity(user);
     } catch (error) {
-      if (error instanceof EntityNotFound) {
-        throw new NotFoundException(error.message);
-      }
       throw new InternalServerErrorException();
     }
   }
   // ----------------------------------------------------
   @ApiOperation({ summary: "Update User." })
   @ApiOkResponse({ description: "Success.", type: User })
-  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch()
-  async updateUser(@UserId() userId: string, @Body() userInfo: UpdateUserDto): Promise<User> {
+  async updateUser(@CurrentUser() user: User, @Body() userInfo: UpdateUserDto): Promise<User> {
     try {
-      const user: User = await this.userService.findOneByIdOrThrow(userId);
       this.userService.mergeEntity(user, userInfo);
       return await this.userService.saveOneByEntity(user);
     } catch (error) {
-      if (error instanceof EntityNotFound) {
-        throw new NotFoundException(error.message);
-      }
       throw new InternalServerErrorException();
     }
   }

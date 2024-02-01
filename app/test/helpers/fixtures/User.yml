@@ -210,3 +210,10 @@ items:
       -
     verified: true
     verificationCode: 
+  user34:
+    email: 'user11@email.com'
+    password: 'Qwert12345!'
+    refreshToken: 
+      -
+    verified: true
+    verificationCode:

@@ -267,7 +267,7 @@ export class MeasurementController {
       });
       return await this.measurementService.deleteManyByEntities(measurements);
     } catch (error) {
-      if (error instanceof EntityNotFound) throw new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
