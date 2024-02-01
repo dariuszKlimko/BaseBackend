@@ -6,7 +6,7 @@ import { BaseAbstractService } from "@app/common/service/base.abstract.service";
 
 @Injectable()
 export class MeasurementService extends BaseAbstractService<Measurement> implements MeasurementServiceIntrface {
- constructor(measurementsRepository: MeasurementRepository) {
+  constructor(measurementsRepository: MeasurementRepository) {
     super(measurementsRepository);
   }
 }

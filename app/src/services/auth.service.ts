@@ -16,8 +16,8 @@ import {
   USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED,
 } from "@app/common/constans/exceptions.constans";
 import { AuthServiceIntrface } from "@app/services/interfaces/auth.service.interface";
-import { UserServiceIntrface } from "./interfaces/user.service.interface";
-import { UserService } from "./user.service";
+import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { UserService } from "@app/services/user.service";
 
 @Injectable()
 export class AuthService implements AuthServiceIntrface {
