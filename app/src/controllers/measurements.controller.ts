@@ -45,9 +45,11 @@ import { MathSevice } from "@app/services/math.service";
 import { MeasurementServiceIntrface } from "@app/services/interfaces/measurement.service.interface";
 import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
 import { MathServiceIntrface } from "@app/services/interfaces/math.service.interface";
+import { ThrottlerGuard } from "@nestjs/throttler";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)
+@UseGuards(ThrottlerGuard)
 @Controller("measurements")
 export class MeasurementController {
   private readonly logger: Logger = new Logger(MeasurementController.name);
@@ -63,6 +65,7 @@ export class MeasurementController {
 
   @ApiOperation({ summary: "Create measuremet." })
   @ApiCreatedResponse({ description: "Success.", type: Measurement })
+  @ApiNotFoundResponse({ description: "Measurement not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
@@ -84,6 +87,9 @@ export class MeasurementController {
       }
       return await this.measurementService.saveOneByEntity(measurement);
     } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }
@@ -156,7 +162,6 @@ export class MeasurementController {
 
   @ApiOperation({ summary: "Delete all measurements for given user." })
   @ApiOkResponse({ description: "Success.", type: [Measurement] })
-  @ApiNotFoundResponse({ description: "Measurements not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -169,9 +174,6 @@ export class MeasurementController {
       });
       return await this.measurementService.deleteManyByEntities(measurements);
     } catch (error) {
-      if (error instanceof EntityNotFound) {
-        throw new NotFoundException(error.message);
-      }
       throw new InternalServerErrorException();
     }
   }
@@ -237,7 +239,6 @@ export class MeasurementController {
 
   @ApiOperation({ summary: "Delete all measurements by ids." })
   @ApiOkResponse({ description: "Success.", type: [Measurement] })
-  @ApiNotFoundResponse({ description: "Measurements not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -254,7 +255,6 @@ export class MeasurementController {
 
   @ApiOperation({ summary: "Delete all measurements by user id." })
   @ApiOkResponse({ description: "Success.", type: [Measurement] })
-  @ApiNotFoundResponse({ description: "Measurements not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -267,10 +267,7 @@ export class MeasurementController {
       });
       return await this.measurementService.deleteManyByEntities(measurements);
     } catch (error) {
-      if (error instanceof EntityNotFound) {
-        throw new NotFoundException(error.message);
-      }
-      throw new InternalServerErrorException();
+      if (error instanceof EntityNotFound) throw new InternalServerErrorException();
     }
   }
 

@@ -1,5 +1,6 @@
 import { Roles } from "@app/common/decorators/roles.decorator";
 import { UserId } from "@app/common/decorators/user.id.decorator";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { RolesGuard } from "@app/common/guards/roles.guard";
@@ -15,6 +16,7 @@ import {
   Get,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
   ParseIntPipe,
   Patch,
   Query,
@@ -27,14 +29,17 @@ import {
 import {
   ApiBearerAuth,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import { ThrottlerGuard } from "@nestjs/throttler";
 import { In } from "typeorm";
 
 @ApiTags("profiles")
 @UseFilters(HttpExceptionFilter)
+@UseGuards(ThrottlerGuard)
 @Controller("profiles")
 export class ProfileController {
   private readonly logger: Logger = new Logger(ProfileController.name);
@@ -46,6 +51,7 @@ export class ProfileController {
 
   @ApiOperation({ summary: "Get profile." })
   @ApiOkResponse({ description: "Success.", type: Profile })
+  @ApiNotFoundResponse({ description: "Profile not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -55,12 +61,16 @@ export class ProfileController {
     try {
       return await this.profileService.findOneByConditionOrThrow({ userId });
     } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }
 
   @ApiOperation({ summary: "Update profile." })
   @ApiOkResponse({ description: "Success.", type: Profile })
+  @ApiNotFoundResponse({ description: "Profile not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
@@ -73,6 +83,9 @@ export class ProfileController {
       await this.profileService.updateOne(profileDb.id, profile);
       return await this.profileService.findOneByIdOrThrow(profileDb.id);
     } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }

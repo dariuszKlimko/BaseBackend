@@ -289,7 +289,7 @@ describe("Auth (e2e)", () => {
         .patch("/auth/tokens")
         .send({ refreshToken: "someToken" })
         .then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
         });
     });
   });

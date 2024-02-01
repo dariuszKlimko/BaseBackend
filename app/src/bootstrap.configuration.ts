@@ -7,6 +7,7 @@ import { MailerOptions } from "@nestjs-modules/mailer";
 import { JwtModuleOptions } from "@nestjs/jwt";
 import { dataBaseConfig } from "@app/data.source";
 import { DataSourceOptions } from "typeorm";
+import { ThrottlerModuleOptions } from "@nestjs/throttler";
 
 export function configureSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
@@ -38,7 +39,16 @@ export function configureHttpExceptionFilters(app: INestApplication): void {
   app.useGlobalFilters(new HttpExceptionFilter());
 }
 
-export async function configureMailerModule(configService: ConfigService): Promise<MailerOptions> {
+export function configureThrotllerModule(configService: ConfigService): ThrottlerModuleOptions {
+  return [
+    {
+      ttl: configService.get("THROTTLE_TTL"),
+      limit: configService.get("THROTTLE_LIMIT"),
+    },
+  ];
+}
+
+export function configureMailerModule(configService: ConfigService): MailerOptions {
   return {
     transport: {
       service: configService.get("SERVICE_NODEMAILER"),
@@ -54,13 +64,13 @@ export async function configureMailerModule(configService: ConfigService): Promi
   };
 }
 
-export async function configureJwtModule(configService: ConfigService): Promise<JwtModuleOptions> {
+export function configureJwtModule(configService: ConfigService): JwtModuleOptions {
   return {
     secret: configService.get<string>("JWT_SECRET"),
     signOptions: { expiresIn: `${configService.get<string>("JWT_EXPIRATION")}s` },
   };
 }
 
-export async function configureTypeORMModule(configService: ConfigService): Promise<DataSourceOptions> {
+export function configureTypeORMModule(configService: ConfigService): DataSourceOptions {
   return dataBaseConfig(configService.get("NODE_ENV"));
 }

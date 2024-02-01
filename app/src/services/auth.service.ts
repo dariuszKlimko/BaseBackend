@@ -9,8 +9,6 @@ import { UpdateCredentialsDto } from "@app/dtos/auth/update.creadentials.dto";
 import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception ";
 import { PASSWORD_RESET_RESPONSE, USER_VERIFIED_RESPONSE } from "@app/common/constans/constans";
-import { UserRepository } from "@app/repositories/user.repository";
-import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
 import {
   INCORRECT_EMAIL_ADDRES_OR_PASSWORD,
   INVALID_VERIFICATION_CODE,
@@ -18,27 +16,29 @@ import {
   USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED,
 } from "@app/common/constans/exceptions.constans";
 import { AuthServiceIntrface } from "@app/services/interfaces/auth.service.interface";
+import { UserServiceIntrface } from "./interfaces/user.service.interface";
+import { UserService } from "./user.service";
 
 @Injectable()
 export class AuthService implements AuthServiceIntrface {
   private readonly logger: Logger = new Logger(AuthService.name);
-  private readonly userRepository: UserRepositoryIntrface;
+  private readonly userService: UserServiceIntrface;
 
-  constructor(userRepository: UserRepository) {
-    this.userRepository = userRepository;
+  constructor(userService: UserService) {
+    this.userService = userService;
   }
 
   async userConfirmation(email: string): Promise<MessageInfo> {
-    const user: User = await this.userRepository.findOneByConditionOrThrow({ email });
+    const user: User = await this.userService.findOneByConditionOrThrow({ email });
     if (user.verified) {
       throw new UserAlreadyConfirmedException(USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED);
     }
-    await this.userRepository.updateOne(user.id, { verified: true });
+    await this.userService.updateOne(user.id, { verified: true });
     return USER_VERIFIED_RESPONSE;
   }
 
   async comparePassword(userInfo: CreateUserDto): Promise<User> {
-    const user: User = await this.userRepository.findOneByConditionOrThrow({ email: userInfo.email });
+    const user: User = await this.userService.findOneByConditionOrThrow({ email: userInfo.email });
     const isMatch: boolean = await user.validatePassword(userInfo.password);
     if (!isMatch) {
       throw new UserAuthenticateException(INCORRECT_EMAIL_ADDRES_OR_PASSWORD);
@@ -49,20 +49,20 @@ export class AuthService implements AuthServiceIntrface {
   }
 
   async resetPasswordConfirm(resetPassord: ResetPasswordDto): Promise<MessageInfo> {
-    const user: User = await this.userRepository.findOneByConditionOrThrow({ email: resetPassord.email });
+    const user: User = await this.userService.findOneByConditionOrThrow({ email: resetPassord.email });
     if (user.verificationCode !== resetPassord.verificationCode) {
       throw new InvalidVerificationCodeException(INVALID_VERIFICATION_CODE);
     }
     user.password = resetPassord.password;
     user.verificationCode = null;
-    await this.userRepository.updateOne(user.id, user);
+    await this.userService.updateOne(user.id, user);
     return PASSWORD_RESET_RESPONSE;
   }
 
   async updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User> {
-    const user: User = await this.userRepository.findOneByIdOrThrow(id);
-    this.userRepository.mergeEntity(user, userInfo);
-    await this.userRepository.updateOne(user.id, user);
-    return await this.userRepository.findOneByIdOrThrow(user.id);
+    const user: User = await this.userService.findOneByIdOrThrow(id);
+    this.userService.mergeEntity(user, userInfo);
+    await this.userService.updateOne(user.id, user);
+    return await this.userService.findOneByIdOrThrow(user.id);
   }
 }

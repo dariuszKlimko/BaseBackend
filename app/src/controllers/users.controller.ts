@@ -51,9 +51,11 @@ import { UserServiceIntrface } from "@app/services/interfaces/user.service.inter
 import { EmailServiceIntrface } from "@app/services/interfaces/email.service.interface";
 import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
 import { In } from "typeorm";
+import { ThrottlerGuard } from "@nestjs/throttler";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
+@UseGuards(ThrottlerGuard)
 @Controller("users")
 export class UserController {
   private readonly logger: Logger = new Logger(UserController.name);
@@ -91,6 +93,7 @@ export class UserController {
 
   @ApiOperation({ summary: "Get user data." })
   @ApiOkResponse({ description: "Success.", type: User })
+  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -109,6 +112,7 @@ export class UserController {
 
   @ApiOperation({ summary: "Delete user account with measurement." })
   @ApiOkResponse({ description: "Success.", type: User })
+  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -119,6 +123,9 @@ export class UserController {
       const user: User = await this.userService.findOneByIdOrThrow(userId);
       return await this.userService.deleteOneByEntity(user);
     } catch (error) {
+      if (error instanceof EntityNotFound) {
+        throw new NotFoundException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }
@@ -184,7 +191,6 @@ export class UserController {
 
   @ApiOperation({ summary: "Get user data by email - admin." })
   @ApiOkResponse({ description: "Success.", type: User })
-  @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)
@@ -229,6 +235,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: "Delete users by ids - admin." })
+  @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
   @UsePipes(ValidationPipe)

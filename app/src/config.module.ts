@@ -25,6 +25,8 @@ import { ConfigModule } from "@nestjs/config";
         JWT_EXPIRATION: Joi.number().required(),
         JWT_CONFIRMATION_TOKEN_SECRET: Joi.string().required(),
         JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME: Joi.number().required(),
+        THROTTLE_TTL: Joi.number().required(),
+        THROTTLE_LIMIT: Joi.number().required(),
       }),
       envFilePath: "../.env",
       validationOptions: {

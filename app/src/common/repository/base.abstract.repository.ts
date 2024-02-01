@@ -27,7 +27,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
 
   async findOneByIdOrThrow(id: string): Promise<E> {
     try {
-      return await this.repository.findOneByOrFail({ id } as FindOptionsWhere<E>);
+      return await this.repository.findOneByOrFail({ id } as FindOptionsWhere<E> | FindOptionsWhere<E>[]);
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
         throw new EntityNotFound(this.errorMessage);
@@ -49,7 +49,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
 
   async findAllByIds(ids: string[], skip?: number, take?: number): Promise<[E[], number]> {
     return await this.repository.findAndCount({
-      where: { id: In(ids) } as FindOptionsWhere<E>,
+      where: { id: In(ids) } as FindOptionsWhere<E> | FindOptionsWhere<E>[],
       skip,
       take,
     });
@@ -103,7 +103,7 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
     return await this.repository.remove(entities);
   }
 
-  async count(condition?: FindOptionsWhere<E>): Promise<number> {
+  async count(condition?: FindOptionsWhere<E> | FindOptionsWhere<E>[]): Promise<number> {
     return await this.repository.count({
       where: condition,
     });
