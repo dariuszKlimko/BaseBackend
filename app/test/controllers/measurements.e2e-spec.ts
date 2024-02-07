@@ -7,7 +7,7 @@ import { MeasurementRepository } from "@app/repositories/measurement.repository"
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 import { Request } from "express";
 import { BodyCRUD } from "@test/helpers/types/body";
-import { deleteCRUD, getCRUD, patchCRUD, postCRUD } from "@test/crud/crud";
+import { deleteCRUD, getCRUD, patchCRUD, postCRUD } from "@test/helpers/crud/crud";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;

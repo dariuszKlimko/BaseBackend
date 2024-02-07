@@ -11,7 +11,6 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
   Req,
   Res,
   UnauthorizedException,
@@ -379,8 +378,8 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Patch("forcelogoutbyadmin")
-  async forceLogoutbyadmin(@Query("userid", ParseUUIDPipe) userId: string): Promise<LogoutResponse> {
+  @Patch("forcelogoutbyadmin/:userid")
+  async forceLogoutbyadmin(@Param("userid", ParseUUIDPipe) userId: string): Promise<LogoutResponse> {
     try {
       return await this.tokenService.deleteAllRefreshTokensFromUser(userId);
     } catch (error) {

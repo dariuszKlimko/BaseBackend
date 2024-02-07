@@ -7,8 +7,8 @@ import { MeasurementRepository } from "@app/repositories/measurement.repository"
 import { ProfileRepository } from "@app/repositories/profile.repository";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { BodyCRUD } from "@test/helpers/types/body";
-import { postCRUD } from "@test/crud/crud";
-import { deleteAuthCRUD, getAuthCRUD } from "@test/crud/auth.crud";
+import { postCRUD } from "@test/helpers/crud/crud";
+import { deleteAuthCRUD, getAuthCRUD } from "@test/helpers/crud/auth.crud";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;

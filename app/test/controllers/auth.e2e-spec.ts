@@ -7,9 +7,9 @@ import { JwtService } from "@nestjs/jwt";
 import { LoginResponse } from "@app/dtos/auth/login.response";
 import { jwtGenerate } from "@test/helpers/jwt.generate";
 import { UserRepository } from "@app/repositories/user.repository";
-import { getCRUD, patchCRUD, postCRUD } from "@test/crud/crud";
+import { getCRUD, patchCRUD, postCRUD } from "@test/helpers/crud/crud";
 import { BodyCRUD } from "@test/helpers/types/body";
-import { patchAuthCRUD } from "@test/crud/auth.crud";
+import { patchAuthCRUD } from "@test/helpers/crud/auth.crud";
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;

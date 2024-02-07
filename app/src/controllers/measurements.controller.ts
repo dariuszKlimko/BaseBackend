@@ -210,7 +210,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Get("getallmeasurements")
+  @Get("getall")
   async getAllMeasurementsByAdmin(
     @Query("skip", ParseIntPipe) skip: number,
     @Query("take", ParseIntPipe) take: number
@@ -228,7 +228,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Get("getallmeasurementsbyids")
+  @Get("getbyids")
   async getAllMeasurementsByIdsByAdmin(@Body() ids: string[]): Promise<[Measurement[], number]> {
     try {
       return await this.measurementService.findAllByIds(ids);
@@ -243,7 +243,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("daletemeasurementsbyids")
+  @Delete("daletebyids")
   async deleteAllMeasurementsByIdsByAdmin(@Body() ids: string[]): Promise<Measurement[]> {
     try {
       const [measurements]: [Measurement[], number] = await this.measurementService.findAllByIds(ids);
@@ -259,8 +259,8 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("daletemeasurementsbyuserid")
-  async deleteMeasurementsByUserIdByAdmi(@Query("userid", ParseUUIDPipe) userId: string): Promise<Measurement[]> {
+  @Delete("daletebyuserid/:userid")
+  async deleteMeasurementsByUserIdByAdmi(@Param("userid", ParseUUIDPipe) userId: string): Promise<Measurement[]> {
     try {
       const [measurements]: [Measurement[], number] = await this.measurementService.findAllByCondition({
         userId,
@@ -278,9 +278,9 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("updatemeasurementbyidbyadmin")
+  @Delete("updatebyid/:id")
   async updateMeasurementByIdByAdmin(
-    @Query("id", ParseUUIDPipe) id: string,
+    @Param("id", ParseUUIDPipe) id: string,
     @Body() measurementPayload: UpdateMeasurementDto
   ): Promise<Measurement> {
     try {

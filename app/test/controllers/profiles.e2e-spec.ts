@@ -3,8 +3,8 @@ import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/helpers/load.fixtures";
 import { ProfileRepository } from "@app/repositories/profile.repository";
-import { postCRUD } from "@test/crud/crud";
-import { getAuthCRUD, patchAuthCRUD } from "@test/crud/auth.crud";
+import { postCRUD } from "@test/helpers/crud/crud";
+import { getAuthCRUD, patchAuthCRUD } from "@test/helpers/crud/auth.crud";
 
 describe("Profiles (e2e)", () => {
   let app: INestApplication;

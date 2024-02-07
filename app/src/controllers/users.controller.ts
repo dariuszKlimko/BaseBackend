@@ -18,6 +18,7 @@ import {
   Query,
   SerializeOptions,
   ParseUUIDPipe,
+  Param,
 } from "@nestjs/common";
 import { UserService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
@@ -147,7 +148,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
-  @Get("getallusers")
+  @Get("getall")
   async getAllUsersByAdmin(
     @Query("skip", ParseIntPipe) skip: number,
     @Query("take", ParseIntPipe) take: number
@@ -167,7 +168,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
-  @Get("getusersbyids")
+  @Get("getbyids")
   async getUsersByIdsByAdmin(@Body() ids: string[]): Promise<[User[], number]> {
     try {
       return await this.userService.findAllByIds(ids);
@@ -184,7 +185,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
-  @Get("getusersbyemails")
+  @Get("getbyemails")
   async getUsersByEmailsByAdmin(@Body() emails: string[]): Promise<[User[], number]> {
     try {
       return await this.userService.findOpenQuery({
@@ -204,8 +205,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
-  @Get("getuserwithrelation")
-  async getUserWithRelationByAdmin(@Query("id", ParseUUIDPipe) id: string): Promise<User> {
+  @Get("getwithrelation/:id")
+  async getUserWithRelationByAdmin(@Param("id", ParseUUIDPipe) id: string): Promise<User> {
     try {
       await this.userService.findOneByIdOrThrow(id);
       const [users]: [User[], number] = await this.userService.findOpenQuery({
@@ -248,7 +249,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
-  @Post("createuserbyadmin")
+  @Post("createbyadmin")
   async createUserByAdmin(@Body() userInfo: CreateUserByAdminDto): Promise<User> {
     try {
       return await this.userService.registerUser(userInfo);
@@ -269,9 +270,9 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
-  @Patch("updateuserrole")
+  @Patch("updaterole/:id")
   async updateUserRoleByAdmin(
-    @Query("id", ParseUUIDPipe) id: string,
+    @Param("id", ParseUUIDPipe) id: string,
     @Body() userInfo: UpdateUserByAdminDto
   ): Promise<User> {
     try {

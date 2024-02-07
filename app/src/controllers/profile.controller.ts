@@ -97,7 +97,7 @@ export class ProfileController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Get("getallprofiles")
+  @Get("getall")
   async getProfilesByAdmin(
     @Query("skip", ParseIntPipe) skip: number,
     @Query("take", ParseIntPipe) take: number
@@ -116,7 +116,7 @@ export class ProfileController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Get("getprofilesbyids")
+  @Get("getbyids")
   async getProfilesByIdsByAdmin(@Body() ids: string[]): Promise<[Profile[], number]> {
     try {
       return await this.profileService.findAllByIds(ids);
@@ -132,7 +132,7 @@ export class ProfileController {
   @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Get("getprofilesbyuserids")
+  @Get("getbyuserids")
   async getProfilesByUserIdsByAdmin(@Body() userIds: string[]): Promise<[Profile[], number]> {
     try {
       return await this.profileService.findAllByCondition({ userId: In(userIds) });
