@@ -1,12 +1,13 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe, ExecutionContext, CallHandler } from "@nestjs/common";
-import * as request from "supertest";
 import { AppModule } from "@app/app.module";
 import loadFixtures, { FixtureFactory } from "@test/helpers/load.fixtures";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 import { Request } from "express";
+import { BodyCRUD } from "@test/helpers/types/body";
+import { deleteCRUD, getCRUD, patchCRUD, postCRUD } from "@test/crud/crud";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;
@@ -39,26 +40,22 @@ describe("Measurements (e2e)", () => {
 
   describe("/measurements (POST) - create measurement", () => {
     it("should create measurement in database and correctly calculate BMI", async () => {
-      const measurement = {
+      const measurement: BodyCRUD = {
         weight: 77,
         caloriesDelivered: 1900,
         distanceTraveled: 5,
         measurementDate: "2023-01-26 02:03:30.118709",
       };
       const userHeight = fixtures.get("profile5").height;
-      const bmi = +(measurement.weight / Math.pow(userHeight / 100, 2)).toFixed(2);
+      const bmi = +(Number(measurement.weight) / Math.pow(userHeight / 100, 2)).toFixed(2);
       let id: string;
-      await request
-        .default(app.getHttpServer())
-        .post("/measurements")
-        .send(measurement)
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.CREATED);
-          expect(res.body.measurementDate).toEqual(measurement.measurementDate);
-          expect(res.body.weight).toEqual(measurement.weight);
-          expect(res.body.bmi).toEqual(bmi);
-          id = res.body.id;
-        });
+      await postCRUD("/measurements", measurement, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.CREATED);
+        expect(res.body.measurementDate).toEqual(measurement.measurementDate);
+        expect(res.body.weight).toEqual(measurement.weight);
+        expect(res.body.bmi).toEqual(bmi);
+        id = res.body.id;
+      });
 
       return await measurementRepository.findOneByIdOrThrow(id).then((measure) => {
         expect(measure.measurementDate).toEqual(measurement.measurementDate);
@@ -70,86 +67,64 @@ describe("Measurements (e2e)", () => {
 
   describe("/measurements (GET) - get all measurements", () => {
     it("should get all measurements of user", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .get("/measurements")
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body[0].length).toEqual(4);
-        });
+      return await getCRUD("/measurements", app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body[0].length).toEqual(4);
+      });
     });
 
     it("should return empty array if there id no measurements for user", async () => {
-      await request.default(app.getHttpServer()).delete("/measurements");
-      return await request
-        .default(app.getHttpServer())
-        .get("/measurements")
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body).toEqual([[], 0]);
-        });
+      await deleteCRUD("/measurements", app);
+      return await getCRUD("/measurements", app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body).toEqual([[], 0]);
+      });
     });
   });
 
   describe("/measurements/:id (GET) - get one measurement", () => {
     it("should get one measurement for user  with given accessToken", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .get(`/measurements/${fixtures.get("measurement5").id}`)
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.id).toEqual(fixtures.get("measurement5").id);
-          expect(res.body.userId).toEqual(fixtures.get("measurement5").userId);
-        });
+      return await getCRUD(`/measurements/${fixtures.get("measurement5").id}`, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.id).toEqual(fixtures.get("measurement5").id);
+        expect(res.body.userId).toEqual(fixtures.get("measurement5").userId);
+      });
     });
 
     it("should not get one measurement for user  with given accessToken which is not owner of measurement", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .get(`/measurements/${fixtures.get("measurement1").id}`)
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-        });
+      return await getCRUD(`/measurements/${fixtures.get("measurement1").id}`, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
     });
 
     it("should not get one measurement with wrong id for user with given accessToken", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .get("/measurements/fcbe637d-6472-4033-8862-b1553990422f")
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-        });
+      return await getCRUD("/measurements/fcbe637d-6472-4033-8862-b1553990422f", app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
     });
 
     it("should not get one measurement with id not uuid type for user with given accessToken", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .get("/measurements/notUUUIDmeasurementId")
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+      return await getCRUD("/measurements/notUUUIDmeasurementId", app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
   });
 
   describe("/measurements/:id (PATCH) - update measurement", () => {
     it("should update measurement for given user ith accessToken", async () => {
-      const measurement = {
+      const measurement: BodyCRUD = {
         weight: 67,
         caloriesDelivered: 1500,
         distanceTraveled: 3,
         measurementDate: "2023-01-16 02:03:30.118709",
       };
-      await request
-        .default(app.getHttpServer())
-        .patch(`/measurements/${fixtures.get("measurement5").id}`)
-        .send(measurement)
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.weight).toEqual(measurement.weight);
-          expect(res.body.caloriesDelivered).toEqual(measurement.caloriesDelivered);
-          expect(res.body.distanceTraveled).toEqual(measurement.distanceTraveled);
-          expect(res.body.measurementDate).toEqual(measurement.measurementDate);
-        });
+      await patchCRUD(`/measurements/${fixtures.get("measurement5").id}`, measurement, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.weight).toEqual(measurement.weight);
+        expect(res.body.caloriesDelivered).toEqual(measurement.caloriesDelivered);
+        expect(res.body.distanceTraveled).toEqual(measurement.distanceTraveled);
+        expect(res.body.measurementDate).toEqual(measurement.measurementDate);
+      });
 
       return await measurementRepository.findOneByIdOrThrow(fixtures.get("measurement5").id).then((measure) => {
         expect(measure.weight).toEqual(measurement.weight);
@@ -159,53 +134,48 @@ describe("Measurements (e2e)", () => {
       });
     });
 
-    it("should not update measurement ith wrong id for user with given accessToken", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .patch(`/measurements/${fixtures.get("measurement1").id}`)
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-        });
+    it("should not update measurement with wrong id for user with given accessToken", async () => {
+      return await patchCRUD(`/measurements/${fixtures.get("measurement1").id}`, null, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
     });
 
     it("should not update measurement when weight is not number", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .patch(`/measurements/${fixtures.get("measurement5").id}`)
-        .send({ weight: "76" })
-        .then((res) => {
+      return await patchCRUD(`/measurements/${fixtures.get("measurement5").id}`, { weight: "76" }, app).then(
+        (res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+        }
+      );
     });
 
     it("should not update measurement when caloriesDelivered is not number", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .patch(`/measurements/${fixtures.get("measurement5").id}`)
-        .send({ caloriesDelivered: "1976" })
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+      return await patchCRUD(
+        `/measurements/${fixtures.get("measurement5").id}`,
+        { caloriesDelivered: "1976" },
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should not update measurement when distanceTraveled is not number", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .patch(`/measurements/${fixtures.get("measurement5").id}`)
-        .send({ distanceTraveled: "9" })
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+      return await patchCRUD(
+        `/measurements/${fixtures.get("measurement5").id}`,
+        { distanceTraveled: "9" },
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should not update measurement when measurementDate is not number", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .patch(`/measurements/${fixtures.get("measurement5").id}`)
-        .send({ measurementDate: 567789 })
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+      return await patchCRUD(
+        `/measurements/${fixtures.get("measurement5").id}`,
+        { measurementDate: 567789 },
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
   });
 
@@ -215,13 +185,10 @@ describe("Measurements (e2e)", () => {
       const allMeasurementsLenght: number = await measurementRepository
         .findAllByCondition({ userId })
         .then((res) => res[0].length);
-      await request
-        .default(app.getHttpServer())
-        .delete("/measurements")
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.length).toEqual(allMeasurementsLenght);
-        });
+      await deleteCRUD("/measurements", app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.length).toEqual(allMeasurementsLenght);
+      });
 
       return await measurementRepository
         .findAllByCondition({ userId: fixtures.get("user5").id })
@@ -237,13 +204,10 @@ describe("Measurements (e2e)", () => {
       const allMeasurementsLenght: number = await measurementRepository
         .findAllByCondition({ userId })
         .then((res) => res[0].length);
-      await request
-        .default(app.getHttpServer())
-        .delete(`/measurements/${fixtures.get("measurement5").id}`)
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body.userId).toEqual(userId);
-        });
+      await deleteCRUD(`/measurements/${fixtures.get("measurement5").id}`, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.userId).toEqual(userId);
+      });
 
       return await measurementRepository.findAllByCondition({ userId }).then((measurements) => {
         expect(measurements[0].length).toEqual(allMeasurementsLenght - 1);
@@ -251,21 +215,15 @@ describe("Measurements (e2e)", () => {
     });
 
     it("should not delete one measurement with incorrect id for user with given accessToken", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .delete(`/measurements/${fixtures.get("measurement1").id}`)
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-        });
+      return await deleteCRUD(`/measurements/${fixtures.get("measurement1").id}`, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
     });
 
     it("should not delete one measurement if id is not uuid type for user with given accessToken", async () => {
-      return await request
-        .default(app.getHttpServer())
-        .delete("/measurements/someNotUUIDmeasurementId")
-        .then((res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        });
+      return await deleteCRUD("/measurements/someNotUUIDmeasurementId", app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
   });
 });
