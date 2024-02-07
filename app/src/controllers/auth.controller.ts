@@ -221,7 +221,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch("logout-cookies")
-  async logoutCookie(@UserId() userId: string, @CurrentUser() user: User, @Req() request: Request): Promise<LogoutResponse> {
+  async logoutCookie(
+    @UserId() userId: string,
+    @CurrentUser() user: User,
+    @Req() request: Request
+  ): Promise<LogoutResponse> {
     try {
       const refreshToken: string = request.cookies["cookieKey"];
       await this.tokenService.deleteRefreshTokenFromUser(user, refreshToken);
