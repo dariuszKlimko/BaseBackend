@@ -4,7 +4,7 @@ import * as request from "supertest";
 
 export async function postCRUD(
   path: string,
-  body: BodyCRUD | string[] | number[] | boolean[],
+  body: BodyCRUD | null,
   app: INestApplication
 ): Promise<request.Response> {
   return request
@@ -14,16 +14,21 @@ export async function postCRUD(
     .then((res) => res);
 }
 
-export async function getCRUD(path: string, app: INestApplication): Promise<request.Response> {
+export async function getCRUD(
+  path: string,
+  app: INestApplication,
+  body: BodyCRUD | null = null
+): Promise<request.Response> {
   return request
     .default(app.getHttpServer())
     .get(path)
+    .send(body)
     .then((res) => res);
 }
 
 export async function patchCRUD(
   path: string,
-  body: BodyCRUD | string[] | number[] | boolean[] | null,
+  body: BodyCRUD | null,
   app: INestApplication
 ): Promise<request.Response> {
   return request

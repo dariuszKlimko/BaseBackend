@@ -3,217 +3,234 @@ items:
   user1:
     email: 'user1@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user2:
     email: 'user2@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user3:
     email: 'user3@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user4:
     email: 'user4@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user5:
     email: 'user5@email.com'
     password: 'QWERTqwert5!'
-    refreshToken:
-      -'b01c162b94cac32a3aaa61a563f4c65c0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e'
+    refreshTokens: [b01c162b94cac32a3aaa61a563f4c65c0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
     verified: true
     verificationCode:
+    role:
+    # profile: '@profile5'
   user6:
     email: 'user6@email.com'
     password: 'QWERTqwert6!'
-    refreshToken: 
-      -'9iyc162b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6I9jH6'
+    refreshTokens: [9iyc162b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6I9jH6]
     verified: true
     verificationCode:
+    role:
   user10:
     email: 'user10@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: false
     verificationCode:
+    role:
   user11:
     email: 'auth1@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: false
     verificationCode:
+    role:
   user12:
     email: 'auth2@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user13:
     email: 'auth3@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: false
     verificationCode:
+    role:
   user14:
     email: 'auth4@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: false
     verificationCode:
+    role:
   user15:
     email: 'auth5@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user16:
     email: 'auth6@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user17:
     email: 'auth7@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: false
     verificationCode:
+    role:
   user18:
     email: 'auth8@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user19:
     email: 'auth9@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user20:
     email: 'auth10@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user21:
     email: 'auth11@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user22:
     email: 'auth12@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user23:
     email: 'auth13@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user24:
     email: 'auth14@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user25:
     email: 'auth15@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user26:
     email: 'auth16@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user27:
     email: 'auth17@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
   user28:
     email: 'auth18@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: false
     verificationCode:
+    role:
   user29:
     email: 'auth19@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode: 123456
+    role:
   user30:
     email: 'auth20@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode: 123456
+    role:
   user31:
     email: 'profile1@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode: 
+    role:
+    # profile: '@profile1'
   user32:
     email: 'profile2@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode: 
+    role:
   user33:
     email: 'profile3@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode: 
+    role:
+    # profile: '@profile3'
   user34:
     email: 'user11@email.com'
     password: 'Qwert12345!'
-    refreshToken: 
-      -
+    refreshTokens: []
     verified: true
     verificationCode:
+    role:
+  user35:
+    email: 'admin_0_12@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role: 'admin_0'
+  user36:
+    email: 'user12@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:

@@ -15,8 +15,6 @@ import {
   UseFilters,
   UseGuards,
   UseInterceptors,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import { MeasurementService } from "@app/services/measurement.service";
 import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
@@ -46,6 +44,7 @@ import { MeasurementServiceIntrface } from "@app/services/interfaces/measurement
 import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
 import { MathServiceIntrface } from "@app/services/interfaces/math.service.interface";
 import { ThrottlerGuard } from "@nestjs/throttler";
+import { UpuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)
@@ -68,7 +67,6 @@ export class MeasurementController {
   @ApiNotFoundResponse({ description: "Measurement not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Post()
@@ -136,7 +134,6 @@ export class MeasurementController {
   @ApiNotFoundResponse({ description: "Measurement not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch(":id")
@@ -229,9 +226,9 @@ export class MeasurementController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Get("getbyids")
-  async getAllMeasurementsByIdsByAdmin(@Body() ids: string[]): Promise<[Measurement[], number]> {
+  async getAllMeasurementsByIdsByAdmin(@Body() body: UpuidArrayDto): Promise<[Measurement[], number]> {
     try {
-      return await this.measurementService.findAllByIds(ids);
+      return await this.measurementService.findAllByIds(body.ids);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -244,9 +241,9 @@ export class MeasurementController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Delete("daletebyids")
-  async deleteAllMeasurementsByIdsByAdmin(@Body() ids: string[]): Promise<Measurement[]> {
+  async deleteAllMeasurementsByIdsByAdmin(@Body() body: UpuidArrayDto): Promise<Measurement[]> {
     try {
-      const [measurements]: [Measurement[], number] = await this.measurementService.findAllByIds(ids);
+      const [measurements]: [Measurement[], number] = await this.measurementService.findAllByIds(body.ids);
       return await this.measurementService.deleteManyByEntities(measurements);
     } catch (error) {
       throw new InternalServerErrorException();

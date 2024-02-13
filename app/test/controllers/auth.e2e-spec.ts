@@ -10,6 +10,7 @@ import { UserRepository } from "@app/repositories/user.repository";
 import { getCRUD, patchCRUD, postCRUD } from "@test/helpers/crud/crud";
 import { BodyCRUD } from "@test/helpers/types/body";
 import { patchAuthCRUD } from "@test/helpers/crud/auth.crud";
+import { User } from "@app/entities/user.entity";
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;
@@ -295,8 +296,10 @@ describe("Auth (e2e)", () => {
         auth15Tokens.accessToken,
         { password: "Qwerty123456!" },
         app
-      ).then((res) => {
+      ).then(async (res) => {
+        const authUser: User = await userRepository.findOneByConditionOrThrow({ email: "auth15@email.com" });
         expect(res.status).toEqual(HttpStatus.OK);
+        expect(await authUser.validatePassword("Qwerty123456!")).toBe(true);
       });
     });
 

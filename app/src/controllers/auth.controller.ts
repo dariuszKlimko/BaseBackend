@@ -17,8 +17,6 @@ import {
   UseFilters,
   UseGuards,
   UseInterceptors,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import { AuthService } from "@app/services/auth.service";
 import { UserId } from "@app/common/decorators/user.id.decorator";
@@ -127,7 +125,6 @@ export class AuthController {
   @ApiCreatedResponse({ description: "Success.", type: MessageInfo })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailExistGuard)
-  @UsePipes(ValidationPipe)
   @HttpCode(200)
   @Post("resend-confirmation")
   async resendConfirmationLink(@Body() userInfo: EmailDto): Promise<MessageInfo> {
@@ -147,7 +144,6 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailVerifiedGuard)
-  @UsePipes(ValidationPipe)
   @Post("login")
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
     try {
@@ -169,7 +165,6 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailVerifiedGuard)
-  @UsePipes(ValidationPipe)
   @Post("login-cookies")
   async loginCookies(@Body() user: LoginDto, @Res() response: Response): Promise<LoginResponseCookies> {
     try {
@@ -195,7 +190,6 @@ export class AuthController {
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch("logout")
@@ -216,15 +210,10 @@ export class AuthController {
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch("logout-cookies")
-  async logoutCookie(
-    @UserId() userId: string,
-    @CurrentUser() user: User,
-    @Req() request: Request
-  ): Promise<LogoutResponse> {
+  async logoutCookie(@CurrentUser() user: User, @Req() request: Request): Promise<LogoutResponse> {
     try {
       const refreshToken: string = request.cookies["cookieKey"];
       await this.tokenService.deleteRefreshTokenFromUser(user, refreshToken);
@@ -241,7 +230,6 @@ export class AuthController {
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch("forcelogout")
@@ -258,7 +246,6 @@ export class AuthController {
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UsePipes(ValidationPipe)
   @Patch("tokens")
   async getNewTokens(@Body() payload: TokenDto): Promise<LoginResponse> {
     try {
@@ -284,7 +271,6 @@ export class AuthController {
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UsePipes(ValidationPipe)
   @Patch("tokens-cookie")
   async getNewTokensCookies(@Req() request: Request, @Res() response: Response): Promise<LoginResponseCookies> {
     try {
@@ -313,7 +299,6 @@ export class AuthController {
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch("credentials")
@@ -329,7 +314,6 @@ export class AuthController {
   @ApiOkResponse({ description: "Success.", type: MessageInfo })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UsePipes(ValidationPipe)
   @UseGuards(EmailVerifiedGuard)
   @Patch("reset-password")
   async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
@@ -354,7 +338,6 @@ export class AuthController {
   @ApiBadRequestResponse({ description: "Invalid verification code." })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UsePipes(ValidationPipe)
   @UseGuards(EmailVerifiedGuard)
   @Patch("reset-password-confirm")
   async resetPasswordConfirm(@Body() resetPassword: ResetPasswordDto): Promise<MessageInfo> {
@@ -375,7 +358,6 @@ export class AuthController {
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Patch("forcelogoutbyadmin/:userid")
