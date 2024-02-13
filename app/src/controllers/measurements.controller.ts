@@ -44,7 +44,7 @@ import { MeasurementServiceIntrface } from "@app/services/interfaces/measurement
 import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
 import { MathServiceIntrface } from "@app/services/interfaces/math.service.interface";
 import { ThrottlerGuard } from "@nestjs/throttler";
-import { UpuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
+import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 
 @ApiTags("measurements")
 @UseFilters(HttpExceptionFilter)
@@ -226,7 +226,7 @@ export class MeasurementController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Get("getbyids")
-  async getAllMeasurementsByIdsByAdmin(@Body() body: UpuidArrayDto): Promise<[Measurement[], number]> {
+  async getAllMeasurementsByIdsByAdmin(@Body() body: UuuidArrayDto): Promise<[Measurement[], number]> {
     try {
       return await this.measurementService.findAllByIds(body.ids);
     } catch (error) {
@@ -241,7 +241,7 @@ export class MeasurementController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Delete("daletebyids")
-  async deleteAllMeasurementsByIdsByAdmin(@Body() body: UpuidArrayDto): Promise<Measurement[]> {
+  async deleteAllMeasurementsByIdsByAdmin(@Body() body: UuuidArrayDto): Promise<Measurement[]> {
     try {
       const [measurements]: [Measurement[], number] = await this.measurementService.findAllByIds(body.ids);
       return await this.measurementService.deleteManyByEntities(measurements);

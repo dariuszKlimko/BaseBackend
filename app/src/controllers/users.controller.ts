@@ -51,7 +51,7 @@ import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.ser
 import { In } from "typeorm";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { CurrentUser } from "@app/common/decorators/user.decorator";
-import { UpuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
+import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 import { EmailArrayDto } from "@app/dtos/user/email.array.user.dto";
 
 @ApiTags("users")
@@ -164,7 +164,7 @@ export class UserController {
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
   @Get("getbyids")
-  async getUsersByIdsByAdmin(@Body() body: UpuidArrayDto): Promise<[User[], number]> {
+  async getUsersByIdsByAdmin(@Body() body: UuuidArrayDto): Promise<[User[], number]> {
     try {
       return await this.userService.findAllByIds(body.ids);
     } catch (error) {
@@ -223,7 +223,7 @@ export class UserController {
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
   @Delete("deletebyids")
-  async deleteUsersByIdsByAdmi(@Body() body: UpuidArrayDto): Promise<User[]> {
+  async deleteUsersByIdsByAdmi(@Body() body: UuuidArrayDto): Promise<User[]> {
     try {
       const [users]: [User[], number] = await this.userService.findAllByIds(body.ids);
       return await this.userService.deleteManyByEntities(users);

@@ -234,3 +234,45 @@ items:
     verified: true
     verificationCode:
     role:
+  user37:
+    email: 'userToDelete13@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user38:
+    email: 'userToDelete14@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user39:
+    email: 'userToDelete15@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user40:
+    email: 'userToDelete16@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user41:
+    email: 'userToDelete17@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user42:
+    email: 'userToDelete18@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:

@@ -47,11 +47,13 @@ export async function patchAuthCRUD(
 export async function deleteAuthCRUD(
   path: string,
   accessToken: string,
-  app: INestApplication
+  app: INestApplication,
+  body: BodyCRUD = null,
 ): Promise<request.Response> {
   return request
     .default(app.getHttpServer())
     .delete(path)
     .set("Authorization", `Bearer ${accessToken}`)
+    .send(body)
     .then((res) => res);
 }

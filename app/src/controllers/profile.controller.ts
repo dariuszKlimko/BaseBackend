@@ -7,7 +7,7 @@ import { RolesGuard } from "@app/common/guards/roles.guard";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 import { Role } from "@app/common/types/role.enum";
 import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
-import { UpuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
+import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 import { Profile } from "@app/entities/profile.entity";
 import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
 import { ProfileService } from "@app/services/profile.service";
@@ -113,7 +113,7 @@ export class ProfileController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Get("getbyids")
-  async getProfilesByIdsByAdmin(@Body() body: UpuidArrayDto): Promise<[Profile[], number]> {
+  async getProfilesByIdsByAdmin(@Body() body: UuuidArrayDto): Promise<[Profile[], number]> {
     try {
       return await this.profileService.findAllByIds(body.ids);
     } catch (error) {
@@ -128,7 +128,7 @@ export class ProfileController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Get("getbyuserids")
-  async getProfilesByUserIdsByAdmin(@Body() body: UpuidArrayDto): Promise<[Profile[], number]> {
+  async getProfilesByUserIdsByAdmin(@Body() body: UuuidArrayDto): Promise<[Profile[], number]> {
     try {
       return await this.profileService.findAllByCondition({ userId: In(body.ids) });
     } catch (error) {
