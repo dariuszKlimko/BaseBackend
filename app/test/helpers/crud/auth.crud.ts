@@ -48,7 +48,7 @@ export async function deleteAuthCRUD(
   path: string,
   accessToken: string,
   app: INestApplication,
-  body: BodyCRUD = null,
+  body: BodyCRUD = null
 ): Promise<request.Response> {
   return request
     .default(app.getHttpServer())

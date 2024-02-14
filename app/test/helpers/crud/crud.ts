@@ -38,7 +38,11 @@ export async function patchCRUD(
     .then((res) => res);
 }
 
-export async function deleteCRUD(path: string, app: INestApplication, body: BodyCRUD = null): Promise<request.Response> {
+export async function deleteCRUD(
+  path: string,
+  app: INestApplication,
+  body: BodyCRUD = null
+): Promise<request.Response> {
   return request
     .default(app.getHttpServer())
     .delete(path)

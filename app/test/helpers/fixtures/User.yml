@@ -276,3 +276,31 @@ items:
     verified: true
     verificationCode:
     role:
+  user43:
+    email: 'userToUpdateRole19@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user44:
+    email: 'userToUpdateRole20@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user45:
+    email: 'userToUpdateRole21@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user46:
+    email: 'userToCreateByAdmin22@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
