@@ -182,10 +182,10 @@ describe("Users (e2e)", () => {
       });
     });
   });
-  // ------------------------------------------------------------------
-  describe("/users (PATCH) - update user's account", () => {
-    // same as auth credential update because there is no field to update/test
-  });
+
+  // describe("/users (PATCH) - update user's account", () => {
+  // same as auth credential update because there is no field to update/test
+  // });
 
   describe("/users/getall (GET) - get all users by admin", () => {
     it("should return first 10 and seccond 10 users for admin_0", async () => {
