@@ -5,7 +5,7 @@ import * as request from "supertest";
 export async function postAuthCRUD(
   path: string,
   accessToken: string,
-  body: BodyCRUD | string[] | number[] | boolean[],
+  body: BodyCRUD | null,
   app: INestApplication
 ): Promise<request.Response> {
   return request
@@ -19,11 +19,13 @@ export async function postAuthCRUD(
 export async function getAuthCRUD(
   path: string,
   accessToken: string,
-  app: INestApplication
+  app: INestApplication,
+  body: BodyCRUD | null = null
 ): Promise<request.Response> {
   return request
     .default(app.getHttpServer())
     .get(path)
+    .send(body)
     .set("Authorization", `Bearer ${accessToken}`)
     .then((res) => res);
 }
@@ -31,7 +33,7 @@ export async function getAuthCRUD(
 export async function patchAuthCRUD(
   path: string,
   accessToken: string,
-  body: BodyCRUD | string[] | number[] | boolean[] | null,
+  body: BodyCRUD | null,
   app: INestApplication
 ): Promise<request.Response> {
   return request
@@ -45,11 +47,13 @@ export async function patchAuthCRUD(
 export async function deleteAuthCRUD(
   path: string,
   accessToken: string,
-  app: INestApplication
+  app: INestApplication,
+  body: BodyCRUD = null
 ): Promise<request.Response> {
   return request
     .default(app.getHttpServer())
     .delete(path)
     .set("Authorization", `Bearer ${accessToken}`)
+    .send(body)
     .then((res) => res);
 }

@@ -19,3 +19,4 @@ async function bootstrap(): Promise<void> {
   await app.listen(port, () => Logger.log(`App listening on port ${port} or docker on ${docker_port}`));
 }
 bootstrap();
+// yarn migration:generate ./src/migrations/name

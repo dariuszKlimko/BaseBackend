@@ -8,8 +8,6 @@ import {
   UseGuards,
   InternalServerErrorException,
   ConflictException,
-  UsePipes,
-  ValidationPipe,
   UseInterceptors,
   Logger,
   Patch,
@@ -23,7 +21,6 @@ import {
 import { UserService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
 import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
-import { UserId } from "@app/common/decorators/user.id.decorator";
 import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";
@@ -54,6 +51,8 @@ import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.ser
 import { In } from "typeorm";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { CurrentUser } from "@app/common/decorators/user.decorator";
+import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
+import { EmailArrayDto } from "@app/dtos/user/email.array.user.dto";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
@@ -75,7 +74,6 @@ export class UserController {
   @ApiCreatedResponse({ description: "Success.", type: User })
   @ApiConflictResponse({ description: "User exist in database." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UsePipes(ValidationPipe)
   @Post()
   async registerUser(@Body() userInfo: CreateUserDto): Promise<User> {
     try {
@@ -115,7 +113,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Delete()
-  async deleteUser(@UserId() userId: string, @CurrentUser() user: User): Promise<User> {
+  async deleteUser(@CurrentUser() user: User): Promise<User> {
     try {
       return await this.userService.deleteOneByEntity(user);
     } catch (error) {
@@ -127,7 +125,6 @@ export class UserController {
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch()
@@ -144,7 +141,6 @@ export class UserController {
   @ApiOkResponse({ description: "Success.", type: [User] })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
@@ -164,14 +160,13 @@ export class UserController {
   @ApiOkResponse({ description: "Success.", type: [User] })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
   @Get("getbyids")
-  async getUsersByIdsByAdmin(@Body() ids: string[]): Promise<[User[], number]> {
+  async getUsersByIdsByAdmin(@Body() body: UuuidArrayDto): Promise<[User[], number]> {
     try {
-      return await this.userService.findAllByIds(ids);
+      return await this.userService.findAllByIds(body.ids);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -181,15 +176,14 @@ export class UserController {
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
   @Get("getbyemails")
-  async getUsersByEmailsByAdmin(@Body() emails: string[]): Promise<[User[], number]> {
+  async getUsersByEmailsByAdmin(@Body() body: EmailArrayDto): Promise<[User[], number]> {
     try {
       return await this.userService.findOpenQuery({
-        where: { email: In(emails) },
+        where: { email: In(body.emails) },
       });
     } catch (error) {
       throw new InternalServerErrorException();
@@ -201,7 +195,6 @@ export class UserController {
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
@@ -226,14 +219,13 @@ export class UserController {
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
   @Delete("deletebyids")
-  async deleteUsersByIdsByAdmi(@Body() ids: string[]): Promise<User[]> {
+  async deleteUsersByIdsByAdmi(@Body() body: UuuidArrayDto): Promise<User[]> {
     try {
-      const [users]: [User[], number] = await this.userService.findAllByIds(ids);
+      const [users]: [User[], number] = await this.userService.findAllByIds(body.ids);
       return await this.userService.deleteManyByEntities(users);
     } catch (error) {
       throw new InternalServerErrorException();
@@ -245,7 +237,6 @@ export class UserController {
   @ApiConflictResponse({ description: "User exist in database." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)
@@ -266,7 +257,6 @@ export class UserController {
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SerializeOptions({ groups: [Role.Admin_0] })
   @Roles(Role.Admin_0)

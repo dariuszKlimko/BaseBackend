@@ -7,6 +7,7 @@ import { RolesGuard } from "@app/common/guards/roles.guard";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 import { Role } from "@app/common/types/role.enum";
 import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
+import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 import { Profile } from "@app/entities/profile.entity";
 import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
 import { ProfileService } from "@app/services/profile.service";
@@ -23,8 +24,6 @@ import {
   UseFilters,
   UseGuards,
   UseInterceptors,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -73,7 +72,6 @@ export class ProfileController {
   @ApiNotFoundResponse({ description: "Profile not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch()
@@ -94,7 +92,6 @@ export class ProfileController {
   @ApiOkResponse({ description: "Success.", type: [Profile] })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Get("getall")
@@ -113,13 +110,12 @@ export class ProfileController {
   @ApiOkResponse({ description: "Success.", type: [Profile] })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Get("getbyids")
-  async getProfilesByIdsByAdmin(@Body() ids: string[]): Promise<[Profile[], number]> {
+  async getProfilesByIdsByAdmin(@Body() body: UuuidArrayDto): Promise<[Profile[], number]> {
     try {
-      return await this.profileService.findAllByIds(ids);
+      return await this.profileService.findAllByIds(body.ids);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -129,13 +125,12 @@ export class ProfileController {
   @ApiOkResponse({ description: "Success.", type: [Profile] })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
   @Get("getbyuserids")
-  async getProfilesByUserIdsByAdmin(@Body() userIds: string[]): Promise<[Profile[], number]> {
+  async getProfilesByUserIdsByAdmin(@Body() body: UuuidArrayDto): Promise<[Profile[], number]> {
     try {
-      return await this.profileService.findAllByCondition({ userId: In(userIds) });
+      return await this.profileService.findAllByCondition({ userId: In(body.ids) });
     } catch (error) {
       throw new InternalServerErrorException();
     }

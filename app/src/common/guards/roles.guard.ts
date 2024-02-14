@@ -39,6 +39,9 @@ export class RolesGuard implements CanActivate {
     try {
       const userId: string = await this.tokenService.decodeJWTtoken(accessToken).sub;
       const user: User = await this.userService.findOneByIdOrThrow(userId);
+      if (!roles.includes(user.role)) {
+        throw new ForbiddenException("User unauthorized.");
+      }
       return roles.includes(user.role);
     } catch (error) {
       if (error instanceof ForbiddenException) {
