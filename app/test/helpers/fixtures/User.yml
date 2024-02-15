@@ -35,7 +35,6 @@ items:
     verified: true
     verificationCode:
     role:
-    # profile: '@profile5'
   user6:
     email: 'user6@email.com'
     password: 'QWERTqwert6!'
@@ -197,7 +196,6 @@ items:
     verified: true
     verificationCode: 
     role:
-    # profile: '@profile1'
   user32:
     email: 'profile2@email.com'
     password: 'Qwert12345!'
@@ -212,7 +210,6 @@ items:
     verified: true
     verificationCode: 
     role:
-    # profile: '@profile3'
   user34:
     email: 'user11@email.com'
     password: 'Qwert12345!'
@@ -303,4 +300,11 @@ items:
     refreshTokens: []
     verified: true
     verificationCode:
+    role:
+  user47:
+    email: 'profile47@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode: 
     role:

@@ -10,6 +10,9 @@ import { BodyCRUD } from "@test/helpers/types/body";
 import { postCRUD } from "@test/helpers/crud/crud";
 import { deleteAuthCRUD, getAuthCRUD, patchAuthCRUD, postAuthCRUD } from "@test/helpers/crud/auth.crud";
 import { User } from "@app/entities/user.entity";
+import { GeneratorSevice } from "@app/services/generator.service";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
@@ -17,20 +20,23 @@ describe("Users (e2e)", () => {
   let userRepository: UserRepository;
   let measurementRepository: MeasurementRepository;
   let profileRepository: ProfileRepository;
+  let generatorService: GeneratorSevice;
   let user2accessToken: string;
   let user3accessToken: string;
-  let admin0_12accessToken: string;
   let user12accessToken: string;
+  let admin0_12accessToken: string;
 
   beforeAll(async () => {
     fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
+      providers: [ConfigService, JwtService]
     }).compile();
 
     userRepository = moduleFixture.get(UserRepository);
     measurementRepository = moduleFixture.get(MeasurementRepository);
     profileRepository = moduleFixture.get(ProfileRepository);
+    generatorService = moduleFixture.get(GeneratorSevice);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -41,23 +47,26 @@ describe("Users (e2e)", () => {
       { email: "user2@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
+
     user3accessToken = await postCRUD(
       "/auth/login",
       { email: "user3@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
+
     user12accessToken = await postCRUD(
       "/auth/login",
       { email: "user12@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
+
     admin0_12accessToken = await postCRUD(
       "/auth/login",
       { email: "admin_0_12@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
   });
-
+  
   describe("/users (POST) - register user", () => {
     it("should register user in database", async () => {
       const user: BodyCRUD = {
@@ -152,9 +161,26 @@ describe("Users (e2e)", () => {
       });
     });
 
-    it("should not return user's data for invalid accessToken", async () => {
+    it("should not return user's data for not accessToken", async () => {
       return await getAuthCRUD("/users", "Bearer someToken", app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not get user with wrong signed jwt", async () => {
+      const accessToken: string =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+      return await getAuthCRUD("/users", accessToken, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not get user if user not exist in database", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      const accessToken: string = generatorService.generateAccessToken(user);
+      return await getAuthCRUD("/users", accessToken, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
   });
@@ -176,9 +202,26 @@ describe("Users (e2e)", () => {
       ).rejects.toThrow(EntityNotFound);
     });
 
-    it("should not delete user account for given accessToken", async () => {
+    it("should not delete user account for not jwt accessToken", async () => {
       return await deleteAuthCRUD("/users", "Bearer someToken", app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not delete user account for wrong signed jwt", async () => {
+      const accessToken: string =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+      return await deleteAuthCRUD("/users", accessToken, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not delete user account for user not existed in database", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      const accessToken: string = generatorService.generateAccessToken(user);
+      return await deleteAuthCRUD("/users", accessToken, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
   });
@@ -189,35 +232,37 @@ describe("Users (e2e)", () => {
 
   describe("/users/getall (GET) - get all users by admin", () => {
     it("should return first 10 and seccond 10 users for admin_0", async () => {
-      let skip: number = 0;
-      let take: number = 10;
-      await getAuthCRUD(`/users/getall?skip=${skip}&take=${take}`, admin0_12accessToken, app).then((res) => {
+      await getAuthCRUD("/users/getall?skip=0&take=10", admin0_12accessToken, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
-        expect(res.body[0].length).toEqual(take);
+        expect(res.body[0].length).toEqual(10);
       });
-      skip = 10;
-      take = 20;
-      return await getAuthCRUD(`/users/getall?skip=${skip}&take=${take}`, admin0_12accessToken, app).then(
+      return await getAuthCRUD("/users/getall?skip=10&take=10", admin0_12accessToken, app).then(
         (res) => {
           expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body[0].length).toEqual(take);
+          expect(res.body[0].length).toEqual(10);
         }
       );
     });
 
     it("should not return first 10 users for normal user accessToken", async () => {
-      const skip: number = 0;
-      const take: number = 10;
-      return await getAuthCRUD(`/users/getall?skip=${skip}&take=${take}`, user12accessToken, app).then((res) => {
+      return await getAuthCRUD("/users/getall?skip=0&take=10", user12accessToken, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
 
     it("should not return first 10 users for not jwt token", async () => {
-      const skip: number = 0;
-      const take: number = 10;
-      return await getAuthCRUD(`/users/getall?skip=${skip}&take=${take}`, "someToken", app).then((res) => {
+      return await getAuthCRUD("/users/getall?skip=0&take=10", "someToken", app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not return first 10 users for admin not existed in database", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.role = "admin_0"
+      const accessToken: string = generatorService.generateAccessToken(user);
+      return await getAuthCRUD("/users/getall?skip=0&take=10", accessToken, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
   });
@@ -252,6 +297,20 @@ describe("Users (e2e)", () => {
       });
       return await getAuthCRUD("/users/getbyids", "someToken", app, { ids }).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not return users with given ids for admin_0 not existed in database", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.role = "admin_0"
+      const accessToken: string = generatorService.generateAccessToken(user);
+      const users: [User[], number] = await userRepository.findAll();
+      const ids: string[] = users[0].map((user: User) => {
+        return user.id;
+      });
+      return await getAuthCRUD("/users/getbyids", accessToken, app, { ids }).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
 
@@ -308,6 +367,20 @@ describe("Users (e2e)", () => {
       });
     });
 
+    it("should not return users with given emails for admin_0 not existed in database", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.role = "admin_0"
+      const accessToken: string = generatorService.generateAccessToken(user);
+      const users: [User[], number] = await userRepository.findAll();
+      const emails: string[] = users[0].map((user: User) => {
+        return user.email;
+      });
+      return await getAuthCRUD("/users/getbyemails", accessToken, app, { emails }).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
+    });
+
     it("should not return array for not emails ids for admin_0", async () => {
       const emails: string[] = ["wrong1email.com", "wrong2email.com", "wrong3email.com"];
       return await getAuthCRUD("/users/getbyemails", admin0_12accessToken, app, { emails }).then((res) => {
@@ -352,7 +425,19 @@ describe("Users (e2e)", () => {
       );
     });
 
-    it("should not return users with relation for not exist user by admin", async () => {
+    it("should not return users with relation for given id for admin_0 not existed in database", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.role = "admin_0"
+      const accessToken: string = generatorService.generateAccessToken(user);
+      return await getAuthCRUD(`/users/getwithrelation/${fixtures.get("user5").id}`, accessToken, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+        }
+      );
+    });
+
+    it("should not return user with relation for not existed user by admin", async () => {
       return await getAuthCRUD(
         "/users/getwithrelation/8499c166-b9ee-4ef6-a0b5-8240a8521b37",
         admin0_12accessToken,
@@ -397,6 +482,21 @@ describe("Users (e2e)", () => {
       const ids: string[] = [fixtures.get("user40").id, fixtures.get("user41").id, fixtures.get("user42").id];
       await deleteAuthCRUD("/users/deletebyids", "someToken", app, { ids }).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+
+      return await userRepository.findAllByIds(ids).then((res) => {
+        expect(res[0].length).toBe(ids.length);
+      });
+    });
+
+    it("should not delete users for given id for admin_0 not existed in database", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.role = "admin_0"
+      const accessToken: string = generatorService.generateAccessToken(user);
+      const ids: string[] = [fixtures.get("user40").id, fixtures.get("user41").id, fixtures.get("user42").id];
+      await deleteAuthCRUD("/users/deletebyids", accessToken, app, { ids }).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
 
       return await userRepository.findAllByIds(ids).then((res) => {
@@ -467,6 +567,22 @@ describe("Users (e2e)", () => {
       };
       return await postAuthCRUD("/users/createbyadmin", "someToken", user, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not create user by admin_0 not existed in database", async () => {
+      const admin: User = new User();
+      admin.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      admin.role = "admin_0"
+      const accessToken: string = generatorService.generateAccessToken(admin);
+      const user: BodyCRUD = {
+        email: "userCreatedByAdmin3@emailArrayDto.com",
+        password: "Qwert12345!",
+        role: "admin_1",
+        verified: true,
+      };
+      return await postAuthCRUD("/users/createbyadmin", accessToken, user, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
 
@@ -605,6 +721,21 @@ describe("Users (e2e)", () => {
       return await patchAuthCRUD(`/users/updaterole/${fixtures.get("user44").id}`, "someToken", body, app).then(
         (res) => {
           expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+        }
+      );
+    });
+
+    it("should not update user role with given id to admin_1 by admin_0 not existed in database", async () => {
+      const admin: User = new User();
+      admin.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      admin.role = "admin_0"
+      const accessToken: string = generatorService.generateAccessToken(admin);
+      const body: BodyCRUD = {
+        role: "admin_1",
+      };
+      return await patchAuthCRUD(`/users/updaterole/${fixtures.get("user44").id}`, accessToken, body, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
         }
       );
     });
