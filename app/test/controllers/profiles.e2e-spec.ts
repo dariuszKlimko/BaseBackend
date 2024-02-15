@@ -137,7 +137,7 @@ describe("Profiles (e2e)", () => {
       });
     });
   });
-  
+
   describe("/profiles/getall (GET) - get all profiles by admin", () => {
     it("should get first 10 profiles by admin", async () => {
       return await getAuthCRUD("/profiles/getall?skip=0&take=10", admin0_12accessToken, app).then((res) => {
@@ -169,7 +169,7 @@ describe("Profiles (e2e)", () => {
     it("should not get first 10 profiles by admin not existed in database", async () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      user.role = "admin_0"
+      user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD("/profiles/getall?skip=0&take=10", accessToken, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -228,7 +228,7 @@ describe("Profiles (e2e)", () => {
     it("should not get profiles by ids by not existed admin in database", async () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      user.role = "admin_0"
+      user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const ids: string[] = [
         fixtures.get("profile1").id,
@@ -299,7 +299,7 @@ describe("Profiles (e2e)", () => {
     it("should not get profiles by users ids by admin not existed in database", async () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      user.role = "admin_0"
+      user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const ids: string[] = [
         fixtures.get("profile1").id,

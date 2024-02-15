@@ -30,7 +30,7 @@ describe("Users (e2e)", () => {
     fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [ConfigService, JwtService]
+      providers: [ConfigService, JwtService],
     }).compile();
 
     userRepository = moduleFixture.get(UserRepository);
@@ -66,7 +66,7 @@ describe("Users (e2e)", () => {
       app
     ).then((res) => res.body.accessToken);
   });
-  
+
   describe("/users (POST) - register user", () => {
     it("should register user in database", async () => {
       const user: BodyCRUD = {
@@ -236,12 +236,10 @@ describe("Users (e2e)", () => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body[0].length).toEqual(10);
       });
-      return await getAuthCRUD("/users/getall?skip=10&take=10", admin0_12accessToken, app).then(
-        (res) => {
-          expect(res.status).toEqual(HttpStatus.OK);
-          expect(res.body[0].length).toEqual(10);
-        }
-      );
+      return await getAuthCRUD("/users/getall?skip=10&take=10", admin0_12accessToken, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body[0].length).toEqual(10);
+      });
     });
 
     it("should not return first 10 users for normal user accessToken", async () => {
@@ -259,7 +257,7 @@ describe("Users (e2e)", () => {
     it("should not return first 10 users for admin not existed in database", async () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      user.role = "admin_0"
+      user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD("/users/getall?skip=0&take=10", accessToken, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -303,7 +301,7 @@ describe("Users (e2e)", () => {
     it("should not return users with given ids for admin_0 not existed in database", async () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      user.role = "admin_0"
+      user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const users: [User[], number] = await userRepository.findAll();
       const ids: string[] = users[0].map((user: User) => {
@@ -370,7 +368,7 @@ describe("Users (e2e)", () => {
     it("should not return users with given emails for admin_0 not existed in database", async () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      user.role = "admin_0"
+      user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const users: [User[], number] = await userRepository.findAll();
       const emails: string[] = users[0].map((user: User) => {
@@ -428,7 +426,7 @@ describe("Users (e2e)", () => {
     it("should not return users with relation for given id for admin_0 not existed in database", async () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      user.role = "admin_0"
+      user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD(`/users/getwithrelation/${fixtures.get("user5").id}`, accessToken, app).then(
         (res) => {
@@ -492,7 +490,7 @@ describe("Users (e2e)", () => {
     it("should not delete users for given id for admin_0 not existed in database", async () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      user.role = "admin_0"
+      user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const ids: string[] = [fixtures.get("user40").id, fixtures.get("user41").id, fixtures.get("user42").id];
       await deleteAuthCRUD("/users/deletebyids", accessToken, app, { ids }).then((res) => {
@@ -573,7 +571,7 @@ describe("Users (e2e)", () => {
     it("should not create user by admin_0 not existed in database", async () => {
       const admin: User = new User();
       admin.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      admin.role = "admin_0"
+      admin.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(admin);
       const user: BodyCRUD = {
         email: "userCreatedByAdmin3@emailArrayDto.com",
@@ -728,7 +726,7 @@ describe("Users (e2e)", () => {
     it("should not update user role with given id to admin_1 by admin_0 not existed in database", async () => {
       const admin: User = new User();
       admin.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
-      admin.role = "admin_0"
+      admin.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(admin);
       const body: BodyCRUD = {
         role: "admin_1",
