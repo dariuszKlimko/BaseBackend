@@ -308,3 +308,38 @@ items:
     verified: true
     verificationCode: 
     role:
+  user48:
+    email: 'measurement48@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode: 
+    role:
+  user49:
+    email: 'measurement49@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode: 
+    role:
+  user50:
+    email: 'measurement50@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode: 
+    role:
+  user51:
+    email: 'measurement51@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode: 
+    role:
+  # user52:
+  #   email: 'admin0_measurement52@email.com'
+  #   password: 'Qwert12345!'
+  #   refreshTokens: []
+  #   verified: true
+  #   verificationCode: 
+  #   role: 'admin_0'

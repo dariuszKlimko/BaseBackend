@@ -21,12 +21,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     this.userService = userService;
   }
 
-  // async validate(payload: PayloadJwt): Promise<boolean> {
-  async validate(payload: PayloadJwt): Promise<User> {
+  async validate(payload: PayloadJwt): Promise<boolean> {
     try {
       const user: User = await this.userService.findOneByIdOrThrow(payload.sub);
-      // return !!user;
-      return user;
+      return !!user;
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
