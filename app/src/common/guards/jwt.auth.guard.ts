@@ -1,4 +1,3 @@
-import { User } from "@app/entities/user.entity";
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 

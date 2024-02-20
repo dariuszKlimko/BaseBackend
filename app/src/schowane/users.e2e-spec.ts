@@ -13,8 +13,6 @@ import { User } from "@app/entities/user.entity";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { MathSevice } from "@app/services/math.service";
-import { MathServiceIntrface } from "@app/services/interfaces/math.service.interface";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
@@ -23,7 +21,6 @@ describe("Users (e2e)", () => {
   let measurementRepository: MeasurementRepository;
   let profileRepository: ProfileRepository;
   let generatorService: GeneratorSevice;
-  let mathService: MathServiceIntrface
   let user2accessToken: string;
   let user3accessToken: string;
   let user12accessToken: string;
@@ -40,7 +37,6 @@ describe("Users (e2e)", () => {
     measurementRepository = moduleFixture.get(MeasurementRepository);
     profileRepository = moduleFixture.get(ProfileRepository);
     generatorService = moduleFixture.get(GeneratorSevice);
-    mathService = moduleFixture.get(MathSevice);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());

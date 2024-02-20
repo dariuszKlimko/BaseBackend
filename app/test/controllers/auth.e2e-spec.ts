@@ -135,7 +135,7 @@ describe("Auth (e2e)", () => {
     });
   });
 
-  describe("/auth (POST) - login user", () => {
+  describe("/auth/login (POST) - login user", () => {
     it("should return tokens", async () => {
       const user: BodyCRUD = { email: "auth5@email.com", password: "Qwert12345!" };
       await postCRUD("/auth/login", user, app).then((res) => {
@@ -198,7 +198,7 @@ describe("Auth (e2e)", () => {
     });
   });
 
-  describe("/auth (PATCH) - logout user ", () => {
+  describe("/auth/logout (PATCH) - logout user", () => {
     it("should delete refresh token for user with given accessToken and refreshToken", async () => {
       await patchAuthCRUD(
         "/auth/logout",
@@ -238,7 +238,7 @@ describe("Auth (e2e)", () => {
     });
   });
 
-  describe("/auth/tokens (PATCH) - get new tokens ", () => {
+  describe("/auth/tokens (PATCH) - get new tokens", () => {
     it("should get new tokens", async () => {
       await patchCRUD("/auth/tokens", { refreshToken: auth12Tokens.refreshToken }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
@@ -442,5 +442,25 @@ describe("Auth (e2e)", () => {
           expect(users[0].verificationCode).toEqual(123456);
         });
     });
+  });
+
+  describe("/auth/loginc (POST) - login user with cookies", () => {
+
+  });
+
+  describe("/auth/logoutc (PATCH) - logout user", () => {
+
+  });
+  
+  describe("/auth/tokensc (PATCH) - get new tokens", () => {
+
+  });
+
+  describe("/auth/forcelogout (PATCH) - forcelogout user", () => {
+
+  });
+
+  describe("forcelogoutbyadmin/:userid (PATCH) - forcelogout user by admin", () => {
+
   });
 });

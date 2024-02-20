@@ -165,7 +165,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailVerifiedGuard)
-  @Post("login-cookies")
+  @Post("loginc")
   async loginCookies(@Body() user: LoginDto, @Res() response: Response): Promise<LoginResponseCookies> {
     try {
       const authorizedUser: User = await this.authService.comparePassword(user);
@@ -212,7 +212,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
-  @Patch("logout-cookies")
+  @Patch("logoutc")
   async logoutCookie(@CurrentUser() user: User, @Req() request: Request): Promise<LogoutResponse> {
     try {
       const refreshToken: string = request.cookies["cookieKey"];
@@ -271,7 +271,7 @@ export class AuthController {
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @Patch("tokens-cookie")
+  @Patch("tokensc")
   async getNewTokensCookies(@Req() request: Request, @Res() response: Response): Promise<LoginResponseCookies> {
     try {
       const refreshTokenCookies: string = request.cookies["cookieKey"];

@@ -21,4 +21,32 @@ items:
     caloriesDelivered: 1900
     bmi:
     user: "@user2"
+  measurement{11..13}:
+    weight: 80
+    distanceTraveled: 15
+    measurementDate: '2023-0($current)-26 02:03:30.118709'
+    caloriesDelivered: 1900
+    bmi:
+    user: "@user48"
+  measurement{14..16}:
+    weight: 80
+    distanceTraveled: 15
+    measurementDate: '2023-0($current)-26 02:03:30.118709'
+    caloriesDelivered: 1900
+    bmi:
+    user: "@user49"
+  measurement{17..19}:
+    weight: 80
+    distanceTraveled: 15
+    measurementDate: '2023-0($current)-26 02:03:30.118709'
+    caloriesDelivered: 1900
+    bmi:
+    user: "@user50"
+  measurement{20..23}:
+    weight: 80
+    distanceTraveled: 15
+    measurementDate: '2023-0($current)-26 02:03:30.118709'
+    caloriesDelivered: 1900
+    bmi:
+    user: "@user51"
   

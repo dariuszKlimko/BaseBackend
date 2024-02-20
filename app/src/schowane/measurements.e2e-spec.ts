@@ -8,6 +8,7 @@ import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.i
 import { Request } from "express";
 import { BodyCRUD } from "@test/helpers/types/body";
 import { deleteCRUD, getCRUD, patchCRUD, postCRUD } from "@test/helpers/crud/crud";
+import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;
@@ -211,9 +212,11 @@ describe("Measurements (e2e)", () => {
         distanceTraveled: 3,
         measurementDate: "2023-01-16 02:03:30.118709",
       };
-      return await patchCRUD(`/measurements/one/${fixtures.get("measurement1").id}`, measurement, app).then((res) => {
-        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-      });
+      return await patchCRUD(`/measurements/one/${fixtures.get("measurement1").id}`, measurement, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+        }
+      );
     });
 
     it("should not update measurement when weight is not number", async () => {
@@ -284,6 +287,10 @@ describe("Measurements (e2e)", () => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.userId).toEqual(userId);
       });
+
+      await expect(
+        measurementRepository.findOneByIdOrThrow(fixtures.get("measurement5").id)
+      ).rejects.toThrow(EntityNotFound);
 
       return await measurementRepository.findAllByCondition({ userId }).then((measurements) => {
         expect(measurements[0].length).toEqual(allMeasurementsLenght - 1);

@@ -240,7 +240,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("daletebyids")
+  @Delete("deletebyids")
   async deleteAllMeasurementsByIdsByAdmin(@Body() body: UuuidArrayDto): Promise<Measurement[]> {
     try {
       const [measurements]: [Measurement[], number] = await this.measurementService.findAllByIds(body.ids);
@@ -256,7 +256,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("daletebyuserid/:userid")
+  @Delete("deletebyuserid/:userid")
   async deleteMeasurementsByUserIdByAdmi(@Param("userid", ParseUUIDPipe) userId: string): Promise<Measurement[]> {
     try {
       const [measurements]: [Measurement[], number] = await this.measurementService.findAllByCondition({
@@ -275,7 +275,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("updatebyid/:id")
+  @Patch("updatebyid/:id")
   async updateMeasurementByIdByAdmin(
     @Param("id", ParseUUIDPipe) id: string,
     @Body() measurementPayload: UpdateMeasurementDto
