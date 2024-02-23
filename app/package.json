@@ -51,7 +51,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "typeorm": "^0.3.13-dev.58fc088",
-    "typeorm-fixtures-cli": "^3.0.2"
+    "typeorm-fixtures-cli": "^3.0.2",
+    "vm2-fixed": "^0.0.1"
   },
   "devDependencies": {
     "@babel/traverse": "^7.23.9",

@@ -7301,6 +7301,14 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
+vm2-fixed@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/vm2-fixed/-/vm2-fixed-0.0.1.tgz#60ba5e14961226bbcb4162e886185ebff61b7e42"
+  integrity sha512-OR6xu/sntqL1/q0smSvdyYvRUuO4WtCnCGTfgvcDSYCTMGw74UeKyuGrhpIHDez4Kzag/3ebJg8GWk2X9bYPJQ==
+  dependencies:
+    acorn "^8.7.0"
+    acorn-walk "^8.2.0"
+
 vm2@^3.9.19:
   version "3.9.19"
   resolved "https://registry.yarnpkg.com/vm2/-/vm2-3.9.19.tgz#be1e1d7a106122c6c492b4d51c2e8b93d3ed6a4a"
