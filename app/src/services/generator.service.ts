@@ -1,12 +1,12 @@
 import { RESET_PASSWORD_MESSAGE, VERIFICATION_EMAIL_MESSAGE } from "@app/common/constans/constans";
-import { LinkGeneratePayload } from "@app/common/types/linkGeneratePayload";
-import { TokenResponsePayload } from "@app/common/types/tokenResponsePayload";
+import { LinkGeneratePayload } from "@app/common/types/type/linkGeneratePayload";
+import { TokenResponsePayload } from "@app/common/types/type/tokenResponsePayload";
 import { User } from "@app/entities/user.entity";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { randomBytes, randomInt } from "crypto";
-import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
+import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
 
 @Injectable()
 export class GeneratorSevice implements GeneratorServiceIntrface {

@@ -12,9 +12,10 @@ import { BodyCRUD } from "@test/helpers/types/body";
 import { patchAuthCRUD } from "@test/helpers/crud/auth.crud";
 import { User } from "@app/entities/user.entity";
 import cookieParser from "cookie-parser";
-import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
-import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
+import { UserRepositoryIntrface } from "@app/common/types/interfaces/repositories/user.repository.interface";
+import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
 import { GeneratorSevice } from "@app/services/generator.service";
+import { faker } from "@faker-js/faker";
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;
@@ -619,7 +620,7 @@ describe("Auth (e2e)", () => {
 
     it("should not delete all refresh tokens for user with given accessToken if user not exist in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       return await patchAuthCRUD("/auth/forcelogout", accessToken, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -659,14 +660,11 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not delete all refresh tokens for given not existed userId by admin_0", async () => {
-      await patchAuthCRUD(
-        "/auth/forcelogoutbyadmin/24cd5be2-ca5b-11ee-a506-0242ac120002",
-        admin0_12accessToken,
-        null,
-        app
-      ).then((res) => {
-        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-      });
+      await patchAuthCRUD(`/auth/forcelogoutbyadmin/${faker.string.uuid()}`, admin0_12accessToken, null, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+        }
+      );
     });
 
     it("should not delete all refresh tokens for given userId by normal user", async () => {
@@ -700,7 +698,7 @@ describe("Auth (e2e)", () => {
 
     it("should not delete all refresh tokens for given userId by not existed", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       await patchAuthCRUD(`/auth/forcelogoutbyadmin/${fixtures.get("user59").id}`, accessToken, null, app).then(
         (res) => {

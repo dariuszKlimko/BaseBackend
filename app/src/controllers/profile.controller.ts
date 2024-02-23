@@ -5,11 +5,11 @@ import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { RolesGuard } from "@app/common/guards/roles.guard";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
-import { Role } from "@app/common/types/role.enum";
+import { Role } from "@app/common/types/enum/role.enum";
 import { UpdateProfileDto } from "@app/dtos/profile/update.profile.dto";
 import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 import { Profile } from "@app/entities/profile.entity";
-import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
+import { ProfileServiceIntrface } from "@app/common/types/interfaces/services/profile.service.interface";
 import { ProfileService } from "@app/services/profile.service";
 import {
   Body,

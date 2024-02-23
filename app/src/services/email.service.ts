@@ -4,9 +4,9 @@ import { User } from "@app/entities/user.entity";
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { EmailServiceIntrface } from "@app/services/interfaces/email.service.interface";
+import { EmailServiceIntrface } from "@app/common/types/interfaces/services/email.service.interface";
 import { UserService } from "@app/services/user.service";
-import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 
 @Injectable()
 export class EmailService implements EmailServiceIntrface {

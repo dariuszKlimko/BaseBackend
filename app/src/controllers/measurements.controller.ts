@@ -36,13 +36,13 @@ import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exceptio
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
 import { RolesGuard } from "@app/common/guards/roles.guard";
 import { Roles } from "@app/common/decorators/roles.decorator";
-import { Role } from "@app/common/types/role.enum";
+import { Role } from "@app/common/types/enum/role.enum";
 import { ProfileService } from "@app/services/profile.service";
 import { Profile } from "@app/entities/profile.entity";
 import { MathSevice } from "@app/services/math.service";
-import { MeasurementServiceIntrface } from "@app/services/interfaces/measurement.service.interface";
-import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
-import { MathServiceIntrface } from "@app/services/interfaces/math.service.interface";
+import { MeasurementServiceIntrface } from "@app/common/types/interfaces/services/measurement.service.interface";
+import { ProfileServiceIntrface } from "@app/common/types/interfaces/services/profile.service.interface";
+import { MathServiceIntrface } from "@app/common/types/interfaces/services/math.service.interface";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 

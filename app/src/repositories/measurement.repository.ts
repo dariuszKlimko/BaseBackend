@@ -2,7 +2,7 @@ import { BaseAbstractRepository } from "@app/common/repository/base.abstract.rep
 import { Measurement } from "@app/entities/measurement.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
+import { MeasurementRepositoryInterface } from "@app/common/types/interfaces/repositories/measurements.repository.interface";
 import { MEASUREMENTS_NOT_FOUND } from "@app/common/constans/constans";
 
 export class MeasurementRepository

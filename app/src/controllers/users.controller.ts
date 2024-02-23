@@ -41,13 +41,13 @@ import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.i
 import { UpdateUserDto } from "@app/dtos/user/update.user.dto";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { Roles } from "@app/common/decorators/roles.decorator";
-import { Role } from "@app/common/types/role.enum";
+import { Role } from "@app/common/types/enum/role.enum";
 import { CreateUserByAdminDto } from "@app/dtos/user/create.user.by.admin.dto";
 import { RolesGuard } from "@app/common/guards/roles.guard";
 import { UpdateUserByAdminDto } from "@app/dtos/user/update.user.by.admin.dto";
-import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
-import { EmailServiceIntrface } from "@app/services/interfaces/email.service.interface";
-import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
+import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
+import { EmailServiceIntrface } from "@app/common/types/interfaces/services/email.service.interface";
+import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
 import { In } from "typeorm";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { CurrentUser } from "@app/common/decorators/user.decorator";

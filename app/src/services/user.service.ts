@@ -3,16 +3,16 @@ import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
 import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
 import { UserRepository } from "@app/repositories/user.repository";
-import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
+import { UserRepositoryIntrface } from "@app/common/types/interfaces/repositories/user.repository.interface";
 import { DULICATED_EXCEPTION_MESSAGE } from "@app/common/constans/exceptions.constans";
-import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 import { UpdateResult } from "typeorm";
-import { VerificationCode } from "@app/common/types/verificationCode";
+import { VerificationCode } from "@app/common/types/type/verificationCode";
 import { CreateUserByAdminDto } from "@app/dtos/user/create.user.by.admin.dto";
-import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
+import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
 import { ProfileRepository } from "@app/repositories/profile.repository";
 import { Profile } from "@app/entities/profile.entity";
-import { Role } from "@app/common/types/role.enum";
+import { Role } from "@app/common/types/enum/role.enum";
 import { BaseAbstractService } from "@app/common/service/base.abstract.service";
 
 @Injectable()

@@ -1,14 +1,14 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { config } from "dotenv";
 import path from "path";
-import { IDataSource } from "@app/common/types/dataSourceOptions";
+import { IDataSource } from "@app/common/types/type/dataSourceOptions";
 import { Logger } from "@nestjs/common";
 
 const root: string = path.resolve(__dirname, "../");
 const envpath: string = path.resolve(root, "../");
 config({ path: `${envpath}/.env` });
 
-export const dataBaseConfig: (env: string) => DataSourceOptions = (env: string): DataSourceOptions => {
+export function dataBaseConfig(env: string): DataSourceOptions {
   const dataSourceOptionsProd: DataSourceOptions = {
     type: "postgres",
     host: process.env.DB_HOST,
@@ -42,7 +42,7 @@ export const dataBaseConfig: (env: string) => DataSourceOptions = (env: string):
   };
 
   return options[env];
-};
+}
 
 const dataSource: DataSource = new DataSource(dataBaseConfig(process.env.NODE_ENV));
 

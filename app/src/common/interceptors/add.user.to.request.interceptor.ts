@@ -12,7 +12,7 @@ import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exceptio
 import { UserService } from "@app/services/user.service";
 import { Request } from "express";
 import { TokenService } from "@app/services/token.service";
-import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 
 @Injectable()
 export class AddUserToRequest implements NestInterceptor {

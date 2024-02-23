@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { MathServiceIntrface } from "@app/services/interfaces/math.service.interface";
+import { MathServiceIntrface } from "@app/common/types/interfaces/services/math.service.interface";
 
 @Injectable()
 export class MathSevice implements MathServiceIntrface {

@@ -13,10 +13,11 @@ import { User } from "@app/entities/user.entity";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
-import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
-import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
-import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
+import { UserRepositoryIntrface } from "@app/common/types/interfaces/repositories/user.repository.interface";
+import { MeasurementRepositoryInterface } from "@app/common/types/interfaces/repositories/measurements.repository.interface";
+import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
+import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
+import { faker } from "@faker-js/faker";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
@@ -181,7 +182,7 @@ describe("Users (e2e)", () => {
 
     it("should not get user if user not exist in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD("/users", accessToken, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -222,7 +223,7 @@ describe("Users (e2e)", () => {
 
     it("should not delete user account for user not existed in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       return await deleteAuthCRUD("/users", accessToken, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -260,7 +261,7 @@ describe("Users (e2e)", () => {
 
     it("should not return first 10 users for admin_0 not existed in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD("/users/getall?skip=0&take=10", accessToken, null, app).then((res) => {
@@ -304,7 +305,7 @@ describe("Users (e2e)", () => {
 
     it("should not return users with given ids for admin_0 not existed in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const users: [User[], number] = await userRepository.findAll();
@@ -324,11 +325,7 @@ describe("Users (e2e)", () => {
     });
 
     it("should return an empty array for not existed uuids for admin_0", async () => {
-      const ids: string[] = [
-        "24cd5be2-ca5b-11ee-a506-0242ac120002",
-        "2cb1f228-ca5b-11ee-a506-0242ac120002",
-        "32c96b82-ca5b-11ee-a506-0242ac120002",
-      ];
+      const ids: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
       return await getAuthCRUD("/users/getbyids", admin0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body[0].length).toEqual(0);
@@ -371,7 +368,7 @@ describe("Users (e2e)", () => {
 
     it("should not return users with given emails for admin_0 not existed in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const users: [User[], number] = await userRepository.findAll();
@@ -433,7 +430,7 @@ describe("Users (e2e)", () => {
 
     it("should not return user with relations for given id for admin_0 not existed in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD(`/users/getwithrelation/${fixtures.get("user5").id}`, accessToken, null, app).then(
@@ -498,7 +495,7 @@ describe("Users (e2e)", () => {
 
     it("should not delete users for given id for admin_0 not existed in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const ids: string[] = [fixtures.get("user40").id, fixtures.get("user41").id, fixtures.get("user42").id];
@@ -512,11 +509,7 @@ describe("Users (e2e)", () => {
     });
 
     it("should not delete users wchih not exist in database by admin_0", async () => {
-      const ids: string[] = [
-        "24cd5be2-ca5b-11ee-a506-0242ac120002",
-        "2cb1f228-ca5b-11ee-a506-0242ac120002",
-        "32c96b82-ca5b-11ee-a506-0242ac120002",
-      ];
+      const ids: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
       return await deleteAuthCRUD("/users/deletebyids", admin0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.length).toEqual(0);
@@ -578,7 +571,7 @@ describe("Users (e2e)", () => {
 
     it("should not create user by admin_0 not existed in database", async () => {
       const admin: User = new User();
-      admin.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      admin.id = faker.string.uuid();
       admin.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(admin);
       const user: BodyCRUD = {
@@ -726,7 +719,7 @@ describe("Users (e2e)", () => {
 
     it("should not update user role with given id to admin_1 by admin_0 not existed in database", async () => {
       const admin: User = new User();
-      admin.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      admin.id = faker.string.uuid();
       admin.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(admin);
       const body: BodyCRUD = {

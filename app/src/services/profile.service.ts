@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Profile } from "@app/entities/profile.entity";
 import { ProfileRepository } from "@app/repositories/profile.repository";
-import { ProfileServiceIntrface } from "@app/services/interfaces/profile.service.interface";
+import { ProfileServiceIntrface } from "@app/common/types/interfaces/services/profile.service.interface";
 import { BaseAbstractService } from "@app/common/service/base.abstract.service";
 
 @Injectable()

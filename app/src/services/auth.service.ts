@@ -15,8 +15,8 @@ import {
   USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED,
   USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED,
 } from "@app/common/constans/exceptions.constans";
-import { AuthServiceIntrface } from "@app/services/interfaces/auth.service.interface";
-import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { AuthServiceIntrface } from "@app/common/types/interfaces/services/auth.service.interface";
+import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 import { UserService } from "@app/services/user.service";
 
 @Injectable()

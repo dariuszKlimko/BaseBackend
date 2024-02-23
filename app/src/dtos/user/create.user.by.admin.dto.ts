@@ -1,5 +1,5 @@
 import { PASSWORD_REGEX, WEAK_PASSWORD_MESSAGE } from "@app/common/constans/constans";
-import { Role } from "@app/common/types/role.enum";
+import { Role } from "@app/common/types/enum/role.enum";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsString, Matches, MinLength } from "class-validator";
 

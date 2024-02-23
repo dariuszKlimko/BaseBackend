@@ -7,10 +7,11 @@ import { deleteAuthCRUD, getAuthCRUD, patchAuthCRUD } from "@test/helpers/crud/a
 import { User } from "@app/entities/user.entity";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { BodyCRUD } from "@test/helpers/types/body";
-import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
+import { MeasurementRepositoryInterface } from "@app/common/types/interfaces/repositories/measurements.repository.interface";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
 import { In } from "typeorm";
-import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
+import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
+import { faker } from "@faker-js/faker";
 
 describe("MeasurementAdmin (e2e)", () => {
   let app: INestApplication;
@@ -77,7 +78,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     it("should not return first 10 measuremants for not existed user", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD("/measurements/getall?skip=0&take=10", accessToken, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -130,7 +131,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     it("should not return measurements with given ids for not existed user", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       const ids: string[] = [
         fixtures.get("measurement1").id,
@@ -156,11 +157,7 @@ describe("MeasurementAdmin (e2e)", () => {
     });
 
     it("should not return measurements with given ids for not existed measurements for admin_0", async () => {
-      const ids: string[] = [
-        "24cd5be2-ca5b-11ee-a506-0242ac120002",
-        "2cb1f228-ca5b-11ee-a506-0242ac120002",
-        "32c96b82-ca5b-11ee-a506-0242ac120002",
-      ];
+      const ids: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
       return await getAuthCRUD("/measurements/getbyids", admin_0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body[0].length).toEqual(0);
@@ -219,7 +216,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     it("should not delete measurements with given ids for not existed user", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       const ids: string[] = [
         fixtures.get("measurement1").id,
@@ -245,11 +242,7 @@ describe("MeasurementAdmin (e2e)", () => {
     });
 
     it("should not delete measurements with given ids for not existed measurements for admin_0", async () => {
-      const ids: string[] = [
-        "24cd5be2-ca5b-11ee-a506-0242ac120002",
-        "2cb1f228-ca5b-11ee-a506-0242ac120002",
-        "32c96b82-ca5b-11ee-a506-0242ac120002",
-      ];
+      const ids: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
       return await deleteAuthCRUD("/measurements/deletebyids", admin_0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.length).toEqual(0);
@@ -305,7 +298,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     it("should not delete measurements for userId for not existed user accessToken", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       return await deleteAuthCRUD(
         `/measurements/deletebyuserid/${fixtures.get("user50").id}`,
@@ -332,7 +325,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     it("should not delete measurements for userId for not existed measurements for admin_0", async () => {
       return await deleteAuthCRUD(
-        "/measurements/deletebyuserid/24cd5be2-ca5b-11ee-a506-0242ac120002",
+        `/measurements/deletebyuserid/${faker.string.uuid()}`,
         admin_0_12accessToken,
         null,
         app
@@ -459,7 +452,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     it("should not update measurements with given id for not existed user", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       const body: BodyCRUD = {
         weight: 100,
@@ -495,7 +488,7 @@ describe("MeasurementAdmin (e2e)", () => {
         weight: 100,
       };
       return await patchAuthCRUD(
-        "/measurements/updatebyid/24cd5be2-ca5b-11ee-a506-0242ac120002",
+        `/measurements/updatebyid/${faker.string.uuid()}`,
         admin_0_12accessToken,
         body,
         app

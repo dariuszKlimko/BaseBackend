@@ -9,8 +9,9 @@ import { User } from "@app/entities/user.entity";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { ProfileRepositoryInterface } from "@app/repositories/interfaces/profile.repository.interface";
-import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
+import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
+import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
+import { faker } from "@faker-js/faker";
 
 describe("Profiles (e2e)", () => {
   let app: INestApplication;
@@ -80,7 +81,7 @@ describe("Profiles (e2e)", () => {
 
     it("should not get profile height for not existed user", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD("/profiles", accessToken, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -132,7 +133,7 @@ describe("Profiles (e2e)", () => {
 
     it("should not update profile height in database for not existed user", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       const accessToken: string = generatorService.generateAccessToken(user);
       return await patchAuthCRUD("/profiles", accessToken, { height: 180 }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -170,7 +171,7 @@ describe("Profiles (e2e)", () => {
 
     it("should not get first 10 profiles by admin_0 not existed in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       return await getAuthCRUD("/profiles/getall?skip=0&take=10", accessToken, null, app).then((res) => {
@@ -229,7 +230,7 @@ describe("Profiles (e2e)", () => {
 
     it("should not get profiles by ids by not existed admin_0 in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const ids: string[] = [
@@ -243,11 +244,7 @@ describe("Profiles (e2e)", () => {
     });
 
     it("should not get profiles by not existed ids by admin_0", async () => {
-      const ids: string[] = [
-        "24cd5be2-ca5b-11ee-a506-0242ac120002",
-        "2cb1f228-ca5b-11ee-a506-0242ac120002",
-        "32c96b82-ca5b-11ee-a506-0242ac120002",
-      ];
+      const ids: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
       return await getAuthCRUD("/profiles/getbyids", admin0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toBe(HttpStatus.OK);
         expect(res.body[0].length).toEqual(0);
@@ -300,7 +297,7 @@ describe("Profiles (e2e)", () => {
 
     it("should not get profiles by users ids by admin_0 not existed in database", async () => {
       const user: User = new User();
-      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      user.id = faker.string.uuid();
       user.role = "admin_0";
       const accessToken: string = generatorService.generateAccessToken(user);
       const ids: string[] = [
@@ -314,11 +311,7 @@ describe("Profiles (e2e)", () => {
     });
 
     it("should not get profiles by not existed users ids by admin_0", async () => {
-      const ids: string[] = [
-        "24cd5be2-ca5b-11ee-a506-0242ac120002",
-        "2cb1f228-ca5b-11ee-a506-0242ac120002",
-        "32c96b82-ca5b-11ee-a506-0242ac120002",
-      ];
+      const ids: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
       return await getAuthCRUD("/profiles/getbyuserids", admin0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toBe(HttpStatus.OK);
         expect(res.body[0].length).toEqual(0);

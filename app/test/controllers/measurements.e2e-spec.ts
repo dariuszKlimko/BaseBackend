@@ -9,7 +9,7 @@ import { Request } from "express";
 import { BodyCRUD } from "@test/helpers/types/body";
 import { deleteCRUD, getCRUD, patchCRUD, postCRUD } from "@test/helpers/crud/crud";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
-import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
+import { MeasurementRepositoryInterface } from "@app/common/types/interfaces/repositories/measurements.repository.interface";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;

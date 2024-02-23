@@ -13,8 +13,8 @@ import { Reflector } from "@nestjs/core";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { Request } from "express";
 import { UserService } from "@app/services/user.service";
-import { TokenServiceIntrface } from "@app/services/interfaces/token.service.interface";
-import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { TokenServiceIntrface } from "@app/common/types/interfaces/services/token.service.interface";
+import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 
 @Injectable()
 export class RolesGuard implements CanActivate {

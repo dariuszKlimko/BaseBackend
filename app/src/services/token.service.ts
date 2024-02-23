@@ -9,10 +9,10 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { ArrayContains } from "typeorm";
-import { TokenServiceIntrface } from "@app/services/interfaces/token.service.interface";
+import { TokenServiceIntrface } from "@app/common/types/interfaces/services/token.service.interface";
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalid.refresh.token.exception";
 import { LogoutResponse } from "@app/dtos/auth/logout.response";
-import { UserServiceIntrface } from "@app/services/interfaces/user.service.interface";
+import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 import { UserService } from "@app/services/user.service";
 
 @Injectable()

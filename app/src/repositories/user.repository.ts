@@ -2,7 +2,7 @@ import { BaseAbstractRepository } from "@app/common/repository/base.abstract.rep
 import { User } from "@app/entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
+import { UserRepositoryIntrface } from "@app/common/types/interfaces/repositories/user.repository.interface";
 import { USER_NOT_FOUND } from "@app/common/constans/constans";
 
 export class UserRepository extends BaseAbstractRepository<User> implements UserRepositoryIntrface {

@@ -1,6 +1,6 @@
 import { Logger, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
-import { LoggerDestructure } from "@app/common/types/loggerDestructureType";
+import { LoggerDestructure } from "@app/common/types/type/loggerDestructureType";
 
 export class RestLogger implements NestMiddleware {
   private logger: Logger = new Logger("HTTP");
