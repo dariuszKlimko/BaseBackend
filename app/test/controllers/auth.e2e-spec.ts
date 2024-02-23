@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "@app/app.module";
-import loadFixtures from "@test/helpers/load.fixtures";
+import loadFixtures, { FixtureFactoryInterface } from "@test/helpers/load.fixtures";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { LoginResponse } from "@app/dtos/auth/login.response";
@@ -11,12 +11,18 @@ import { getCRUD, patchCRUD, postCRUD } from "@test/helpers/crud/crud";
 import { BodyCRUD } from "@test/helpers/types/body";
 import { patchAuthCRUD } from "@test/helpers/crud/auth.crud";
 import { User } from "@app/entities/user.entity";
+import cookieParser from "cookie-parser";
+import { UserRepositoryIntrface } from "@app/repositories/interfaces/user.repository.interface";
+import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
+import { GeneratorSevice } from "@app/services/generator.service";
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;
+  let fixtures: FixtureFactoryInterface;
   let configService: ConfigService;
   let jwtService: JwtService;
-  let userRepository: UserRepository;
+  let userRepository: UserRepositoryIntrface;
+  let generatorService: GeneratorServiceIntrface;
   let tokenSecret: string;
   let tokenExpireTime: number;
 
@@ -28,20 +34,27 @@ describe("Auth (e2e)", () => {
   let auth13Tokens: LoginResponse;
   let auth14Tokens: LoginResponse;
   let auth15Tokens: LoginResponse;
+  let auth21Tokens: LoginResponse;
+  let auth22Tokens: LoginResponse;
+  let auth26Tokens: LoginResponse;
+  let auth28Tokens: LoginResponse;
+  let admin0_12accessToken: string;
 
   beforeAll(async () => {
-    await loadFixtures();
+    fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [ConfigService, JwtService],
+      providers: [ConfigService, JwtService, GeneratorSevice],
     }).compile();
 
-    jwtService = moduleFixture.get(JwtService);
-    configService = moduleFixture.get(ConfigService);
-    userRepository = moduleFixture.get(UserRepository);
+    jwtService = moduleFixture.get<JwtService>(JwtService);
+    configService = moduleFixture.get<ConfigService>(ConfigService);
+    userRepository = moduleFixture.get<UserRepositoryIntrface>(UserRepository);
+    generatorService = moduleFixture.get<GeneratorServiceIntrface>(GeneratorSevice);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
+    app.use(cookieParser());
     await app.init();
 
     tokenSecret = configService.get("JWT_CONFIRMATION_TOKEN_SECRET");
@@ -71,12 +84,29 @@ describe("Auth (e2e)", () => {
     auth15Tokens = await postCRUD("/auth/login", { email: "auth15@email.com", password: "Qwert12345!" }, app).then(
       (res) => res.body
     );
+    auth21Tokens = await postCRUD("/auth/login", { email: "auth21@email.com", password: "Qwert12345!" }, app).then(
+      (res) => res.body
+    );
+    auth22Tokens = await postCRUD("/auth/login", { email: "auth22@email.com", password: "Qwert12345!" }, app).then(
+      (res) => res.body
+    );
+    auth26Tokens = await postCRUD("/auth/login", { email: "auth26@email.com", password: "Qwert12345!" }, app).then(
+      (res) => res.body
+    );
+    auth28Tokens = await postCRUD("/auth/login", { email: "auth28@email.com", password: "Qwert12345!" }, app).then(
+      (res) => res.body
+    );
+    admin0_12accessToken = await postCRUD(
+      "/auth/login",
+      { email: "admin_0_12@email.com", password: "Qwert12345!" },
+      app
+    ).then((res) => res.body.accessToken);
   });
 
   describe("/auth/confirmation/:token (GET) - confirm user account", () => {
     it("should confirm user account in database if token is valid", async () => {
       const token: string = jwtGenerate("auth1@email.com", tokenSecret, tokenExpireTime, jwtService);
-      await getCRUD(`/auth/confirmation/${token}`, app).then((res) => {
+      await getCRUD(`/auth/confirmation/${token}`, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.status).toEqual("ok");
       });
@@ -92,27 +122,27 @@ describe("Auth (e2e)", () => {
 
     it("should not confirm account if user with given token not exist in database", async () => {
       const token: string = jwtGenerate("authNotExistInDb@email.com", tokenSecret, tokenExpireTime, jwtService);
-      return await getCRUD(`/auth/confirmation/${token}`, app).then((res) => {
+      return await getCRUD(`/auth/confirmation/${token}`, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
 
     it("should not confirm user account if user for given token is already confirmed", async () => {
       const token: string = jwtGenerate("auth2@email.com", tokenSecret, tokenExpireTime, jwtService);
-      return await getCRUD(`/auth/confirmation/${token}`, app).then((res) => {
+      return await getCRUD(`/auth/confirmation/${token}`, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
     it("should not confirm user account if given token is not valid", async () => {
-      return await getCRUD("/auth/confirmation/someToken", app).then((res) => {
+      return await getCRUD("/auth/confirmation/someToken", null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
 
     it("should not confirm user account if given token is expired", async () => {
       const token: string = jwtGenerate("auth3@email.com", tokenSecret, -10, jwtService);
-      return await getCRUD(`/auth/confirmation/${token}`, app).then((res) => {
+      return await getCRUD(`/auth/confirmation/${token}`, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
@@ -135,7 +165,7 @@ describe("Auth (e2e)", () => {
     });
   });
 
-  describe("/auth (POST) - login user", () => {
+  describe("/auth/login (POST) - login user", () => {
     it("should return tokens", async () => {
       const user: BodyCRUD = { email: "auth5@email.com", password: "Qwert12345!" };
       await postCRUD("/auth/login", user, app).then((res) => {
@@ -198,7 +228,7 @@ describe("Auth (e2e)", () => {
     });
   });
 
-  describe("/auth (PATCH) - logout user ", () => {
+  describe("/auth/logout (PATCH) - logout user", () => {
     it("should delete refresh token for user with given accessToken and refreshToken", async () => {
       await patchAuthCRUD(
         "/auth/logout",
@@ -238,7 +268,7 @@ describe("Auth (e2e)", () => {
     });
   });
 
-  describe("/auth/tokens (PATCH) - get new tokens ", () => {
+  describe("/auth/tokens (PATCH) - get new tokens", () => {
     it("should get new tokens", async () => {
       await patchCRUD("/auth/tokens", { refreshToken: auth12Tokens.refreshToken }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
@@ -441,6 +471,242 @@ describe("Auth (e2e)", () => {
         .then(([users]) => {
           expect(users[0].verificationCode).toEqual(123456);
         });
+    });
+  });
+
+  describe("/auth/loginc (POST) - login user with cookies", () => {
+    it("should return tokens", async () => {
+      const user: BodyCRUD = { email: "auth23@email.com", password: "Qwert12345!" };
+      let refreshToken: string;
+      await postCRUD("/auth/loginc", user, app).then((res) => {
+        refreshToken = res.header["set-cookie"][0];
+        expect(res.status).toEqual(HttpStatus.CREATED);
+        expect(res.body.accessToken).toBeDefined();
+        expect(res.header["set-cookie"][0]).toBeDefined();
+      });
+
+      refreshToken = refreshToken.substring(refreshToken.indexOf("=") + 1, refreshToken.indexOf(";"));
+      return await userRepository.findOneByConditionOrThrow({ email: String(user.email) }).then((user) => {
+        expect(user.refreshTokens[0]).toEqual(refreshToken);
+      });
+    });
+
+    it("should login one user twice", async () => {
+      const user: BodyCRUD = { email: "auth24@email.com", password: "Qwert12345!" };
+      await postCRUD("/auth/loginc", user, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.CREATED);
+        expect(res.body.accessToken).toBeDefined();
+        expect(res.header["set-cookie"][0]).toBeDefined();
+      });
+
+      await postCRUD("/auth/loginc", user, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.CREATED);
+        expect(res.body.accessToken).toBeDefined();
+        expect(res.header["set-cookie"][0]).toBeDefined();
+      });
+
+      return await userRepository.findOneByConditionOrThrow({ email: String(user.email) }).then((user) => {
+        expect(user.refreshTokens.length).toEqual(2);
+      });
+    });
+
+    it("should not return tokens if email not exist in database", async () => {
+      const user: BodyCRUD = { email: "authNotExistInDb@email.com", password: "Qwert12345!" };
+      await postCRUD("/auth/loginc", user, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
+    });
+
+    it("should not return tokens if password is incorrect", async () => {
+      const user: BodyCRUD = { email: "auth25@email.com", password: "Qwert123456789!" };
+      return await postCRUD("/auth/loginc", user, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not return tokens if email is not verified", async () => {
+      const user: BodyCRUD = { email: "auth7@email.com", password: "Qwert12345!" };
+      return await postCRUD("/auth/loginc", user, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+  });
+
+  describe("/auth/logoutc (PATCH) - logout user", () => {
+    it("should delete refresh token for user with given accessToken and refreshToken", async () => {
+      const cookie: string = `refreshToken=${auth22Tokens.refreshToken}`;
+      await patchAuthCRUD("/auth/logoutc", auth22Tokens.accessToken, null, app, cookie).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.email).toEqual("auth22@email.com");
+      });
+      return await userRepository.findOneByConditionOrThrow({ email: "auth22@email.com" }).then((users) => {
+        expect(users.refreshTokens.length).toEqual(2);
+      });
+    });
+
+    it("should not delete refresh token for user with given accessToken which is not owner of refreshToken", async () => {
+      const cookie: string = `refreshToken=${auth22Tokens.refreshToken}`;
+      await patchAuthCRUD("/auth/logoutc", auth21Tokens.accessToken, null, app, cookie).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+
+    it("should not delete refresh token for user with given accessToken if resreshToken not exist in database", async () => {
+      const cookie: string = "refreshToken=rongrefreshToken";
+      await patchAuthCRUD("/auth/logoutc", auth22Tokens.accessToken, null, app, cookie).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+
+    it("should not delete refresh token for user with given accessToken if wrong signed jwt accessToken", async () => {
+      const cookie: string = `refreshToken=${auth22Tokens.refreshToken}`;
+      const accessToken: string =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+      return await patchAuthCRUD("/auth/logoutc", accessToken, null, app, cookie).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not delete refresh token for user with given accessToken for not jwt accessToken", async () => {
+      const cookie: string = `refreshToken=${auth22Tokens.refreshToken}`;
+      return await patchAuthCRUD("/auth/logoutc", "someToken", null, app, cookie).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+  });
+
+  describe("/auth/tokensc (PATCH) - get new tokens", () => {
+    it("should get new tokens", async () => {
+      const cookie: string = `refreshToken=${auth21Tokens.refreshToken}`;
+      let refreshToken: string;
+      await patchCRUD("/auth/tokensc", null, app, cookie).then((res) => {
+        refreshToken = res.header["set-cookie"][0];
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.accessToken).toBeDefined();
+        expect(res.header["set-cookie"][0]).toBeDefined();
+      });
+      refreshToken = refreshToken.substring(refreshToken.indexOf("=") + 1, refreshToken.indexOf(";"));
+      return await userRepository.findOneByConditionOrThrow({ email: "auth21@email.com" }).then((users) => {
+        expect(users.refreshTokens[0]).toEqual(refreshToken);
+      });
+    });
+
+    it("should not get new tokens if invalid refreshToken", async () => {
+      const cookie: string = "refreshToken=invalidRefreshToken";
+      await patchCRUD("/auth/tokensc", null, app, cookie).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
+    });
+  });
+
+  describe("/auth/forcelogout (PATCH) - forcelogout user", () => {
+    it("should delete all refresh tokens for user with given accessToken", async () => {
+      await patchAuthCRUD("/auth/forcelogout", auth26Tokens.accessToken, null, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.email).toEqual("auth26@email.com");
+      });
+
+      return await userRepository.findOneByConditionOrThrow({ email: "auth26@email.com" }).then((user) => {
+        expect(user.refreshTokens).toEqual([]);
+      });
+    });
+
+    it("should not delete all refresh tokens for user with given accessToken if is not jwt", async () => {
+      return await patchAuthCRUD("/auth/forcelogout", "someToken", null, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not delete all refresh tokens for user with given accessToken if user not exist in database", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      const accessToken: string = generatorService.generateAccessToken(user);
+      return await patchAuthCRUD("/auth/forcelogout", accessToken, null, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
+    });
+
+    it("should not delete all refresh tokens for user with given accessToken if is wrong signed", async () => {
+      const accessToken: string =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+      return await patchAuthCRUD("/auth/forcelogout", accessToken, null, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+  });
+
+  describe("forcelogoutbyadmin/:userid (PATCH) - forcelogout user by admin", () => {
+    it("should delete all refresh tokens for given userId by admin_0", async () => {
+      await patchAuthCRUD(
+        `/auth/forcelogoutbyadmin/${fixtures.get("user58").id}`,
+        admin0_12accessToken,
+        null,
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.email).toEqual("auth27@email.com");
+      });
+
+      return await userRepository.findOneByConditionOrThrow({ email: "auth27@email.com" }).then((user) => {
+        expect(user.refreshTokens).toEqual([]);
+      });
+    });
+
+    it("should not delete all refresh tokens for given not uuid userId by admin_0", async () => {
+      await patchAuthCRUD("/auth/forcelogoutbyadmin/notUuid", admin0_12accessToken, null, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+
+    it("should not delete all refresh tokens for given not existed userId by admin_0", async () => {
+      await patchAuthCRUD(
+        "/auth/forcelogoutbyadmin/24cd5be2-ca5b-11ee-a506-0242ac120002",
+        admin0_12accessToken,
+        null,
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+      });
+    });
+
+    it("should not delete all refresh tokens for given userId by normal user", async () => {
+      await patchAuthCRUD(
+        `/auth/forcelogoutbyadmin/${fixtures.get("user59").id}`,
+        auth28Tokens.accessToken,
+        null,
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
+
+    it("should not delete all refresh tokens for given userId by not jwt token", async () => {
+      await patchAuthCRUD(`/auth/forcelogoutbyadmin/${fixtures.get("user59").id}`, "someToken", null, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+        }
+      );
+    });
+
+    it("should not delete all refresh tokens for given userId by not jwt token", async () => {
+      const accessToken: string =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+      await patchAuthCRUD(`/auth/forcelogoutbyadmin/${fixtures.get("user59").id}`, accessToken, null, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+        }
+      );
+    });
+
+    it("should not delete all refresh tokens for given userId by not existed", async () => {
+      const user: User = new User();
+      user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
+      const accessToken: string = generatorService.generateAccessToken(user);
+      await patchAuthCRUD(`/auth/forcelogoutbyadmin/${fixtures.get("user59").id}`, accessToken, null, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+        }
+      );
     });
   });
 });

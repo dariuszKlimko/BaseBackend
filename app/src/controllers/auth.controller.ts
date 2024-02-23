@@ -165,8 +165,8 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @UseGuards(EmailVerifiedGuard)
-  @Post("login-cookies")
-  async loginCookies(@Body() user: LoginDto, @Res() response: Response): Promise<LoginResponseCookies> {
+  @Post("loginc")
+  async loginCookies(@Body() user: LoginDto, @Res() response: Response): Promise<Response<LoginResponseCookies>> {
     try {
       const authorizedUser: User = await this.authService.comparePassword(user);
       const refreshToken: string = this.generatorService.generateRefreshToken();
@@ -176,7 +176,7 @@ export class AuthController {
         sameSite: "strict",
         httpOnly: true,
       });
-      return { accessToken };
+      return response.send({ accessToken });
     } catch (error) {
       if (error instanceof UserAuthenticateException) {
         throw new UnauthorizedException(error.message);
@@ -212,12 +212,16 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
-  @Patch("logout-cookies")
-  async logoutCookie(@CurrentUser() user: User, @Req() request: Request): Promise<LogoutResponse> {
+  @Patch("logoutc")
+  async logoutCookie(
+    @CurrentUser() user: User,
+    @Req() request: Request,
+    @Res() response: Response
+  ): Promise<Response<LogoutResponse>> {
     try {
-      const refreshToken: string = request.cookies["cookieKey"];
+      const refreshToken: string = request.cookies["refreshToken"];
       await this.tokenService.deleteRefreshTokenFromUser(user, refreshToken);
-      return { email: user.email };
+      return response.send({ email: user.email });
     } catch (error) {
       if (error instanceof InvalidRefreshTokenException) {
         throw new BadRequestException(error.message);
@@ -225,7 +229,7 @@ export class AuthController {
       throw new InternalServerErrorException();
     }
   }
-  // -------------------------------------------------------------------------
+
   @ApiOperation({ summary: "User force logout." })
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
@@ -240,7 +244,7 @@ export class AuthController {
       throw new InternalServerErrorException();
     }
   }
-  // -------------------------------------------------------------------------
+
   @ApiOperation({ summary: "Get new access and refresh tokens." })
   @ApiOkResponse({ description: "Success.", type: LoginResponse })
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
@@ -254,7 +258,6 @@ export class AuthController {
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
-
       return { accessToken, refreshToken };
     } catch (error) {
       if (error instanceof EntityNotFound) {
@@ -271,10 +274,13 @@ export class AuthController {
   @ApiBadRequestResponse({ description: "Refresh token bad request." })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @Patch("tokens-cookie")
-  async getNewTokensCookies(@Req() request: Request, @Res() response: Response): Promise<LoginResponseCookies> {
+  @Patch("tokensc")
+  async getNewTokensCookies(
+    @Req() request: Request,
+    @Res() response: Response
+  ): Promise<Response<LoginResponseCookies>> {
     try {
-      const refreshTokenCookies: string = request.cookies["cookieKey"];
+      const refreshTokenCookies: string = request.cookies["refreshToken"];
       const authorizedUser: User = await this.tokenService.findUserByRefreshToken(refreshTokenCookies);
       this.tokenService.deleteRefreshTokenFromUser(authorizedUser, refreshTokenCookies);
       const refreshToken: string = this.generatorService.generateRefreshToken();
@@ -284,7 +290,7 @@ export class AuthController {
         sameSite: "strict",
         httpOnly: true,
       });
-      return { accessToken };
+      return response.send({ accessToken });
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
@@ -352,7 +358,7 @@ export class AuthController {
       throw new InternalServerErrorException();
     }
   }
-  // -------------------------------------------------------------------------
+
   @ApiOperation({ summary: "User force logout." })
   @ApiOkResponse({ description: "Success.", type: LogoutResponse })
   @ApiNotFoundResponse({ description: "User not found" })

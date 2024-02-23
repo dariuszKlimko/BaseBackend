@@ -71,7 +71,7 @@ export class MeasurementController {
   @UseInterceptors(AddUserToRequest)
   @Post()
   async createMeasurement(
-    @UserId() userId: string,
+    @UserId("userId", ParseUUIDPipe) userId: string,
     @Body() measurementPayload: CreateMeasurementDto
   ): Promise<Measurement> {
     try {
@@ -114,7 +114,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
-  @Get(":id")
+  @Get("one/:id")
   async getOneMeasurement(@UserId() userId: string, @Param("id", ParseUUIDPipe) id: string): Promise<Measurement> {
     try {
       return await this.measurementService.findOneByConditionOrThrow({
@@ -136,7 +136,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
-  @Patch(":id")
+  @Patch("one/:id")
   async updateMeasurement(
     @UserId() userId: string,
     @Param("id", ParseUUIDPipe) id: string,
@@ -182,7 +182,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
-  @Delete(":id")
+  @Delete("one/:id")
   async deleteOneMeasurement(
     @UserId() userId: string,
     @Param("id", ParseUUIDPipe) id: string
@@ -240,7 +240,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("daletebyids")
+  @Delete("deletebyids")
   async deleteAllMeasurementsByIdsByAdmin(@Body() body: UuuidArrayDto): Promise<Measurement[]> {
     try {
       const [measurements]: [Measurement[], number] = await this.measurementService.findAllByIds(body.ids);
@@ -256,7 +256,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("daletebyuserid/:userid")
+  @Delete("deletebyuserid/:userid")
   async deleteMeasurementsByUserIdByAdmi(@Param("userid", ParseUUIDPipe) userId: string): Promise<Measurement[]> {
     try {
       const [measurements]: [Measurement[], number] = await this.measurementService.findAllByCondition({
@@ -275,7 +275,7 @@ export class MeasurementController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin_0)
-  @Delete("updatebyid/:id")
+  @Patch("updatebyid/:id")
   async updateMeasurementByIdByAdmin(
     @Param("id", ParseUUIDPipe) id: string,
     @Body() measurementPayload: UpdateMeasurementDto
