@@ -336,10 +336,59 @@ items:
     verified: true
     verificationCode: 
     role:
-  # user52:
-  #   email: 'admin0_measurement52@email.com'
-  #   password: 'Qwert12345!'
-  #   refreshTokens: []
-  #   verified: true
-  #   verificationCode: 
-  #   role: 'admin_0'
+  user52:
+    email: 'auth21@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user53:
+    email: 'auth22@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: [b01c162b94cac32a3aaa61a563f4c65c0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e,b01c162b94cac32a3aaa61a563f4c65c0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
+    verified: true
+    verificationCode:
+    role:
+  user54:
+    email: 'auth23@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user55:
+    email: 'auth24@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user56:
+    email: 'auth25@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: []
+    verified: true
+    verificationCode:
+    role:
+  user57:
+    email: 'auth26@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: [b01c162b94cac32a3aaa61a563f4c6hc0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
+    verified: true
+    verificationCode:
+    role:
+  user58:
+    email: 'auth27@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: [b01c162b94cac32a3aaf61a563f4c6hc0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
+    verified: true
+    verificationCode:
+    role:
+  user59:
+    email: 'auth28@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: [b01cf62b94cac32a3aaa61a563f4c6hc0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
+    verified: true
+    verificationCode:
+    role:

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe, ExecutionContext, CallHandler } from "@nestjs/common";
 import { AppModule } from "@app/app.module";
-import loadFixtures, { FixtureFactory } from "@test/helpers/load.fixtures";
+import loadFixtures, { FixtureFactoryInterface } from "@test/helpers/load.fixtures";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
@@ -9,11 +9,12 @@ import { Request } from "express";
 import { BodyCRUD } from "@test/helpers/types/body";
 import { deleteCRUD, getCRUD, patchCRUD, postCRUD } from "@test/helpers/crud/crud";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
+import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;
-  let fixtures: FixtureFactory;
-  let measurementRepository: MeasurementRepository;
+  let fixtures: FixtureFactoryInterface;
+  let measurementRepository: MeasurementRepositoryInterface;
 
   beforeEach(async () => {
     fixtures = await loadFixtures();
@@ -32,7 +33,7 @@ describe("Measurements (e2e)", () => {
       .useValue(true)
       .compile();
 
-    measurementRepository = moduleFixture.get(MeasurementRepository);
+    measurementRepository = moduleFixture.get<MeasurementRepositoryInterface>(MeasurementRepository);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -138,15 +139,15 @@ describe("Measurements (e2e)", () => {
 
   describe("/measurements (GET) - get all measurements", () => {
     it("should get all measurements of user", async () => {
-      return await getCRUD("/measurements", app).then((res) => {
+      return await getCRUD("/measurements", null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body[0].length).toEqual(4);
       });
     });
 
     it("should return empty array if there is no measurements for user", async () => {
-      await deleteCRUD("/measurements", app);
-      return await getCRUD("/measurements", app).then((res) => {
+      await deleteCRUD("/measurements", null, app);
+      return await getCRUD("/measurements", null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body[0].length).toEqual(0);
       });
@@ -155,7 +156,7 @@ describe("Measurements (e2e)", () => {
 
   describe("/measurements/one/:id (GET) - get one measurement", () => {
     it("should get one measurement for user  with given accessToken", async () => {
-      return await getCRUD(`/measurements/one/${fixtures.get("measurement5").id}`, app).then((res) => {
+      return await getCRUD(`/measurements/one/${fixtures.get("measurement5").id}`, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.id).toEqual(fixtures.get("measurement5").id);
         expect(res.body.userId).toEqual(fixtures.get("measurement5").userId);
@@ -163,19 +164,19 @@ describe("Measurements (e2e)", () => {
     });
 
     it("should not get one measurement for user  with given accessToken which is not owner of measurement", async () => {
-      return await getCRUD(`/measurements/one/${fixtures.get("measurement1").id}`, app).then((res) => {
+      return await getCRUD(`/measurements/one/${fixtures.get("measurement1").id}`, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
 
     it("should not get one measurement with wrong id for user with given accessToken", async () => {
-      return await getCRUD("/measurements/one/fcbe637d-6472-4033-8862-b1553990422f", app).then((res) => {
+      return await getCRUD("/measurements/one/fcbe637d-6472-4033-8862-b1553990422f", null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
 
     it("should not get one measurement with id not uuid type for user with given accessToken", async () => {
-      return await getCRUD("/measurements/one/notUUUIDmeasurementId", app).then((res) => {
+      return await getCRUD("/measurements/one/notUUUIDmeasurementId", null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
@@ -264,7 +265,7 @@ describe("Measurements (e2e)", () => {
       const allMeasurementsLenght: number = await measurementRepository
         .findAllByCondition({ userId })
         .then((res) => res[0].length);
-      await deleteCRUD("/measurements", app).then((res) => {
+      await deleteCRUD("/measurements", null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.length).toEqual(allMeasurementsLenght);
       });
@@ -283,14 +284,14 @@ describe("Measurements (e2e)", () => {
       const allMeasurementsLenght: number = await measurementRepository
         .findAllByCondition({ userId })
         .then((res) => res[0].length);
-      await deleteCRUD(`/measurements/one/${fixtures.get("measurement5").id}`, app).then((res) => {
+      await deleteCRUD(`/measurements/one/${fixtures.get("measurement5").id}`, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.userId).toEqual(userId);
       });
 
-      await expect(
-        measurementRepository.findOneByIdOrThrow(fixtures.get("measurement5").id)
-      ).rejects.toThrow(EntityNotFound);
+      await expect(measurementRepository.findOneByIdOrThrow(fixtures.get("measurement5").id)).rejects.toThrow(
+        EntityNotFound
+      );
 
       return await measurementRepository.findAllByCondition({ userId }).then((measurements) => {
         expect(measurements[0].length).toEqual(allMeasurementsLenght - 1);
@@ -298,13 +299,13 @@ describe("Measurements (e2e)", () => {
     });
 
     it("should not delete one measurement with for wrong user with given accessToken", async () => {
-      return await deleteCRUD(`/measurements/one/${fixtures.get("measurement1").id}`, app).then((res) => {
+      return await deleteCRUD(`/measurements/one/${fixtures.get("measurement1").id}`, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
 
     it("should not delete one measurement if id is not uuid type for user with given accessToken", async () => {
-      return await deleteCRUD("/measurements/one/someNotUUIDmeasurementId", app).then((res) => {
+      return await deleteCRUD("/measurements/one/someNotUUIDmeasurementId", null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });

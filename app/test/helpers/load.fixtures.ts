@@ -6,7 +6,7 @@ import { Logger } from "@nestjs/common";
 
 const FIXTURES_PATH = "./test/helpers/fixtures/";
 
-export interface FixtureFactory {
+export interface FixtureFactoryInterface {
   get: <T extends IEntity>(key: string) => T;
 }
 
@@ -14,7 +14,7 @@ export interface CreatedFixtures {
   [key: string]: IEntity;
 }
 
-const loadFixtures = async (): Promise<FixtureFactory> => {
+const loadFixtures = async (): Promise<FixtureFactoryInterface> => {
   const createdFixtures: CreatedFixtures = {};
   try {
     const dataSource: DataSource = new DataSource(dataBaseConfig(process.env.NODE_ENV));

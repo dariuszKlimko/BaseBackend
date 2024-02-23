@@ -23,12 +23,13 @@ module.exports = {
     "@typescript-eslint/explicit-function-return-type": ["error", { allowExpressions: true }],
     "@typescript-eslint/no-explicit-any": 1,
     "@typescript-eslint/semi": ["error", "always"],
-    "@typescript-eslint/no-inferrable-types": [
-      "warn",
-      {
-        ignoreParameters: true,
-      },
-    ],
+    // "@typescript-eslint/no-inferrable-types": [
+    //   "warn",
+    //   {
+    //     ignoreParameters: true,
+    //   },
+    // ],
+    "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/interface-name-prefix": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",

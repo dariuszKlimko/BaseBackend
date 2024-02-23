@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, HttpStatus, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "@app/app.module";
-import loadFixtures, { FixtureFactory } from "@test/helpers/load.fixtures";
+import loadFixtures, { FixtureFactoryInterface } from "@test/helpers/load.fixtures";
 import { postCRUD } from "@test/helpers/crud/crud";
 import { deleteAuthCRUD, getAuthCRUD, patchAuthCRUD } from "@test/helpers/crud/auth.crud";
 import { User } from "@app/entities/user.entity";
@@ -10,11 +10,12 @@ import { BodyCRUD } from "@test/helpers/types/body";
 import { MeasurementRepositoryInterface } from "@app/repositories/interfaces/measurements.repository.interface";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
 import { In } from "typeorm";
+import { GeneratorServiceIntrface } from "@app/services/interfaces/generator.service.interface";
 
 describe("MeasurementAdmin (e2e)", () => {
   let app: INestApplication;
-  let fixtures: FixtureFactory;
-  let generatorService: GeneratorSevice;
+  let fixtures: FixtureFactoryInterface;
+  let generatorService: GeneratorServiceIntrface;
   let measurementRepository: MeasurementRepositoryInterface;
   let measurement48accessToken: string;
   let measurement50accessToken: string;
@@ -26,8 +27,8 @@ describe("MeasurementAdmin (e2e)", () => {
       imports: [AppModule],
     }).compile();
 
-    generatorService = moduleFixture.get(GeneratorSevice);
-    measurementRepository = moduleFixture.get(MeasurementRepository);
+    generatorService = moduleFixture.get<GeneratorServiceIntrface>(GeneratorSevice);
+    measurementRepository = moduleFixture.get<MeasurementRepositoryInterface>(MeasurementRepository);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -52,14 +53,16 @@ describe("MeasurementAdmin (e2e)", () => {
 
   describe("/measurements/getall (GET) - get all measurements by admin", () => {
     it("should return first 10 measuremants for admin_0", async () => {
-      return await getAuthCRUD("/measurements/getall?skip=0&take=10", admin_0_12accessToken, app).then((res) => {
-        expect(res.status).toEqual(HttpStatus.OK);
-        expect(res.body[0].length).toEqual(10);
-      });
+      return await getAuthCRUD("/measurements/getall?skip=0&take=10", admin_0_12accessToken, null, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.OK);
+          expect(res.body[0].length).toEqual(10);
+        }
+      );
     });
 
     it("should not return first 10 measuremants for normal user", async () => {
-      return await getAuthCRUD("/measurements/getall?skip=0&take=10", measurement48accessToken, app).then(
+      return await getAuthCRUD("/measurements/getall?skip=0&take=10", measurement48accessToken, null, app).then(
         (res) => {
           expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
         }
@@ -67,7 +70,7 @@ describe("MeasurementAdmin (e2e)", () => {
     });
 
     it("should not return first 10 measuremants for not jwt accessToken by admin_o", async () => {
-      return await getAuthCRUD("/measurements/getall?skip=0&take=10", "someToken", app).then((res) => {
+      return await getAuthCRUD("/measurements/getall?skip=0&take=10", "someToken", null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
@@ -76,7 +79,7 @@ describe("MeasurementAdmin (e2e)", () => {
       const user: User = new User();
       user.id = "24cd5be2-ca5b-11ee-a506-0242ac120002";
       const accessToken: string = generatorService.generateAccessToken(user);
-      return await getAuthCRUD("/measurements/getall?skip=0&take=10", accessToken, app).then((res) => {
+      return await getAuthCRUD("/measurements/getall?skip=0&take=10", accessToken, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
@@ -84,7 +87,7 @@ describe("MeasurementAdmin (e2e)", () => {
     it("should not return first 10 measuremants for wrong signed jwt accessToken", async () => {
       const accessToken: string =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-      return await getAuthCRUD("/measurements/getall?skip=0&take=10", accessToken, app).then((res) => {
+      return await getAuthCRUD("/measurements/getall?skip=0&take=10", accessToken, null, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
@@ -97,7 +100,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await getAuthCRUD("/measurements/getbyids", admin_0_12accessToken, app, { ids }).then((res) => {
+      return await getAuthCRUD("/measurements/getbyids", admin_0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body[0].length).toEqual(ids.length);
       });
@@ -109,7 +112,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await getAuthCRUD("/measurements/getbyids", measurement48accessToken, app, { ids }).then((res) => {
+      return await getAuthCRUD("/measurements/getbyids", measurement48accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
@@ -120,7 +123,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await getAuthCRUD("/measurements/getbyids", "someToken", app, { ids }).then((res) => {
+      return await getAuthCRUD("/measurements/getbyids", "someToken", { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
@@ -134,7 +137,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await getAuthCRUD("/measurements/getbyids", accessToken, app, { ids }).then((res) => {
+      return await getAuthCRUD("/measurements/getbyids", accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
@@ -147,7 +150,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await getAuthCRUD("/measurements/getbyids", accessToken, app, { ids }).then((res) => {
+      return await getAuthCRUD("/measurements/getbyids", accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
@@ -158,7 +161,7 @@ describe("MeasurementAdmin (e2e)", () => {
         "2cb1f228-ca5b-11ee-a506-0242ac120002",
         "32c96b82-ca5b-11ee-a506-0242ac120002",
       ];
-      return await getAuthCRUD("/measurements/getbyids", admin_0_12accessToken, app, { ids }).then((res) => {
+      return await getAuthCRUD("/measurements/getbyids", admin_0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body[0].length).toEqual(0);
         expect(res.body[0]).toEqual([]);
@@ -167,7 +170,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     it("should not return measurements with given ids for measurements with not uuid for admin_0", async () => {
       const ids: string[] = ["wrongId1", "wrongId2", "wrongId3"];
-      return await getAuthCRUD("/measurements/getbyids", admin_0_12accessToken, app, { ids }).then((res) => {
+      return await getAuthCRUD("/measurements/getbyids", admin_0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
@@ -180,12 +183,12 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement12").id,
         fixtures.get("measurement13").id,
       ];
-      await deleteAuthCRUD("/measurements/deletebyids", admin_0_12accessToken, app, { ids }).then((res) => {
+      await deleteAuthCRUD("/measurements/deletebyids", admin_0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.length).toEqual(ids.length);
       });
 
-      return await measurementRepository.findAllByCondition({id: In (ids)}).then((res) => {
+      return await measurementRepository.findAllByCondition({ id: In(ids) }).then((res) => {
         expect(res[0].length).toEqual(0);
       });
     });
@@ -196,7 +199,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await deleteAuthCRUD("/measurements/deletebyids", measurement48accessToken, app, { ids }).then(
+      return await deleteAuthCRUD("/measurements/deletebyids", measurement48accessToken, { ids }, app).then(
         (res) => {
           expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
         }
@@ -209,7 +212,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await deleteAuthCRUD("/measurements/deletebyids", "someToken", app, { ids }).then((res) => {
+      return await deleteAuthCRUD("/measurements/deletebyids", "someToken", { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
@@ -223,7 +226,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await deleteAuthCRUD("/measurements/deletebyids", accessToken, app, { ids }).then((res) => {
+      return await deleteAuthCRUD("/measurements/deletebyids", accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
       });
     });
@@ -236,7 +239,7 @@ describe("MeasurementAdmin (e2e)", () => {
         fixtures.get("measurement2").id,
         fixtures.get("measurement3").id,
       ];
-      return await deleteAuthCRUD("/measurements/deletebyids", accessToken, app, { ids }).then((res) => {
+      return await deleteAuthCRUD("/measurements/deletebyids", accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
@@ -247,7 +250,7 @@ describe("MeasurementAdmin (e2e)", () => {
         "2cb1f228-ca5b-11ee-a506-0242ac120002",
         "32c96b82-ca5b-11ee-a506-0242ac120002",
       ];
-      return await deleteAuthCRUD("/measurements/deletebyids", admin_0_12accessToken, app, { ids }).then((res) => {
+      return await deleteAuthCRUD("/measurements/deletebyids", admin_0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.length).toEqual(0);
         expect(res.body).toEqual([]);
@@ -256,7 +259,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     it("should not delete measurements with given ids for measurements with not uuid for admin_0", async () => {
       const ids: string[] = ["wrongId1", "wrongId2", "wrongId3"];
-      return await deleteAuthCRUD("/measurements/deletebyids", admin_0_12accessToken, app, { ids }).then((res) => {
+      return await deleteAuthCRUD("/measurements/deletebyids", admin_0_12accessToken, { ids }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
@@ -267,12 +270,13 @@ describe("MeasurementAdmin (e2e)", () => {
       await deleteAuthCRUD(
         `/measurements/deletebyuserid/${fixtures.get("user49").id}`,
         admin_0_12accessToken,
+        null,
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
       });
 
-      return await measurementRepository.findAllByCondition({userId: fixtures.get("user49").id}).then((res) => {
+      return await measurementRepository.findAllByCondition({ userId: fixtures.get("user49").id }).then((res) => {
         expect(res[0].length).toEqual(0);
       });
     });
@@ -281,6 +285,7 @@ describe("MeasurementAdmin (e2e)", () => {
       return await deleteAuthCRUD(
         `/measurements/deletebyuserid/${fixtures.get("user50").id}`,
         measurement50accessToken,
+        null,
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
@@ -291,6 +296,7 @@ describe("MeasurementAdmin (e2e)", () => {
       return await deleteAuthCRUD(
         `/measurements/deletebyuserid/${fixtures.get("user50").id}`,
         "someToken",
+        null,
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
@@ -304,6 +310,7 @@ describe("MeasurementAdmin (e2e)", () => {
       return await deleteAuthCRUD(
         `/measurements/deletebyuserid/${fixtures.get("user50").id}`,
         accessToken,
+        null,
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.NOT_FOUND);
@@ -316,6 +323,7 @@ describe("MeasurementAdmin (e2e)", () => {
       return await deleteAuthCRUD(
         `/measurements/deletebyuserid/${fixtures.get("user50").id}`,
         accessToken,
+        null,
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
@@ -326,6 +334,7 @@ describe("MeasurementAdmin (e2e)", () => {
       return await deleteAuthCRUD(
         "/measurements/deletebyuserid/24cd5be2-ca5b-11ee-a506-0242ac120002",
         admin_0_12accessToken,
+        null,
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
@@ -335,7 +344,7 @@ describe("MeasurementAdmin (e2e)", () => {
     });
 
     it("should not delete measurements with given ids for measurements with not uuid for admin_0", async () => {
-      return await deleteAuthCRUD("/measurements/deletebyuserid/wrongId1", admin_0_12accessToken, app).then(
+      return await deleteAuthCRUD("/measurements/deletebyuserid/wrongId1", admin_0_12accessToken, null, app).then(
         (res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
         }
@@ -357,7 +366,7 @@ describe("MeasurementAdmin (e2e)", () => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.weight).toEqual(body.weight);
       });
-      
+
       return await measurementRepository.findOneByIdOrThrow(fixtures.get("measurement20").id).then((res) => {
         expect(res.weight).toEqual(body.weight);
       });
