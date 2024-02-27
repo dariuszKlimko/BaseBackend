@@ -28,8 +28,8 @@ export class GeneratorSevice implements GeneratorServiceIntrface {
     return `${this.configService.get<string>("CONFIRMATION_HOST_NODEMAILER")}${confirmationToken}`;
   }
 
-  codeGenerator(): number {
-    return randomInt(100000, 999999);
+  codeGenerator(bottom: number, top: number): number {
+    return randomInt(bottom, top);
   }
 
   verificationEmailText(email: string, url: string): string {
@@ -46,6 +46,8 @@ export class GeneratorSevice implements GeneratorServiceIntrface {
 
   generateAccessToken(user: User): string {
     const payload: TokenResponsePayload = { sub: user.id };
-    return this.jwtService.sign(payload);
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get<string>("JWT_SECRET"),
+    });
   }
 }
