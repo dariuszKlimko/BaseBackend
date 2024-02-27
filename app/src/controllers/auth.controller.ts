@@ -325,7 +325,7 @@ export class AuthController {
   async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
       const user: User = await this.userService.findOneByConditionOrThrow({ email: userInfo.email });
-      const code: number = this.generatorService.codeGenerator();
+      const code: number = this.generatorService.codeGenerator(100000, 999999);
       await this.userService.updateVerificationCode(user.id, { verificationCode: code });
       const text: string = this.generatorService.resetPasswordEmailText(userInfo.email, code);
       const subject: string = RESET_PASSWORD_VERIFICATION_CODE;

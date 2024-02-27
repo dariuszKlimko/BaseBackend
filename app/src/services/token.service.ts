@@ -7,13 +7,13 @@ import { User } from "@app/entities/user.entity";
 import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { JwtPayload, jwtDecode } from "jwt-decode";
 import { ArrayContains } from "typeorm";
 import { TokenServiceIntrface } from "@app/common/types/interfaces/services/token.service.interface";
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalid.refresh.token.exception";
 import { LogoutResponse } from "@app/dtos/auth/logout.response";
 import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 import { UserService } from "@app/services/user.service";
+import { JwtPayload } from "@app/common/types/type/jwt.payload";
 
 @Injectable()
 export class TokenService implements TokenServiceIntrface {
@@ -31,7 +31,7 @@ export class TokenService implements TokenServiceIntrface {
   async decodeConfirmationToken(confirmationToken: string): Promise<string> {
     try {
       const payload: JwtService = await this.jwtService.verify(confirmationToken, {
-        secret: this.configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
+        secret: this.configService.get<string>("JWT_CONFIRMATION_TOKEN_SECRET"),
       });
       if (typeof payload === "object" && "email" in payload) {
         return payload.email.toString();
@@ -74,7 +74,7 @@ export class TokenService implements TokenServiceIntrface {
     return refreshToken;
   }
 
-  decodeJWTtoken(accessToken: string): JwtPayload {
-    return jwtDecode(accessToken);
+  async decodeJWTtoken(accessToken: string): Promise<JwtPayload> {
+    return await this.jwtService.decode(accessToken);
   }
 }
