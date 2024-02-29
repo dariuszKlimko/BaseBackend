@@ -7,6 +7,6 @@ export interface TokenServiceIntrface {
   findUserByRefreshToken(refreshToken: string): Promise<User>;
   deleteRefreshTokenFromUser(user: User, refreshToken: string): Promise<User>;
   deleteAllRefreshTokensFromUser(id: string): Promise<LogoutResponse>;
-  saveRefreshTokenToUser(user: User, refreshToken: string): Promise<string>;
+  saveRefreshTokenToUser(user: User, refreshToken: string): Promise<User>;
   verifyJWTtoken(accessToken: string): Promise<JwtPayload>;
 }

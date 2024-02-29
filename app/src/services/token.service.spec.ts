@@ -1,45 +1,30 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { ArrayContains, Repository } from "typeorm";
+import { ArrayContains } from "typeorm";
 import { TokenServiceIntrface } from "@app/common/types/interfaces/services/token.service.interface";
 import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
-import { JwtService } from "@nestjs/jwt";
+import { JsonWebTokenError, JwtService, TokenExpiredError } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { TokenService } from "@app/services/token.service";
 import { UserService } from "@app/services/user.service";
 import { JwtPayload } from "@app/common/types/type/jwt.payload";
-import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
-import { GeneratorSevice } from "@app/services/generator.service";
-import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
-import { ProfileService } from "@app/services/profile.service";
-import { UserRepositoryIntrface } from "@app/common/types/interfaces/repositories/user.repository.interface";
 import { User } from "@app/entities/user.entity";
-import { AppModule } from "@app/app.module";
 import { LinkGeneratePayload } from "@app/common/types/type/linkGeneratePayload";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { UpdateUserDto } from "@app/dtos/user/update.user.dto";
 import { InvalidRefreshTokenException } from "@app/common/exceptions/auth/invalid.refresh.token.exception";
 import { LogoutResponse } from "@app/dtos/auth/logout.response";
+import { faker } from "@faker-js/faker";
 
 describe("TokenService", () => {
   let tokenService: TokenServiceIntrface;
   let userService: UserServiceIntrface;
-  // let generatorService: GeneratorServiceIntrface;
   let jwtService: JwtService;
   let configService: ConfigService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      // imports: [AppModule],
       providers: [
         TokenService,
-        JwtService, 
-        // {
-        //   provide: JwtService,
-        //   useValue: {
-        //     verify: jest.fn(),
-        //   },
-        // },
+        JwtService,
         {
           provide: UserService,
           useValue: {
@@ -60,6 +45,10 @@ describe("TokenService", () => {
                 return "wrongsecret";
               } else if (key === "JWT_SECRET") {
                 return "965cc0bfdbd8376cb455a120946da9lkds8898";
+              } else if (key === "JWT_EXPIRATION") {
+                return 900;
+              } else if (key === "JWT_SECRET_WRONG") {
+                return "wrongsecret";
               }
               return null;
             }),
@@ -70,7 +59,6 @@ describe("TokenService", () => {
 
     tokenService = module.get<TokenServiceIntrface>(TokenService);
     userService = module.get<UserServiceIntrface>(UserService);
-    // generatorService = module.get<GeneratorServiceIntrface>(GeneratorSevice);
     jwtService = module.get<JwtService>(JwtService);
     configService = module.get<ConfigService>(ConfigService);
   });
@@ -101,7 +89,7 @@ describe("TokenService", () => {
     });
 
     // it("should return Bad Request if payload is not object", async () => {
-     
+
     // });
 
     it("should return Bad Request if payload not contain email property", async () => {
@@ -114,7 +102,9 @@ describe("TokenService", () => {
         secret: configService.get("JWT_CONFIRMATION_TOKEN_SECRET"),
         expiresIn: `${configService.get("JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME")}s`,
       });
-      return await expect(tokenService.decodeConfirmationToken(confirmationToken)).rejects.toThrow(BadRequestException);
+      return await expect(tokenService.decodeConfirmationToken(confirmationToken)).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it("should return Bad Request if token expired", async () => {
@@ -125,7 +115,9 @@ describe("TokenService", () => {
         expiresIn: "1s",
       });
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      return await expect(tokenService.decodeConfirmationToken(confirmationToken)).rejects.toThrow(BadRequestException);
+      return await expect(tokenService.decodeConfirmationToken(confirmationToken)).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it("should return Bad Request if token wrong signed", async () => {
@@ -135,12 +127,16 @@ describe("TokenService", () => {
         secret: configService.get("JWT_CONFIRMATION_TOKEN_SECRET_WRONG"),
         expiresIn: configService.get("JWT_CONFIRMATION_TOKEN_EXPIRATION_TIME"),
       });
-      return await expect(tokenService.decodeConfirmationToken(confirmationToken)).rejects.toThrow(BadRequestException);
+      return await expect(tokenService.decodeConfirmationToken(confirmationToken)).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it("should return Bad Request if token is not jwt", async () => {
       const confirmationToken: string = "notJWTtoken";
-      return await expect(tokenService.decodeConfirmationToken(confirmationToken)).rejects.toThrow(BadRequestException);
+      return await expect(tokenService.decodeConfirmationToken(confirmationToken)).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -185,7 +181,9 @@ describe("TokenService", () => {
       const user: User = new User();
       user.email = "test@email.com";
       user.refreshTokens = [];
-      return await expect(tokenService.deleteRefreshTokenFromUser(user, refreshToken)).rejects.toThrow(InvalidRefreshTokenException)
+      return await expect(tokenService.deleteRefreshTokenFromUser(user, refreshToken)).rejects.toThrow(
+        InvalidRefreshTokenException
+      );
     });
   });
 
@@ -204,16 +202,48 @@ describe("TokenService", () => {
     });
   });
 
-  // describe("saveRefreshTokenToUser()", () => {
-  //   it("should save refreshToken for given user", async () => {
-   
-  //   });
-  // });
+  describe("saveRefreshTokenToUser()", () => {
+    it("should save refreshToken for given user", async () => {
+      const user: User = new User();
+      user.email = "test@email.com";
+      user.refreshTokens = [];
+      const refreshToken: string = "discnausihdca7dshc87hew87chw78cewhc78ewh";
+      const result: User = await tokenService.saveRefreshTokenToUser(user, refreshToken);
+      return expect(result.refreshTokens[0]).toEqual(refreshToken);
+    });
+  });
 
-  // describe("verifyJWTtoken()", () => {
-  //   it("should verify access token", async () => {
-   
-  //   });
-  // });
+  describe("verifyJWTtoken()", () => {
+    it("should verify access token", async () => {
+      const id: string = faker.string.uuid();
+      const payload: JwtPayload = { sub: id };
+      const jwtToken: string = jwtService.sign(payload, {
+        secret: configService.get("JWT_SECRET"),
+        expiresIn: `${configService.get("JWT_EXPIRATION")}s`,
+      });
+      const result: JwtPayload = await tokenService.verifyJWTtoken(jwtToken);
+      return expect(result.sub).toEqual(id);
+    });
 
+    it("should not verify jwtToken with wrong secret", async () => {
+      const id: string = faker.string.uuid();
+      const payload: JwtPayload = { sub: id };
+      const jwtToken: string = jwtService.sign(payload, {
+        secret: configService.get("JWT_SECRET_WRONG"),
+        expiresIn: `${configService.get("JWT_EXPIRATION")}s`,
+      });
+      return await expect(tokenService.verifyJWTtoken(jwtToken)).rejects.toThrow(JsonWebTokenError);
+    });
+
+    it("should not verify jwtToken if token expired", async () => {
+      const id: string = faker.string.uuid();
+      const payload: JwtPayload = { sub: id };
+      const jwtToken: string = jwtService.sign(payload, {
+        secret: configService.get("JWT_SECRET"),
+        expiresIn: "1s",
+      });
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      return await expect(tokenService.verifyJWTtoken(jwtToken)).rejects.toThrow(TokenExpiredError);
+    });
+  });
 });

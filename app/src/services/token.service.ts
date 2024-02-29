@@ -1,8 +1,4 @@
-import {
-  BAD_CONFIRMATION_TOKEN,
-  CONFIRMATION_TOKEN_EXPIRED,
-  INVALID_REFRESH_TOKEN,
-} from "@app/common/constans/exceptions.constans";
+import { BAD_CONFIRMATION_TOKEN, INVALID_REFRESH_TOKEN } from "@app/common/constans/exceptions.constans";
 import { User } from "@app/entities/user.entity";
 import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -66,13 +62,13 @@ export class TokenService implements TokenServiceIntrface {
     return { email: user.email };
   }
 
-  async saveRefreshTokenToUser(user: User, refreshToken: string): Promise<string> {
+  async saveRefreshTokenToUser(user: User, refreshToken: string): Promise<User> {
     user.refreshTokens.push(refreshToken);
     await this.userService.updateOne(user.id, { refreshTokens: user.refreshTokens });
-    return refreshToken;
+    return user;
   }
 
   async verifyJWTtoken(accessToken: string): Promise<JwtPayload> {
-    return await this.jwtService.verify(accessToken, {secret: this.configService.get<string>("JWT_SECRET")});
+    return await this.jwtService.verify(accessToken, { secret: this.configService.get<string>("JWT_SECRET") });
   }
 }
