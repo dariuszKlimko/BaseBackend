@@ -5,8 +5,8 @@ import { JwtPayload } from "@app/common/types/type/jwt.payload";
 export interface TokenServiceIntrface {
   decodeConfirmationToken(confirmationToken: string): Promise<string>;
   findUserByRefreshToken(refreshToken: string): Promise<User>;
-  deleteRefreshTokenFromUser(user: User, refreshToken: string): Promise<void>;
+  deleteRefreshTokenFromUser(user: User, refreshToken: string): Promise<User>;
   deleteAllRefreshTokensFromUser(id: string): Promise<LogoutResponse>;
-  saveRefreshTokenToUser(user: User, refreshToken: string): Promise<string>;
-  decodeJWTtoken(accessToken: string): Promise<JwtPayload>;
+  saveRefreshTokenToUser(user: User, refreshToken: string): Promise<User>;
+  verifyJWTtoken(accessToken: string): Promise<JwtPayload>;
 }
