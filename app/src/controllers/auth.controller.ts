@@ -254,7 +254,7 @@ export class AuthController {
   async getNewTokens(@Body() payload: TokenDto): Promise<LoginResponse> {
     try {
       const authorizedUser: User = await this.tokenService.findUserByRefreshToken(payload.refreshToken);
-      this.tokenService.deleteRefreshTokenFromUser(authorizedUser, payload.refreshToken);
+      await this.tokenService.deleteRefreshTokenFromUser(authorizedUser, payload.refreshToken);
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
@@ -282,7 +282,7 @@ export class AuthController {
     try {
       const refreshTokenCookies: string = request.cookies["refreshToken"];
       const authorizedUser: User = await this.tokenService.findUserByRefreshToken(refreshTokenCookies);
-      this.tokenService.deleteRefreshTokenFromUser(authorizedUser, refreshTokenCookies);
+      await this.tokenService.deleteRefreshTokenFromUser(authorizedUser, refreshTokenCookies);
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);

@@ -38,9 +38,6 @@ export class TokenService implements TokenServiceIntrface {
       }
       throw new BadRequestException();
     } catch (error) {
-      if (error?.name === "TokenExpiredError") {
-        throw new BadRequestException(CONFIRMATION_TOKEN_EXPIRED);
-      }
       throw new BadRequestException(BAD_CONFIRMATION_TOKEN);
     }
   }
@@ -52,13 +49,14 @@ export class TokenService implements TokenServiceIntrface {
     return user;
   }
 
-  async deleteRefreshTokenFromUser(user: User, refreshToken: string): Promise<void> {
+  async deleteRefreshTokenFromUser(user: User, refreshToken: string): Promise<User> {
     const tokenIndex: number = user.refreshTokens.indexOf(refreshToken);
     if (tokenIndex < 0) {
       throw new InvalidRefreshTokenException(INVALID_REFRESH_TOKEN);
     }
     user.refreshTokens.splice(tokenIndex, 1);
     await this.userService.updateOne(user.id, { refreshTokens: user.refreshTokens });
+    return user;
   }
 
   async deleteAllRefreshTokensFromUser(id: string): Promise<LogoutResponse> {
@@ -74,7 +72,7 @@ export class TokenService implements TokenServiceIntrface {
     return refreshToken;
   }
 
-  async decodeJWTtoken(accessToken: string): Promise<JwtPayload> {
-    return await this.jwtService.decode(accessToken);
+  async verifyJWTtoken(accessToken: string): Promise<JwtPayload> {
+    return await this.jwtService.verify(accessToken, {secret: this.configService.get<string>("JWT_SECRET")});
   }
 }
