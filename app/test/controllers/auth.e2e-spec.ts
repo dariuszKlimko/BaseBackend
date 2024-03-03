@@ -431,12 +431,12 @@ describe("Auth (e2e)", () => {
 
   describe("/auth/reset-password-confirm (PATCH) - reset user password with verification code ", () => {
     it("should reset password with valid verification code", async () => {
-      const resetPassord: BodyCRUD = {
+      const resetPassowrd: BodyCRUD = {
         email: "auth19@email.com",
         password: "Qwerty123456!",
         verificationCode: 123456,
       };
-      await patchCRUD("/auth/reset-password-confirm", resetPassord, app).then((res) => {
+      await patchCRUD("/auth/reset-password-confirm", resetPassowrd, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.OK);
         expect(res.body.status).toEqual("ok");
       });
@@ -456,12 +456,12 @@ describe("Auth (e2e)", () => {
     });
 
     it("should not reset password with invalid verification code", async () => {
-      const resetPassord: BodyCRUD = {
+      const resetPassowrd: BodyCRUD = {
         email: "auth20@email.com",
         password: "Qwerty123456!",
         verificationCode: 777777,
       };
-      await patchCRUD("/auth/reset-password-confirm", resetPassord, app).then((res) => {
+      await patchCRUD("/auth/reset-password-confirm", resetPassowrd, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
 
@@ -472,6 +472,17 @@ describe("Auth (e2e)", () => {
         .then(([users]) => {
           expect(users[0].verificationCode).toEqual(123456);
         });
+    });
+
+    it("should not reset password if user is not verified", async () => {
+      const resetPassword: BodyCRUD = {
+        email: "auth18@email.com",
+        password: "Qwerty123456!",
+        verificationCode: 777777,
+      };
+      return await patchCRUD("/auth/reset-password-confirm", resetPassword, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
   });
 

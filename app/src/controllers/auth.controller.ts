@@ -46,7 +46,7 @@ import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/user.
 import { User } from "@app/entities/user.entity";
 import { UpdateCredentialsDto } from "@app/dtos/auth/update.creadentials.dto";
 import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
-import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception ";
+import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception";
 import { EmailVerifiedGuard } from "@app/common/guards/email.verified.guard";
 import { EmailExistGuard } from "@app/common/guards/email.exist.guard";
 import { TokenService } from "@app/services/token.service";
@@ -72,6 +72,7 @@ import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.
 import { UserService } from "@app/services/user.service";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { CurrentUser } from "@app/common/decorators/user.decorator";
+import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -135,6 +136,9 @@ export class AuthController {
       await this.emailService.sendEmail(userInfo.email, text, subject);
       return RESEND_CONFIRMATION_RESPONSE;
     } catch (error) {
+      if (error instanceof MailerRecipientsException) {
+        throw new BadRequestException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }
@@ -334,6 +338,8 @@ export class AuthController {
     } catch (error) {
       if (error instanceof EntityNotFound) {
         throw new NotFoundException(error.message);
+      } else if (error instanceof MailerRecipientsException) {
+        throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException();
     }

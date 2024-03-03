@@ -2,18 +2,16 @@ import { Injectable, Logger } from "@nestjs/common";
 import { User } from "@app/entities/user.entity";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/user.authenticate.exception";
-import { UserNotVerifiedException } from "@app/common/exceptions/auth/user.not.verified.exception";
 import { MessageInfo } from "@app/dtos/auth/message.info.response";
 import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/user.already.confirmed.exception";
 import { UpdateCredentialsDto } from "@app/dtos/auth/update.creadentials.dto";
 import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
-import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception ";
+import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception";
 import { PASSWORD_RESET_RESPONSE, USER_VERIFIED_RESPONSE } from "@app/common/constans/constans";
 import {
   INCORRECT_EMAIL_ADDRES_OR_PASSWORD,
   INVALID_VERIFICATION_CODE,
   USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED,
-  USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED,
 } from "@app/common/constans/exceptions.constans";
 import { AuthServiceIntrface } from "@app/common/types/interfaces/services/auth.service.interface";
 import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
@@ -42,8 +40,6 @@ export class AuthService implements AuthServiceIntrface {
     const isMatch: boolean = await user.validatePassword(userInfo.password);
     if (!isMatch) {
       throw new UserAuthenticateException(INCORRECT_EMAIL_ADDRES_OR_PASSWORD);
-    } else if (!user.verified) {
-      throw new UserNotVerifiedException(USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED);
     }
     return user;
   }

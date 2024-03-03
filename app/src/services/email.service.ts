@@ -7,6 +7,8 @@ import { ConfigService } from "@nestjs/config";
 import { EmailServiceIntrface } from "@app/common/types/interfaces/services/email.service.interface";
 import { UserService } from "@app/services/user.service";
 import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
+import { SentMessageInfo } from "nodemailer";
+import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
 
 @Injectable()
 export class EmailService implements EmailServiceIntrface {
@@ -33,12 +35,16 @@ export class EmailService implements EmailServiceIntrface {
     return user;
   }
 
-  async sendEmail(email: string, text: string, subject: string): Promise<void> {
-    await this.mailerService.sendMail({
-      to: email,
-      from: this.configService.get<string>("EMAIL_NODEMAILER"),
-      subject,
-      text,
-    });
+  async sendEmail(email: string, text: string, subject: string): Promise<SentMessageInfo> {
+    try {
+      return await this.mailerService.sendMail({
+        to: email,
+        from: this.configService.get<string>("EMAIL_NODEMAILER"),
+        subject,
+        text,
+      });
+    } catch (error) {
+      throw new MailerRecipientsException(error.message);
+    }
   }
 }
