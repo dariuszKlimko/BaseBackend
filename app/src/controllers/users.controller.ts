@@ -17,6 +17,7 @@ import {
   SerializeOptions,
   ParseUUIDPipe,
   Param,
+  BadRequestException,
 } from "@nestjs/common";
 import { UserService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
@@ -53,6 +54,7 @@ import { ThrottlerGuard } from "@nestjs/throttler";
 import { CurrentUser } from "@app/common/decorators/user.decorator";
 import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 import { EmailArrayDto } from "@app/dtos/user/email.array.user.dto";
+import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
@@ -86,6 +88,8 @@ export class UserController {
     } catch (error) {
       if (error instanceof UserDuplicatedException) {
         throw new ConflictException(error.message);
+      } else if (error instanceof MailerRecipientsException) {
+        throw new BadRequestException(error.message);
       }
       throw new InternalServerErrorException(error.message);
     }
