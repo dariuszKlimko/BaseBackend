@@ -1,4 +1,4 @@
-import { BaseEntity } from "@app/entities/base.entity";
+import { BaseEntity } from "@app/common/entity/base.entity";
 import {
   DeepPartial,
   EntityNotFoundError,

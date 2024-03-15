@@ -1,7 +1,7 @@
 import { User } from "@app/entities/user.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { BaseEntity } from "@app/entities/base.entity";
+import { BaseEntity } from "@app/common/entity/base.entity";
 
 @Entity("measurements")
 export class Measurement extends BaseEntity {

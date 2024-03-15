@@ -4,7 +4,7 @@ import { Exclude, Expose } from "class-transformer";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, OneToOne } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Profile } from "@app/entities/profile.entity";
-import { BaseEntity } from "@app/entities/base.entity";
+import { BaseEntity } from "@app/common/entity/base.entity";
 import { Role } from "@app/common/types/enum/role.enum";
 
 @Entity("users")
