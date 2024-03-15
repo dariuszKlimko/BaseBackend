@@ -9,45 +9,41 @@ import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.
 import { UpdateResult } from "typeorm";
 import { VerificationCode } from "@app/common/types/type/verificationCode";
 import { CreateUserByAdminDto } from "@app/dtos/user/create.user.by.admin.dto";
-import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
-import { ProfileRepository } from "@app/repositories/profile.repository";
 import { Profile } from "@app/entities/profile.entity";
 import { Role } from "@app/common/types/enum/role.enum";
 import { BaseAbstractService } from "@app/common/service/base.abstract.service";
+import { ProfileServiceIntrface } from "@app/common/types/interfaces/services/profile.service.interface";
+import { ProfileService } from "@app/services/profile.service";
 
 @Injectable()
 export class UserService extends BaseAbstractService<User> implements UserServiceIntrface {
   private readonly logger: Logger = new Logger(UserService.name);
   private readonly userRepository: UserRepositoryIntrface;
-  private readonly profileRepository: ProfileRepositoryInterface;
+  private readonly profileService: ProfileServiceIntrface;
 
-  constructor(userRepository: UserRepository, profileRepository: ProfileRepository) {
+  constructor(userRepository: UserRepository, profileService: ProfileService) {
     super(userRepository);
     this.userRepository = userRepository;
-    this.profileRepository = profileRepository;
+    this.profileService = profileService;
   }
 
   async updateVerificationCode(id: string, userPayload: VerificationCode): Promise<UpdateResult> {
     return await this.userRepository.updateOne(id, userPayload);
   }
 
-  async updateRoleByAdmin(id: string, role: Role.Admin_1 | Role.Admin_2): Promise<UpdateResult> {
+  async updateRole(id: string, role: Role.Admin_1 | Role.Admin_2): Promise<UpdateResult> {
     return await this.userRepository.updateOne(id, { role });
-  }
-
-  _checkIfUserExist(user: User): void {
-    if (user) {
-      throw new UserDuplicatedException(DULICATED_EXCEPTION_MESSAGE);
-    }
   }
 
   async registerUser(userInfo: CreateUserDto | CreateUserByAdminDto): Promise<User> {
     const [users]: [User[], number] = await this.findOpenQuery({
       where: { email: userInfo.email },
     });
-    this._checkIfUserExist(users[0]);
+    if (users[0]) {
+      throw new UserDuplicatedException(DULICATED_EXCEPTION_MESSAGE);
+    }
     const userPayload: User = await this.createOne(userInfo);
-    const profile: Profile = await this.profileRepository.createOne();
+    const profile: Profile = await this.profileService.createOne();
     userPayload.profile = profile;
     await this.saveOneByEntity(userPayload);
     return userPayload;

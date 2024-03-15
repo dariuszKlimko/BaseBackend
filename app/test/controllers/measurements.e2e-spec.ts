@@ -40,6 +40,10 @@ describe("Measurements (e2e)", () => {
     await app.init();
   });
 
+  it("measurementRepository should be defined", () => {
+    expect(measurementRepository).toBeDefined();
+  });
+
   describe("/measurements (POST) - create measurement", () => {
     it("should create measurement in database and correctly calculate BMI", async () => {
       const measurement: BodyCRUD = {

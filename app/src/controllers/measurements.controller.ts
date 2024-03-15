@@ -100,8 +100,11 @@ export class MeasurementController {
   @UseInterceptors(AddUserToRequest)
   @Get()
   async getAllMeasurementsByUserId(@UserId() userId: string): Promise<[Measurement[], number]> {
+    // async getAllMeasurementsByUserId(    @Query("skip", ParseIntPipe) skip: number,
+    // @Query("take", ParseIntPipe) take: number, @UserId() userId: string): Promise<[Measurement[], number]> {
     try {
       return await this.measurementService.findAllByCondition({ userId });
+      // return await this.measurementService.findAllByCondition({ userId }, skip, take);
     } catch (error) {
       throw new InternalServerErrorException();
     }

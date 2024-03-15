@@ -27,6 +27,9 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
 
   async findOneByIdOrThrow(id: string): Promise<E> {
     try {
+      if (id === undefined) {
+        throw new EntityNotFound(this.errorMessage);
+      }
       return await this.repository.findOneByOrFail({ id } as FindOptionsWhere<E> | FindOptionsWhere<E>[]);
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
@@ -47,11 +50,9 @@ export abstract class BaseAbstractRepository<E extends BaseEntity> implements Ba
     }
   }
 
-  async findAllByIds(ids: string[], skip?: number, take?: number): Promise<[E[], number]> {
+  async findAllByIds(ids: string[]): Promise<[E[], number]> {
     return await this.repository.findAndCount({
       where: { id: In(ids) } as FindOptionsWhere<E> | FindOptionsWhere<E>[],
-      skip,
-      take,
     });
   }
 
