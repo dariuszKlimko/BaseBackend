@@ -8,7 +8,6 @@ import { UpdateResult } from "typeorm";
 
 export interface UserServiceIntrface extends BaseInterfaceService<User> {
   updateVerificationCode(id: string, userPayload: VerificationCode): Promise<UpdateResult>;
-  updateRoleByAdmin(id: string, role: Role.Admin_1 | Role.Admin_2): Promise<UpdateResult>;
-  _checkIfUserExist(user: User): void;
+  updateRole(id: string, role: Role.Admin_1 | Role.Admin_2): Promise<UpdateResult>;
   registerUser(userInfo: CreateUserDto | CreateUserByAdminDto): Promise<User>;
 }

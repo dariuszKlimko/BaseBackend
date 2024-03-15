@@ -52,6 +52,10 @@ describe("MeasurementAdmin (e2e)", () => {
     ).then((res) => res.body.accessToken);
   });
 
+  it("measurementRepository should be defined", () => {
+    expect(measurementRepository).toBeDefined();
+  });
+
   describe("/measurements/getall (GET) - get all measurements by admin", () => {
     it("should return first 10 measuremants for admin_0", async () => {
       return await getAuthCRUD("/measurements/getall?skip=0&take=10", admin_0_12accessToken, null, app).then(

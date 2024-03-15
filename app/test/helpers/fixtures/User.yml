@@ -42,6 +42,20 @@ items:
     verified: true
     verificationCode:
     role:
+  user7:
+    email: 'user7@email.com'
+    password: 'QWERTqwert!'
+    refreshTokens: [9iyc162b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6I9jH6]
+    verified: true
+    verificationCode:
+    role:
+  user8:
+    email: 'user8@email.com'
+    password: 'QWERTqwert!'
+    refreshTokens: [9iyc162b94cac32a3aaa61a563f4c65c0260cdc6d4Dse1bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd6I9jH6]
+    verified: true
+    verificationCode:
+    role:
   user10:
     email: 'user10@email.com'
     password: 'Qwert12345!'
@@ -391,4 +405,25 @@ items:
     refreshTokens: [b01cf62b94cac32a3aaa61a563f4c6hc0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
     verified: true
     verificationCode:
+    role:
+  user60:
+    email: 'user60@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: [b01cf62b94cac32a3aaa61a563f4c6hc0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
+    verified: true
+    verificationCode:
+    role:
+  user61:
+    email: 'user61@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: [b01cf62b94cac32a3aaa61a563f4c6hc0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
+    verified: true
+    verificationCode:
+    role:
+  user62:
+    email: 'user62@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: [b01cf62b94cac32a3aaa61a563f4c6hc0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
+    verified: true
+    verificationCode: '123456'
     role:

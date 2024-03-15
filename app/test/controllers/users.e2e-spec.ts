@@ -11,8 +11,6 @@ import { postCRUD } from "@test/helpers/crud/crud";
 import { deleteAuthCRUD, getAuthCRUD, patchAuthCRUD, postAuthCRUD } from "@test/helpers/crud/auth.crud";
 import { User } from "@app/entities/user.entity";
 import { GeneratorSevice } from "@app/services/generator.service";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
 import { UserRepositoryIntrface } from "@app/common/types/interfaces/repositories/user.repository.interface";
 import { MeasurementRepositoryInterface } from "@app/common/types/interfaces/repositories/measurements.repository.interface";
 import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
@@ -35,7 +33,6 @@ describe("Users (e2e)", () => {
     fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [ConfigService, JwtService],
     }).compile();
 
     userRepository = moduleFixture.get<UserRepositoryIntrface>(UserRepository);
@@ -70,6 +67,19 @@ describe("Users (e2e)", () => {
       { email: "admin_0_12@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
+  });
+
+  it("userRepository should be defined", () => {
+    expect(userRepository).toBeDefined();
+  });
+  it("measurementRepository should be defined", () => {
+    expect(measurementRepository).toBeDefined();
+  });
+  it("profileRepository should be defined", () => {
+    expect(profileRepository).toBeDefined();
+  });
+  it("generatorService should be defined", () => {
+    expect(generatorService).toBeDefined();
   });
 
   describe("/users (POST) - register user", () => {

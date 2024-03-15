@@ -45,7 +45,6 @@ describe("Auth (e2e)", () => {
     fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [ConfigService, JwtService, GeneratorSevice],
     }).compile();
 
     jwtService = moduleFixture.get<JwtService>(JwtService);
@@ -102,6 +101,19 @@ describe("Auth (e2e)", () => {
       { email: "admin_0_12@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
+  });
+
+  it("jwtService should be defined", () => {
+    expect(jwtService).toBeDefined();
+  });
+  it("configService should be defined", () => {
+    expect(configService).toBeDefined();
+  });
+  it("userRepository should be defined", () => {
+    expect(userRepository).toBeDefined();
+  });
+  it("generatorService should be defined", () => {
+    expect(generatorService).toBeDefined();
   });
 
   describe("/auth/confirmation/:token (GET) - confirm user account", () => {

@@ -271,7 +271,7 @@ export class UserController {
   ): Promise<User> {
     try {
       await this.userService.findOneByIdOrThrow(id);
-      await this.userService.updateRoleByAdmin(id, userInfo.role);
+      await this.userService.updateRole(id, userInfo.role);
       return await this.userService.findOneByIdOrThrow(id);
     } catch (error) {
       if (error instanceof EntityNotFound) {

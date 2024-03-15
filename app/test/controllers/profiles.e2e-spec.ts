@@ -7,8 +7,6 @@ import { postCRUD } from "@test/helpers/crud/crud";
 import { getAuthCRUD, patchAuthCRUD } from "@test/helpers/crud/auth.crud";
 import { User } from "@app/entities/user.entity";
 import { GeneratorSevice } from "@app/services/generator.service";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
 import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
 import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
 import { faker } from "@faker-js/faker";
@@ -28,7 +26,6 @@ describe("Profiles (e2e)", () => {
     fixtures = await loadFixtures();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [GeneratorSevice, ConfigService, JwtService],
     }).compile();
 
     profileRepository = moduleFixture.get<ProfileRepositoryInterface>(ProfileRepository);
@@ -63,6 +60,13 @@ describe("Profiles (e2e)", () => {
       { email: "admin_0_12@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
+  });
+
+  it("profileRepository should be defined", () => {
+    expect(profileRepository).toBeDefined();
+  });
+  it("generatorService should be defined", () => {
+    expect(generatorService).toBeDefined();
   });
 
   describe("/profiles (GET) - get profile's data", () => {

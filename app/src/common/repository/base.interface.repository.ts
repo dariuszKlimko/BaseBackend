@@ -5,7 +5,7 @@ export interface BaseInterfaceRepository<E> {
   findAll(skip?: number, take?: number): Promise<[E[], number]>;
   findOneByIdOrThrow(id: string): Promise<E>;
   findOneByConditionOrThrow(condition: FindOptionsWhere<E> | FindOptionsWhere<E>[]): Promise<E>;
-  findAllByIds(ids: string[], skip?: number, take?: number): Promise<[E[], number]>;
+  findAllByIds(ids: string[]): Promise<[E[], number]>;
   findAllByCondition(
     condition: FindOptionsWhere<E> | FindOptionsWhere<E>[],
     skip?: number,
