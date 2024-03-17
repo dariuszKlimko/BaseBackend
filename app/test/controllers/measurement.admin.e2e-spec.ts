@@ -9,7 +9,7 @@ import { GeneratorSevice } from "@app/services/generator.service";
 import { BodyCRUD } from "@test/helpers/types/body";
 import { MeasurementRepositoryInterface } from "@app/common/types/interfaces/repositories/measurements.repository.interface";
 import { MeasurementRepository } from "@app/repositories/measurement.repository";
-import { In } from "typeorm";
+import { DataSource, In } from "typeorm";
 import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
 import { faker } from "@faker-js/faker";
 
@@ -17,6 +17,7 @@ describe("MeasurementAdmin (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactoryInterface;
   let generatorService: GeneratorServiceIntrface;
+  let dataSource: DataSource;
   let measurementRepository: MeasurementRepositoryInterface;
   let measurement48accessToken: string;
   let measurement50accessToken: string;
@@ -30,6 +31,7 @@ describe("MeasurementAdmin (e2e)", () => {
 
     generatorService = moduleFixture.get<GeneratorServiceIntrface>(GeneratorSevice);
     measurementRepository = moduleFixture.get<MeasurementRepositoryInterface>(MeasurementRepository);
+    dataSource = moduleFixture.get<DataSource>(DataSource);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -570,6 +572,7 @@ describe("MeasurementAdmin (e2e)", () => {
   });
 
   afterAll(async () => {
+    await dataSource.destroy();
     await app.close();
   });
 });

@@ -16,10 +16,12 @@ import { UserRepositoryIntrface } from "@app/common/types/interfaces/repositorie
 import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
 import { GeneratorSevice } from "@app/services/generator.service";
 import { faker } from "@faker-js/faker";
+import { DataSource } from "typeorm";
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactoryInterface;
+  let dataSource: DataSource;
   let configService: ConfigService;
   let jwtService: JwtService;
   let userRepository: UserRepositoryIntrface;
@@ -51,6 +53,7 @@ describe("Auth (e2e)", () => {
     configService = moduleFixture.get<ConfigService>(ConfigService);
     userRepository = moduleFixture.get<UserRepositoryIntrface>(UserRepository);
     generatorService = moduleFixture.get<GeneratorServiceIntrface>(GeneratorSevice);
+    dataSource = moduleFixture.get<DataSource>(DataSource);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -114,6 +117,9 @@ describe("Auth (e2e)", () => {
   });
   it("generatorService should be defined", () => {
     expect(generatorService).toBeDefined();
+  });
+  it("dataSource should be defined", () => {
+    expect(dataSource).toBeDefined();
   });
 
   describe("/auth/confirmation/:token (GET) - confirm user account", () => {
@@ -729,5 +735,10 @@ describe("Auth (e2e)", () => {
         }
       );
     });
+  });
+
+  afterAll(async () => {
+    await dataSource.destroy();
+    await app.close();
   });
 });

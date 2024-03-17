@@ -10,12 +10,14 @@ import { GeneratorSevice } from "@app/services/generator.service";
 import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
 import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
 import { faker } from "@faker-js/faker";
+import { DataSource } from "typeorm";
 
 describe("Profiles (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactoryInterface;
   let profileRepository: ProfileRepositoryInterface;
   let generatorService: GeneratorServiceIntrface;
+  let dataSource: DataSource;
   let profile1accessToken: string;
   let profile2accessToken: string;
   let profile3accessToken: string;
@@ -30,6 +32,7 @@ describe("Profiles (e2e)", () => {
 
     profileRepository = moduleFixture.get<ProfileRepositoryInterface>(ProfileRepository);
     generatorService = moduleFixture.get<GeneratorServiceIntrface>(GeneratorSevice);
+    dataSource = moduleFixture.get<DataSource>(DataSource);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -67,6 +70,9 @@ describe("Profiles (e2e)", () => {
   });
   it("generatorService should be defined", () => {
     expect(generatorService).toBeDefined();
+  });
+  it("dataSource should be defined", () => {
+    expect(dataSource).toBeDefined();
   });
 
   describe("/profiles (GET) - get profile's data", () => {
@@ -331,6 +337,7 @@ describe("Profiles (e2e)", () => {
   });
 
   afterAll(async () => {
+    await dataSource.destroy();
     await app.close();
   });
 });

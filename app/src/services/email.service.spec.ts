@@ -15,6 +15,7 @@ import { AppModule } from "@app/app.module";
 import cookieParser from "cookie-parser";
 import { faker } from "@faker-js/faker";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
+import { DataSource } from "typeorm";
 
 describe("EmailService", () => {
   let app: INestApplication;
@@ -23,6 +24,7 @@ describe("EmailService", () => {
   let userService: UserServiceIntrface;
   let configService: ConfigService;
   let mailerService: MailerService;
+  let dataSource: DataSource;
 
   beforeAll(async () => {
     fixtures = await loadFixtures();
@@ -34,6 +36,7 @@ describe("EmailService", () => {
     userService = moduleFixture.get<UserServiceIntrface>(UserService);
     configService = moduleFixture.get<ConfigService>(ConfigService);
     mailerService = moduleFixture.get<MailerService>(MailerService);
+    dataSource = moduleFixture.get<DataSource>(DataSource);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -53,6 +56,9 @@ describe("EmailService", () => {
   });
   it("mailerService should be defined", () => {
     expect(mailerService).toBeDefined();
+  });
+  it("dataSource should be defined", () => {
+    expect(dataSource).toBeDefined();
   });
 
   describe("checkIfEmailExist()", () => {
@@ -102,5 +108,10 @@ describe("EmailService", () => {
         MailerRecipientsException
       );
     });
+  });
+
+  afterAll(async () => {
+    await dataSource.destroy();
+    await app.close();
   });
 });
