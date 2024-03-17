@@ -14,12 +14,14 @@ import { Role } from "@app/common/types/enum/role.enum";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
 import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
 import { CreateUserByAdminDto } from "@app/dtos/user/create.user.by.admin.dto";
+import { DataSource } from "typeorm";
 
 describe("UserService", () => {
   let app: INestApplication;
   let fixtures: FixtureFactoryInterface;
   let userService: UserServiceIntrface;
   let userRepository: UserRepositoryIntrface;
+  let dataSource: DataSource;
 
   beforeAll(async () => {
     fixtures = await loadFixtures();
@@ -29,6 +31,7 @@ describe("UserService", () => {
 
     userService = moduleFixture.get<UserServiceIntrface>(UserService);
     userRepository = moduleFixture.get<UserRepositoryIntrface>(UserRepository);
+    dataSource = moduleFixture.get<DataSource>(DataSource);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -41,6 +44,9 @@ describe("UserService", () => {
   });
   it("userRepository should be defined", () => {
     expect(userRepository).toBeDefined();
+  });
+  it("dataSource should be defined", () => {
+    expect(dataSource).toBeDefined();
   });
 
   describe("updateVerificationCode()", () => {
@@ -100,5 +106,10 @@ describe("UserService", () => {
       expect(result.verified).toEqual(res.verified);
       return expect(result.email).toEqual(userToRegisterByAdmin.email);
     });
+  });
+
+  afterAll(async () => {
+    await dataSource.destroy();
+    await app.close();
   });
 });

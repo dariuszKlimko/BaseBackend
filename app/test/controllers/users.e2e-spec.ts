@@ -16,6 +16,7 @@ import { MeasurementRepositoryInterface } from "@app/common/types/interfaces/rep
 import { ProfileRepositoryInterface } from "@app/common/types/interfaces/repositories/profile.repository.interface";
 import { GeneratorServiceIntrface } from "@app/common/types/interfaces/services/generator.service.interface";
 import { faker } from "@faker-js/faker";
+import { DataSource } from "typeorm";
 
 describe("Users (e2e)", () => {
   let app: INestApplication;
@@ -24,6 +25,7 @@ describe("Users (e2e)", () => {
   let measurementRepository: MeasurementRepositoryInterface;
   let profileRepository: ProfileRepositoryInterface;
   let generatorService: GeneratorServiceIntrface;
+  let dataSource: DataSource;
   let user2accessToken: string;
   let user3accessToken: string;
   let user12accessToken: string;
@@ -39,6 +41,7 @@ describe("Users (e2e)", () => {
     measurementRepository = moduleFixture.get<MeasurementRepositoryInterface>(MeasurementRepository);
     profileRepository = moduleFixture.get<ProfileRepositoryInterface>(ProfileRepository);
     generatorService = moduleFixture.get<GeneratorServiceIntrface>(GeneratorSevice);
+    dataSource = moduleFixture.get<DataSource>(DataSource);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -80,6 +83,9 @@ describe("Users (e2e)", () => {
   });
   it("generatorService should be defined", () => {
     expect(generatorService).toBeDefined();
+  });
+  it("dataSource should be defined", () => {
+    expect(dataSource).toBeDefined();
   });
 
   describe("/users (POST) - register user", () => {
@@ -781,6 +787,7 @@ describe("Users (e2e)", () => {
   });
 
   afterAll(async () => {
+    await dataSource.destroy();
     await app.close();
   });
 });

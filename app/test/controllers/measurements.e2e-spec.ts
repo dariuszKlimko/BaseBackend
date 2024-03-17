@@ -10,11 +10,13 @@ import { BodyCRUD } from "@test/helpers/types/body";
 import { deleteCRUD, getCRUD, patchCRUD, postCRUD } from "@test/helpers/crud/crud";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { MeasurementRepositoryInterface } from "@app/common/types/interfaces/repositories/measurements.repository.interface";
+import { DataSource } from "typeorm";
 
 describe("Measurements (e2e)", () => {
   let app: INestApplication;
   let fixtures: FixtureFactoryInterface;
   let measurementRepository: MeasurementRepositoryInterface;
+  let dataSource: DataSource;
 
   beforeEach(async () => {
     fixtures = await loadFixtures();
@@ -34,6 +36,7 @@ describe("Measurements (e2e)", () => {
       .compile();
 
     measurementRepository = moduleFixture.get<MeasurementRepositoryInterface>(MeasurementRepository);
+    dataSource = moduleFixture.get<DataSource>(DataSource);
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -42,6 +45,9 @@ describe("Measurements (e2e)", () => {
 
   it("measurementRepository should be defined", () => {
     expect(measurementRepository).toBeDefined();
+  });
+  it("dataSource should be defined", () => {
+    expect(dataSource).toBeDefined();
   });
 
   describe("/measurements (POST) - create measurement", () => {
@@ -316,6 +322,7 @@ describe("Measurements (e2e)", () => {
   });
 
   afterAll(async () => {
+    await dataSource.destroy();
     await app.close();
   });
 });
