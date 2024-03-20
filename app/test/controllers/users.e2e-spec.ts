@@ -29,6 +29,8 @@ describe("Users (e2e)", () => {
   let user2accessToken: string;
   let user3accessToken: string;
   let user12accessToken: string;
+  let user68accessToken: string;
+  let user69accessToken: string;
   let admin0_12accessToken: string;
 
   beforeAll(async () => {
@@ -62,6 +64,18 @@ describe("Users (e2e)", () => {
     user12accessToken = await postCRUD(
       "/auth/login",
       { email: "user12@email.com", password: "Qwert12345!" },
+      app
+    ).then((res) => res.body.accessToken);
+
+    user68accessToken = await postCRUD(
+      "/auth/login",
+      { email: "user68@email.com", password: "Qwert12345!" },
+      app
+    ).then((res) => res.body.accessToken);
+
+    user69accessToken = await postCRUD(
+      "/auth/login",
+      { email: "user69@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
 
@@ -247,9 +261,30 @@ describe("Users (e2e)", () => {
     });
   });
 
-  // describe("/users (PATCH) - update user's account", () => {
-  // same as auth credential update because there is no field to update/test
-  // });
+  describe("/users (PATCH) - update user's account", () => {
+    it("should update user email for user with given accessToken", async () => {
+      await patchAuthCRUD("/users", user68accessToken, { email: "userUpdate68@email.com" }, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.OK);
+        expect(res.body.email).toEqual("userUpdate68@email.com");
+      });
+
+      return await userRepository
+        .findOpenQuery({
+          where: { email: "userUpdate68@email.com" },
+        })
+        .then(([users]) => {
+          expect(users[0].email).toEqual("userUpdate68@email.com");
+        });
+    });
+
+    it("should not update user if email is not email", async () => {
+      return await patchAuthCRUD("/users", user69accessToken, { email: "userUpdate69email.com" }, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+        }
+      );
+    });
+  });
 
   describe("/users/getall (GET) - get all users by admin", () => {
     it("should return first 10 and seccond 10 users for admin_0", async () => {

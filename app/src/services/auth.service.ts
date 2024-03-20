@@ -4,7 +4,6 @@ import { CreateUserDto } from "@app/dtos/user/create.user.dto";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/user.authenticate.exception";
 import { MessageInfo } from "@app/dtos/auth/message.info.response";
 import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/user.already.confirmed.exception";
-import { UpdateCredentialsDto } from "@app/dtos/auth/update.creadentials.dto";
 import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception";
 import { PASSWORD_RESET_RESPONSE, USER_VERIFIED_RESPONSE } from "@app/common/constans/constans";
@@ -16,6 +15,7 @@ import {
 import { AuthServiceIntrface } from "@app/common/types/interfaces/services/auth.service.interface";
 import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 import { UserService } from "@app/services/user.service";
+import { UpdatePasswordDto } from "@app/dtos/auth/update.password.dto";
 
 @Injectable()
 export class AuthService implements AuthServiceIntrface {
@@ -55,7 +55,7 @@ export class AuthService implements AuthServiceIntrface {
     return PASSWORD_RESET_RESPONSE;
   }
 
-  async updateCredentials(id: string, userInfo: UpdateCredentialsDto): Promise<User> {
+  async updatePassword(id: string, userInfo: UpdatePasswordDto): Promise<User> {
     const user: User = await this.userService.findOneByIdOrThrow(id);
     this.userService.mergeEntity(user, userInfo);
     await this.userService.updateOne(user.id, user);

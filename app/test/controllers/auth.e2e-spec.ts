@@ -34,7 +34,6 @@ describe("Auth (e2e)", () => {
   let auth10Tokens: LoginResponse;
   let auth11Tokens: LoginResponse;
   let auth12Tokens: LoginResponse;
-  let auth13Tokens: LoginResponse;
   let auth14Tokens: LoginResponse;
   let auth15Tokens: LoginResponse;
   let auth21Tokens: LoginResponse;
@@ -76,9 +75,6 @@ describe("Auth (e2e)", () => {
       (res) => res.body
     );
     auth12Tokens = await postCRUD("/auth/login", { email: "auth12@email.com", password: "Qwert12345!" }, app).then(
-      (res) => res.body
-    );
-    auth13Tokens = await postCRUD("/auth/login", { email: "auth13@email.com", password: "Qwert12345!" }, app).then(
       (res) => res.body
     );
     auth14Tokens = await postCRUD("/auth/login", { email: "auth14@email.com", password: "Qwert12345!" }, app).then(
@@ -307,32 +303,16 @@ describe("Auth (e2e)", () => {
     });
   });
 
-  describe("/auth/credentials (PATCH) - update user email and password ", () => {
-    it("should update user email for user with given accessToken", async () => {
-      await patchAuthCRUD(
-        "/auth/credentials",
-        auth13Tokens.accessToken,
-        { email: "authUpdate13@email.com" },
-        app
-      ).then((res) => {
-        expect(res.status).toEqual(HttpStatus.OK);
-        expect(res.body.email).toEqual("authUpdate13@email.com");
-      });
-
-      return await userRepository
-        .findOpenQuery({
-          where: { email: "authUpdate13@email.com" },
-        })
-        .then(([users]) => {
-          expect(users[0].email).toEqual("authUpdate13@email.com");
-        });
-    });
-
-    it("should not update user if email is not email", async () => {
+  describe("/auth/password (PATCH) - update user email and password ", () => {
+    it("should not update password if email is not email", async () => {
       return await patchAuthCRUD(
-        "/auth/credentials",
+        "/auth/password",
         auth14Tokens.accessToken,
-        { email: "authUpdate14email.com" },
+        {
+          email: "authUpdate14email.com",
+          password: "Qwert12345!",
+          newPassword: "Qwert123456!",
+        },
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -340,31 +320,46 @@ describe("Auth (e2e)", () => {
     });
 
     it("should update user password for user with given accessToken", async () => {
-      return await patchAuthCRUD(
-        "/auth/credentials",
+      await patchAuthCRUD(
+        "/auth/password",
         auth15Tokens.accessToken,
-        { password: "Qwerty123456!" },
+        {
+          email: "auth15@email.com",
+          password: "Qwert12345!",
+          newPassword: "Qwert123456!",
+        },
         app
       ).then(async (res) => {
-        const authUser: User = await userRepository.findOneByConditionOrThrow({ email: "auth15@email.com" });
         expect(res.status).toEqual(HttpStatus.OK);
-        expect(await authUser.validatePassword("Qwerty123456!")).toBe(true);
       });
+      const authUser: User = await userRepository.findOneByConditionOrThrow({ email: "auth15@email.com" });
+      return expect(await authUser.validatePassword("Qwert123456!")).toBe(true);
     });
 
     it("should not update user password shorter than 8 characters", async () => {
-      return await patchAuthCRUD("/auth/credentials", auth14Tokens.accessToken, { password: "Qw12!" }, app).then(
-        (res) => {
-          expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-        }
-      );
+      return await patchAuthCRUD(
+        "/auth/password",
+        auth14Tokens.accessToken,
+        {
+          email: "auth14@email.com",
+          password: "Qwert12345!",
+          newPassword: "Qw12!",
+        },
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
     });
 
     it("should not update user password longer than 24 characters", async () => {
       return await patchAuthCRUD(
-        "/auth/credentials",
+        "/auth/password",
         auth14Tokens.accessToken,
-        { password: "QwrtfgvbcfrewqwerQQW229disj12!" },
+        {
+          email: "auth14@email.com",
+          password: "Qwert12345!",
+          newPassword: "QwrtfgvbcfrewqwerQQW229disj12!",
+        },
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -373,9 +368,13 @@ describe("Auth (e2e)", () => {
 
     it("should not update user password without number", async () => {
       return await patchAuthCRUD(
-        "/auth/credentials",
+        "/auth/password",
         auth14Tokens.accessToken,
-        { password: "Qwertyjhgfjgf!" },
+        {
+          email: "auth14@email.com",
+          password: "Qwert12345!",
+          newPassword: "Qwertyjhgfjgf!",
+        },
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -384,9 +383,13 @@ describe("Auth (e2e)", () => {
 
     it("should not update user password without special character", async () => {
       return await patchAuthCRUD(
-        "/auth/credentials",
+        "/auth/password",
         auth14Tokens.accessToken,
-        { password: "Qwerty123456" },
+        {
+          email: "auth14@email.com",
+          password: "Qwert12345!",
+          newPassword: "Qwerty123456",
+        },
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -395,9 +398,13 @@ describe("Auth (e2e)", () => {
 
     it("should not update user password without capital letter", async () => {
       return await patchAuthCRUD(
-        "/auth/credentials",
+        "/auth/password",
         auth14Tokens.accessToken,
-        { password: "qwerty123456!" },
+        {
+          email: "auth14@email.com",
+          password: "Qwert12345!",
+          newPassword: "qwerty123456!",
+        },
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -406,9 +413,13 @@ describe("Auth (e2e)", () => {
 
     it("should not update user password without small letter", async () => {
       return await patchAuthCRUD(
-        "/auth/credentials",
+        "/auth/password",
         auth14Tokens.accessToken,
-        { password: "QWERTY123456!" },
+        {
+          email: "auth14@email.com",
+          password: "Qwert12345!",
+          newPassword: "QWERTY123456!",
+        },
         app
       ).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);

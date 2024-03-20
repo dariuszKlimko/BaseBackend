@@ -17,8 +17,8 @@ import { CreateUserDto } from "@app/dtos/user/create.user.dto";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/user.authenticate.exception";
 import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception";
-import { UpdateCredentialsDto } from "@app/dtos/auth/update.creadentials.dto";
 import { DataSource } from "typeorm";
+import { UpdatePasswordDto } from "@app/dtos/auth/update.password.dto";
 
 describe("AuthService", () => {
   let app: INestApplication;
@@ -130,22 +130,14 @@ describe("AuthService", () => {
     });
   });
 
-  describe("updateCredentials()", () => {
-    it("should update user email", async () => {
+  describe("updatePassword()", () => {
+    it("should update user password", async () => {
       const user: User = fixtures.get("user66");
-      const credentials: UpdateCredentialsDto = {
-        email: "user66_1@email.com",
-      };
-      const result: User = await authService.updateCredentials(user.id, credentials);
-      return expect(result.email).toEqual(credentials.email);
-    });
-
-    it("should update user passord", async () => {
-      const user: User = fixtures.get("user66");
-      const credentials: UpdateCredentialsDto = {
+      const credentials: UpdatePasswordDto = {
+        email: user.email,
         password: "Qwert12345555!",
       };
-      const result: User = await authService.updateCredentials(user.id, credentials);
+      const result: User = await authService.updatePassword(user.id, credentials);
       const isMatch: boolean = await result.validatePassword(credentials.password);
       return expect(isMatch).toEqual(true);
     });

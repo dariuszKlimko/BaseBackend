@@ -8,7 +8,6 @@ export class RestLogger implements NestMiddleware {
   use(request: Request, response: Response, next: NextFunction): void {
     const { ip, method, originalUrl, statusCode }: LoggerDestructure = request;
     const userAgent: string = request.get("user-agent") || "";
-
     response.on("finish", (): void => {
       const contentLength: string = response.get("content-length");
 

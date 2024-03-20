@@ -44,7 +44,6 @@ import { EmailDto } from "@app/dtos/auth/email.dto";
 import { EmailService } from "@app/services/email.service";
 import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/user.already.confirmed.exception";
 import { User } from "@app/entities/user.entity";
-import { UpdateCredentialsDto } from "@app/dtos/auth/update.creadentials.dto";
 import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception";
 import { EmailVerifiedGuard } from "@app/common/guards/email.verified.guard";
@@ -73,6 +72,7 @@ import { UserService } from "@app/services/user.service";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { CurrentUser } from "@app/common/decorators/user.decorator";
 import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
+import { ChangePasswordDto } from "@app/dtos/auth/change.password.dto";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -311,10 +311,14 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AddUserToRequest)
-  @Patch("credentials")
-  async updateCredentials(@UserId() userId: string, @Body() userInfo: UpdateCredentialsDto): Promise<User> {
+  @Patch("password")
+  async updateCredentials(@UserId() userId: string, @Body() userInfo: ChangePasswordDto): Promise<User> {
     try {
-      return await this.authService.updateCredentials(userId, userInfo);
+      await this.authService.comparePassword({ email: userInfo.email, password: userInfo.password });
+      return await this.authService.updatePassword(userId, {
+        email: userInfo.email,
+        password: userInfo.newPassword,
+      });
     } catch (error) {
       throw new InternalServerErrorException();
     }
