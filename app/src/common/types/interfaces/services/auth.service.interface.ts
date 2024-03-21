@@ -9,4 +9,5 @@ export interface AuthServiceIntrface {
   comparePassword(userInfo: CreateUserDto): Promise<User>;
   resetPasswordConfirm(resetPassord: ResetPasswordDto): Promise<MessageInfo>;
   updatePassword(id: string, userInfo: UpdatePasswordDto): Promise<User>;
+  checkIfNotExternalProvider(id: string): Promise<User>;
 }

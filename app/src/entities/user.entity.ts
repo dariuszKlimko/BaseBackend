@@ -21,7 +21,7 @@ export class User extends BaseEntity {
   @Exclude({ toPlainOnly: true })
   @Column({
     type: "text",
-    nullable: false,
+    nullable: true,
   })
   password: string;
 
@@ -60,6 +60,16 @@ export class User extends BaseEntity {
     nullable: true,
   })
   verificationCode: number;
+
+  @ApiProperty()
+  @Exclude({ toPlainOnly: true })
+  @Column({
+    name: "provider",
+    type: "text",
+    array: true,
+    default: [],
+  })
+  provider: string[];
 
   @OneToMany(() => Measurement, (measurement: Measurement) => measurement.user, {
     cascade: true,

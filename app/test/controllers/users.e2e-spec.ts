@@ -31,6 +31,7 @@ describe("Users (e2e)", () => {
   let user12accessToken: string;
   let user68accessToken: string;
   let user69accessToken: string;
+  let user70accessToken: string;
   let admin0_12accessToken: string;
 
   beforeAll(async () => {
@@ -76,6 +77,12 @@ describe("Users (e2e)", () => {
     user69accessToken = await postCRUD(
       "/auth/login",
       { email: "user69@email.com", password: "Qwert12345!" },
+      app
+    ).then((res) => res.body.accessToken);
+
+    user70accessToken = await postCRUD(
+      "/auth/login",
+      { email: "user70@email.com", password: "Qwert12345!" },
       app
     ).then((res) => res.body.accessToken);
 
@@ -281,6 +288,14 @@ describe("Users (e2e)", () => {
       return await patchAuthCRUD("/users", user69accessToken, { email: "userUpdate69email.com" }, app).then(
         (res) => {
           expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+        }
+      );
+    });
+
+    it("should not update user if eternal provider exist", async () => {
+      return await patchAuthCRUD("/users", user70accessToken, { email: "userUpdate69email.com" }, app).then(
+        (res) => {
+          expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
         }
       );
     });

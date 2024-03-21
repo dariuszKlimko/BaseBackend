@@ -9,10 +9,11 @@ import { EmailService } from "@app/services/email.service";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { User } from "@app/entities/user.entity";
 import { Request } from "express";
+import { EmailServiceIntrface } from "@app/common/types/interfaces/services/email.service.interface";
 
 @Injectable()
 export class EmailExistGuard implements CanActivate {
-  private readonly emailService: EmailService;
+  private readonly emailService: EmailServiceIntrface;
 
   constructor(emailService: EmailService) {
     this.emailService = emailService;

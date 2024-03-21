@@ -18,6 +18,7 @@ import {
   ParseUUIDPipe,
   Param,
   BadRequestException,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { UserService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
@@ -55,6 +56,9 @@ import { CurrentUser } from "@app/common/decorators/user.decorator";
 import { UuuidArrayDto } from "@app/dtos/user/uuid.array.user.dto";
 import { EmailArrayDto } from "@app/dtos/user/email.array.user.dto";
 import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
+import { AuthServiceIntrface } from "@app/common/types/interfaces/services/auth.service.interface";
+import { AuthService } from "@app/services/auth.service";
+import { ExternalProviderException } from "@app/common/exceptions/auth/external.provider.exception";
 
 @ApiTags("users")
 @UseFilters(HttpExceptionFilter)
@@ -65,11 +69,18 @@ export class UserController {
   private readonly userService: UserServiceIntrface;
   private readonly emailService: EmailServiceIntrface;
   private readonly generatorService: GeneratorServiceIntrface;
+  private readonly authService: AuthServiceIntrface;
 
-  constructor(userService: UserService, emailService: EmailService, generatorService: GeneratorSevice) {
+  constructor(
+    userService: UserService,
+    emailService: EmailService,
+    generatorService: GeneratorSevice,
+    authService: AuthService
+  ) {
     this.userService = userService;
     this.emailService = emailService;
     this.generatorService = generatorService;
+    this.authService = authService;
   }
 
   @ApiOperation({ summary: "User registration." })
@@ -124,7 +135,7 @@ export class UserController {
       throw new InternalServerErrorException();
     }
   }
-  // ----------------------------------------------------
+
   @ApiOperation({ summary: "Update User." })
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
@@ -134,9 +145,13 @@ export class UserController {
   @Patch()
   async updateUser(@CurrentUser() user: User, @Body() userInfo: UpdateUserDto): Promise<User> {
     try {
+      await this.authService.checkIfNotExternalProvider(user.email);
       this.userService.mergeEntity(user, userInfo);
       return await this.userService.saveOneByEntity(user);
     } catch (error) {
+      if (error instanceof ExternalProviderException) {
+        throw new UnauthorizedException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }

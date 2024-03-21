@@ -40,6 +40,7 @@ describe("Auth (e2e)", () => {
   let auth22Tokens: LoginResponse;
   let auth26Tokens: LoginResponse;
   let auth28Tokens: LoginResponse;
+  let auth70Tokens: LoginResponse;
   let admin0_12accessToken: string;
 
   beforeAll(async () => {
@@ -93,6 +94,9 @@ describe("Auth (e2e)", () => {
       (res) => res.body
     );
     auth28Tokens = await postCRUD("/auth/login", { email: "auth28@email.com", password: "Qwert12345!" }, app).then(
+      (res) => res.body
+    );
+    auth70Tokens = await postCRUD("/auth/login", { email: "user70@email.com", password: "Qwert12345!" }, app).then(
       (res) => res.body
     );
     admin0_12accessToken = await postCRUD(
@@ -178,6 +182,12 @@ describe("Auth (e2e)", () => {
         }
       );
     });
+
+    it("should not resend confirmation link if external provider", async () => {
+      return await postCRUD("/auth/resend-confirmation", { email: "user70@email.com" }, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
   });
 
   describe("/auth/login (POST) - login user", () => {
@@ -239,6 +249,13 @@ describe("Auth (e2e)", () => {
       const user: BodyCRUD = { email: "auth7@email.com", password: "Qwert12345!" };
       return await postCRUD("/auth/login", user, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+
+    it("should not return tokens if external provider", async () => {
+      const user: BodyCRUD = { email: "user70@email.com", password: "Qwert12345!" };
+      return await postCRUD("/auth/login", user, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
   });
@@ -425,6 +442,21 @@ describe("Auth (e2e)", () => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
+
+    it("should not update user password if external provider", async () => {
+      return await patchAuthCRUD(
+        "/auth/password",
+        auth70Tokens.accessToken,
+        {
+          email: "user70@email.com",
+          password: "Qwert12345!",
+          newPassword: "QWERTY123456!",
+        },
+        app
+      ).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
   });
 
   describe("/auth/reset-password (PATCH) - send verification code ", () => {
@@ -454,6 +486,12 @@ describe("Auth (e2e)", () => {
     it("should not send email with verification code if user is not verified", async () => {
       return await patchCRUD("/auth/reset-password", { email: "auth18@email.com" }, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+
+    it("should not send email with verification code if external provider", async () => {
+      return await patchCRUD("/auth/reset-password", { email: "user70@email.com" }, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
   });
@@ -513,6 +551,17 @@ describe("Auth (e2e)", () => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
       });
     });
+
+    it("should not reset password if user is not verified", async () => {
+      const resetPassword: BodyCRUD = {
+        email: "user70@email.com",
+        password: "Qwerty123456!",
+        verificationCode: 777777,
+      };
+      return await patchCRUD("/auth/reset-password-confirm", resetPassword, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+      });
+    });
   });
 
   describe("/auth/loginc (POST) - login user with cookies", () => {
@@ -569,6 +618,13 @@ describe("Auth (e2e)", () => {
       const user: BodyCRUD = { email: "auth7@email.com", password: "Qwert12345!" };
       return await postCRUD("/auth/loginc", user, app).then((res) => {
         expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
+      });
+    });
+
+    it("should not return tokens if external provider", async () => {
+      const user: BodyCRUD = { email: "user70@email.com", password: "Qwert12345!" };
+      return await postCRUD("/auth/loginc", user, app).then((res) => {
+        expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
       });
     });
   });

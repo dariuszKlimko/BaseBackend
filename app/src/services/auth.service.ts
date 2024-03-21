@@ -16,6 +16,7 @@ import { AuthServiceIntrface } from "@app/common/types/interfaces/services/auth.
 import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 import { UserService } from "@app/services/user.service";
 import { UpdatePasswordDto } from "@app/dtos/auth/update.password.dto";
+import { ExternalProviderException } from "@app/common/exceptions/auth/external.provider.exception";
 
 @Injectable()
 export class AuthService implements AuthServiceIntrface {
@@ -60,5 +61,13 @@ export class AuthService implements AuthServiceIntrface {
     this.userService.mergeEntity(user, userInfo);
     await this.userService.updateOne(user.id, user);
     return await this.userService.findOneByIdOrThrow(user.id);
+  }
+
+  async checkIfNotExternalProvider(email: string): Promise<User> {
+    const user: User = await this.userService.findOneByConditionOrThrow({ email });
+    if (user.provider.length !== 0) {
+      throw new ExternalProviderException("User is provided by external provider.");
+    }
+    return user;
   }
 }

@@ -87,7 +87,7 @@ export class ProfileController {
       throw new InternalServerErrorException();
     }
   }
-  // -------------------------------------------------------
+
   @ApiOperation({ summary: "Get profiles - admin." })
   @ApiOkResponse({ description: "Success.", type: [Profile] })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })

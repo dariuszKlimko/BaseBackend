@@ -19,6 +19,7 @@ import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception";
 import { DataSource } from "typeorm";
 import { UpdatePasswordDto } from "@app/dtos/auth/update.password.dto";
+import { ExternalProviderException } from "@app/common/exceptions/auth/external.provider.exception";
 
 describe("AuthService", () => {
   let app: INestApplication;
@@ -140,6 +141,21 @@ describe("AuthService", () => {
       const result: User = await authService.updatePassword(user.id, credentials);
       const isMatch: boolean = await result.validatePassword(credentials.password);
       return expect(isMatch).toEqual(true);
+    });
+  });
+
+  describe("checkIfNotExternalProvider()", () => {
+    it("should return user if not external provider", async () => {
+      const user: User = fixtures.get("user71");
+      const result: User = await authService.checkIfNotExternalProvider(user.email);
+      return expect(result.email).toEqual(user.email);
+    });
+
+    it("should throw exception if external provider", async () => {
+      const user: User = fixtures.get("user70");
+      return await expect(authService.checkIfNotExternalProvider(user.email)).rejects.toThrow(
+        ExternalProviderException
+      );
     });
   });
 

@@ -73,6 +73,7 @@ import { ThrottlerGuard } from "@nestjs/throttler";
 import { CurrentUser } from "@app/common/decorators/user.decorator";
 import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
 import { ChangePasswordDto } from "@app/dtos/auth/change.password.dto";
+import { NotExternalProviderGuard } from "@app/common/guards/not.external.provider.guard";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -125,7 +126,7 @@ export class AuthController {
   @ApiOperation({ summary: "User registration." })
   @ApiCreatedResponse({ description: "Success.", type: MessageInfo })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UseGuards(EmailExistGuard)
+  @UseGuards(EmailExistGuard, NotExternalProviderGuard)
   @HttpCode(200)
   @Post("resend-confirmation")
   async resendConfirmationLink(@Body() userInfo: EmailDto): Promise<MessageInfo> {
@@ -147,7 +148,7 @@ export class AuthController {
   @ApiCreatedResponse({ description: "Success.", type: LoginResponse })
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UseGuards(EmailVerifiedGuard)
+  @UseGuards(EmailVerifiedGuard, NotExternalProviderGuard)
   @Post("login")
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
     try {
@@ -168,7 +169,7 @@ export class AuthController {
   @ApiCreatedResponse({ description: "Success.", type: LoginResponseCookies })
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UseGuards(EmailVerifiedGuard)
+  @UseGuards(EmailVerifiedGuard, NotExternalProviderGuard)
   @Post("loginc")
   async loginCookies(@Body() user: LoginDto, @Res() response: Response): Promise<Response<LoginResponseCookies>> {
     try {
@@ -309,7 +310,7 @@ export class AuthController {
   @ApiOkResponse({ description: "Success.", type: User })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, NotExternalProviderGuard)
   @UseInterceptors(AddUserToRequest)
   @Patch("password")
   async updateCredentials(@UserId() userId: string, @Body() userInfo: ChangePasswordDto): Promise<User> {
@@ -328,7 +329,7 @@ export class AuthController {
   @ApiOkResponse({ description: "Success.", type: MessageInfo })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UseGuards(EmailVerifiedGuard)
+  @UseGuards(EmailVerifiedGuard, NotExternalProviderGuard)
   @Patch("reset-password")
   async resetPassword(@Body() userInfo: EmailDto): Promise<MessageInfo> {
     try {
@@ -354,7 +355,7 @@ export class AuthController {
   @ApiBadRequestResponse({ description: "Invalid verification code." })
   @ApiNotFoundResponse({ description: "User not found" })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UseGuards(EmailVerifiedGuard)
+  @UseGuards(EmailVerifiedGuard, NotExternalProviderGuard)
   @Patch("reset-password-confirm")
   async resetPasswordConfirm(@Body() resetPassword: ResetPasswordDto): Promise<MessageInfo> {
     try {

@@ -2,13 +2,14 @@ import { USER_WITH_GIVEN_EMAIL_IS_NOT_VERIFIED } from "@app/common/constans/exce
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/user.not.verified.exception";
 import { User } from "@app/entities/user.entity";
 import { MailerService } from "@nestjs-modules/mailer";
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { EmailServiceIntrface } from "@app/common/types/interfaces/services/email.service.interface";
 import { UserService } from "@app/services/user.service";
 import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.service.interface";
 import { SentMessageInfo } from "nodemailer";
 import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
+import validator from "validator";
 
 @Injectable()
 export class EmailService implements EmailServiceIntrface {
@@ -46,5 +47,13 @@ export class EmailService implements EmailServiceIntrface {
     } catch (error) {
       throw new MailerRecipientsException(error.message);
     }
+  }
+
+  checkIfEmail(email: string): string {
+    const result: boolean = validator.isEmail(email);
+    if (!result) {
+      throw new BadRequestException("Validation error.");
+    }
+    return email;
   }
 }

@@ -6,7 +6,7 @@ import { EmailServiceIntrface } from "@app/common/types/interfaces/services/emai
 import { EmailService } from "@app/services/email.service";
 import { MailerService } from "@nestjs-modules/mailer";
 import { User } from "@app/entities/user.entity";
-import { INestApplication, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, INestApplication, ValidationPipe } from "@nestjs/common";
 import { UserNotVerifiedException } from "@app/common/exceptions/auth/user.not.verified.exception";
 import { SentMessageInfo } from "nodemailer";
 import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
@@ -92,7 +92,7 @@ describe("EmailService", () => {
     });
   });
 
-  describe("deleteRefreshTokenFromUser()", () => {
+  describe("sendEmail()", () => {
     it("should send email", async () => {
       const email: string = faker.internet.email();
       const result: SentMessageInfo = await emailService.sendEmail(email, "text", "subject");
@@ -107,6 +107,19 @@ describe("EmailService", () => {
       return await expect(emailService.sendEmail(email, "text", "subject")).rejects.toThrow(
         MailerRecipientsException
       );
+    });
+  });
+
+  describe("checkIfEmail()", () => {
+    it("should return email if addres is correct", () => {
+      const email: string = "example@email.com";
+      const result: string = emailService.checkIfEmail(email);
+      return expect(result).toEqual(email);
+    });
+
+    it("should not return email if addres is incorrect", () => {
+      const email: string = "exampleemail.com";
+      return expect(() => emailService.checkIfEmail(email)).toThrow(BadRequestException);
     });
   });
 

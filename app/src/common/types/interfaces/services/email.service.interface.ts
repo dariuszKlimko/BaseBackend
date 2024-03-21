@@ -5,4 +5,5 @@ export interface EmailServiceIntrface {
   checkIfEmailExist(email: string): Promise<User>;
   checkIfEmailVerified(email: string): Promise<User>;
   sendEmail(email: string, text: string, subject: string): Promise<SentMessageInfo>;
+  checkIfEmail(email: string): string;
 }

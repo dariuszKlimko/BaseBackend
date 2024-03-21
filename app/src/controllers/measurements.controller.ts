@@ -203,7 +203,7 @@ export class MeasurementController {
       throw new InternalServerErrorException();
     }
   }
-  // ----------------------------------------------------------------------------
+
   @ApiOperation({ summary: "Get all measurement." })
   @ApiOkResponse({ description: "Success.", type: [Measurement] })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
