@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { RestLogger } from "@app/common/loggers/rest.logger.middleware";
+import { ThrottlerModule } from "@nestjs/throttler";
+import { HttpModule } from "@nestjs/axios";
 import {
   configureJwtModule,
   configureMailerModule,
@@ -18,7 +20,6 @@ import { default as Entities } from "@app/entities";
 import { default as Repositories } from "@app/repositories";
 import { default as Services } from "@app/services";
 import { default as Controllers } from "@app/controllers";
-import { ThrottlerModule } from "@nestjs/throttler";
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ThrottlerModule } from "@nestjs/throttler";
     TypeOrmModule.forFeature([...Entities]),
     PassportModule,
     AppConfigModule,
+    HttpModule,
   ],
   controllers: [...Controllers],
   providers: [...Services, ...Strategies, ...Repositories],
