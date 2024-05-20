@@ -74,6 +74,7 @@ import { CurrentUser } from "@app/common/decorators/user.decorator";
 import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipients.exception";
 import { ChangePasswordDto } from "@app/dtos/auth/change.password.dto";
 import { NotExternalProviderGuard } from "@app/common/guards/not.external.provider.guard";
+import { LocalGuard } from "@app/common/guards/local.guard";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -148,19 +149,16 @@ export class AuthController {
   @ApiCreatedResponse({ description: "Success.", type: LoginResponse })
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UseGuards(EmailVerifiedGuard, NotExternalProviderGuard)
+  @UseGuards(EmailVerifiedGuard, NotExternalProviderGuard, LocalGuard)
   @Post("login")
   async login(@Body() user: LoginDto): Promise<LoginResponse> {
     try {
-      const authorizedUser: User = await this.authService.comparePassword(user);
+      const authorizedUser: User = await this.userService.findOneByConditionOrThrow({ email: user.email });
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
       return { accessToken, refreshToken };
     } catch (error) {
-      if (error instanceof UserAuthenticateException) {
-        throw new UnauthorizedException(error.message);
-      }
       throw new InternalServerErrorException();
     }
   }
