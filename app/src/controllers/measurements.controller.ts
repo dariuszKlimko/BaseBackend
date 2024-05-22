@@ -17,7 +17,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { MeasurementService } from "@app/services/measurement.service";
-import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { HttpExceptionFilter } from "@app/common/filters/http.exception.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { UserId } from "@app/common/decorators/user.id.decorator";
 import { CreateMeasurementDto } from "@app/dtos/measurement/create.measurement.dto";

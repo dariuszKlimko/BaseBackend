@@ -1,7 +1,7 @@
 import { Reflector } from "@nestjs/core";
 import { BadRequestException, ClassSerializerInterceptor, INestApplication, ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { HttpExceptionFilter } from "@app/common/filters/http.exception.filter";
 import { ConfigService } from "@nestjs/config";
 import { MailerOptions } from "@nestjs-modules/mailer";
 import { JwtModuleOptions } from "@nestjs/jwt";

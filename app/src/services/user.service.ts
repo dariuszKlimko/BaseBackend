@@ -11,7 +11,7 @@ import { VerificationCode } from "@app/common/types/type/verificationCode";
 import { CreateUserByAdminDto } from "@app/dtos/user/create.user.by.admin.dto";
 import { Profile } from "@app/entities/profile.entity";
 import { Role } from "@app/common/types/enum/role.enum";
-import { BaseAbstractService } from "@app/common/service/base.abstract.service";
+import { BaseAbstractService } from "@app/common/services/base.abstract.service";
 import { ProfileServiceIntrface } from "@app/common/types/interfaces/services/profile.service.interface";
 import { ProfileService } from "@app/services/profile.service";
 

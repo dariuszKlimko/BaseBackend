@@ -1,7 +1,7 @@
 import { Roles } from "@app/common/decorators/roles.decorator";
 import { UserId } from "@app/common/decorators/user.id.decorator";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
-import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { HttpExceptionFilter } from "@app/common/filters/http.exception.filter";
 import { JwtAuthGuard } from "@app/common/guards/jwt.auth.guard";
 import { RolesGuard } from "@app/common/guards/roles.guard";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";

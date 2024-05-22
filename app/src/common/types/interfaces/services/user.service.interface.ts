@@ -1,4 +1,4 @@
-import { BaseInterfaceService } from "@app/common/service/base.interface.service";
+import { BaseInterfaceService } from "@app/common/services/base.interface.service";
 import { Role } from "@app/common/types/enum/role.enum";
 import { VerificationCode } from "@app/common/types/type/verificationCode";
 import { CreateUserByAdminDto } from "@app/dtos/user/create.user.by.admin.dto";

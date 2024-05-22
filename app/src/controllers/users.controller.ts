@@ -22,7 +22,7 @@ import {
 } from "@nestjs/common";
 import { UserService } from "@app/services/user.service";
 import { CreateUserDto } from "@app/dtos/user/create.user.dto";
-import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { HttpExceptionFilter } from "@app/common/filters/http.exception.filter";
 import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
 import { EmailService } from "@app/services/email.service";
 import { User } from "@app/entities/user.entity";

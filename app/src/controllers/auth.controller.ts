@@ -20,7 +20,7 @@ import {
 } from "@nestjs/common";
 import { AuthService } from "@app/services/auth.service";
 import { UserId } from "@app/common/decorators/user.id.decorator";
-import { HttpExceptionFilter } from "@app/common/filter/http.exception.filter";
+import { HttpExceptionFilter } from "@app/common/filters/http.exception.filter";
 import { LoginResponse } from "@app/dtos/auth/login.response";
 import { UserAuthenticateException } from "@app/common/exceptions/auth/user.authenticate.exception";
 import { MessageInfo } from "@app/dtos/auth/message.info.response";
