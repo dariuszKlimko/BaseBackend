@@ -167,11 +167,11 @@ export class AuthController {
   @ApiCreatedResponse({ description: "Success.", type: LoginResponseCookies })
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
-  @UseGuards(EmailVerifiedGuard, NotExternalProviderGuard)
+  @UseGuards(EmailVerifiedGuard, NotExternalProviderGuard, LocalGuard)
   @Post("loginc")
   async loginCookies(@Body() user: LoginDto, @Res() response: Response): Promise<Response<LoginResponseCookies>> {
     try {
-      const authorizedUser: User = await this.authService.comparePassword(user);
+      const authorizedUser: User = await this.userService.findOneByConditionOrThrow({ email: user.email });
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
       const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);

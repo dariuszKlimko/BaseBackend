@@ -9,7 +9,7 @@ import { JwtStrategy } from "@app/common/strategies/jwt.strategy";
 import { PayloadJwt } from "@app/common//types/type/payloadJwt";
 import { DataSource } from "typeorm";
 
-describe("AuthService", () => {
+describe("JwtStrategy", () => {
   let app: INestApplication;
   let fixtures: FixtureFactoryInterface;
   let jwtStrategy: JwtStrategy;
@@ -43,8 +43,8 @@ describe("AuthService", () => {
       const payload: PayloadJwt = {
         sub: user.id,
       };
-      const result: boolean = await jwtStrategy.validate(payload);
-      return expect(result).toEqual(true);
+      const result: User = await jwtStrategy.validate(payload);
+      return expect(result.id).toEqual(payload.sub);
     });
 
     it("should return exception when user not exist", async () => {

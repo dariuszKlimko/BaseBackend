@@ -491,3 +491,10 @@ items:
     verified: true
     verificationCode: 
     role:
+  user72:
+    email: 'user72@email.com'
+    password: 'Qwert12345!'
+    refreshTokens: [b01cf62b94cac32a3aaa61a563f4c6hc0260cdc6d4d491bc9a59b24c7344a9631323a13d5bdae5ebf3cfb920f7664e5de9dffa83c0410d3bc7549c8ddd67df1e]
+    verified: true
+    verificationCode: 
+    role:
