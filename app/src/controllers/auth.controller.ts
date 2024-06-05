@@ -55,6 +55,7 @@ import {
   RESEND_CONFIRMATION_RESPONSE,
   VVERIFICTION_CODE_RESPONSE,
   RESET_PASSWORD_VERIFICATION_CODE,
+  EXTERNAL_PROVIDER,
 } from "@app/common/constans/constans";
 import { EntityNotFound } from "@app/common/exceptions/entity.not.found.exception";
 import { AddUserToRequest } from "@app/common/interceptors/add.user.to.request.interceptor";
@@ -75,6 +76,11 @@ import { MailerRecipientsException } from "@app/common/exceptions/mailer.recipie
 import { ChangePasswordDto } from "@app/dtos/auth/change.password.dto";
 import { NotExternalProviderGuard } from "@app/common/guards/not.external.provider.guard";
 import { LocalGuard } from "@app/common/guards/local.guard";
+import { OAuthCodeDto } from "@app/dtos/auth/oauth.code.dto";
+import { GoogleOAuthService } from "@app/services/google.oauth.service";
+import { GoogleOAuthIntrface } from "@app/common/types/interfaces/services/google.oauth.service.interface";
+import { TokenResponsePayload } from "@app/common/types/type/tokenResponsePayload";
+import { AxiosResponse } from "axios";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -87,19 +93,22 @@ export class AuthController {
   private readonly emailService: EmailServiceIntrface;
   private readonly tokenService: TokenServiceIntrface;
   private readonly generatorService: GeneratorServiceIntrface;
+  private readonly googleOAuthService: GoogleOAuthIntrface;
 
   constructor(
     authService: AuthService,
     userService: UserService,
     emailService: EmailService,
     tokenService: TokenService,
-    generatorService: GeneratorSevice
+    generatorService: GeneratorSevice,
+    googleOAuthService: GoogleOAuthService,
   ) {
     this.authService = authService;
     this.userService = userService;
     this.emailService = emailService;
     this.tokenService = tokenService;
     this.generatorService = generatorService;
+    this.googleOAuthService = googleOAuthService;
   }
 
   @ApiOperation({ summary: "Account confirmation." })
@@ -386,4 +395,46 @@ export class AuthController {
       throw new InternalServerErrorException();
     }
   }
+  // ----------------------------------------
+  @ApiOperation({ summary: "User login." })
+  @ApiCreatedResponse({ description: "Success.", type: LoginResponse })
+  @ApiUnauthorizedResponse({ description: "User unauthorized." })
+  @ApiInternalServerErrorResponse({ description: "Internal server error." })
+  @Post("googleoauth")
+  async googleoauth(@Body() oauth: OAuthCodeDto): Promise<any> {
+    try {
+      const token: AxiosResponse = await this.googleOAuthService.exchangeCodeForToken(oauth.code)
+      const userInfo: AxiosResponse = await this.googleOAuthService.exchangeTokenForUserInfo(token.data.access_token)
+
+      if (!userInfo.data.email_verified) {
+        // throw user not verified
+      }
+      const user: [User[], number] = await this.userService.findOpenQuery({
+        where: { email: userInfo.data.email }
+      });
+      const authorizedUser: User = user[0][0];
+      if (authorizedUser && authorizedUser.provider !== EXTERNAL_PROVIDER.GOOGLE) {
+        // throw user with given email already exist in DB
+      }
+      if (authorizedUser && authorizedUser.provider == EXTERNAL_PROVIDER.GOOGLE) {
+        // return access_token and refresh_tokem
+      }
+      if (!authorizedUser) {
+        // save user to DB
+        // return access_token and refresh_tokem
+      }
+
+      // const refreshToken: string = this.generatorService.generateRefreshToken();
+      // await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
+      // const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
+      // return { accessToken, refreshToken };
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
 }
+
+
+// https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A//www.googleapis.com/auth/drive.metadata.readonly&include_granted_scopes=true&response_type=code&state=state_parameter_passthrough_value&redirect_uri=http%3A//localhost:80&client_id=549374378041-4i7cj3e8h78dr8qsfj8ga0gkldhk80f9.apps.googleusercontent.com
+
+// https://accounts.google.com/o/oauth2/v2/auth?response_type=code&scope=openid+email&redirect_uri=http%3A//localhost:80&client_id=549374378041-4i7cj3e8h78dr8qsfj8ga0gkldhk80f9.apps.googleusercontent.com

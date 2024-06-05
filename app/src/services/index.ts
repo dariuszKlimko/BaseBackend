@@ -6,6 +6,7 @@ import { ProfileService } from "@app/services/profile.service";
 import { TokenService } from "@app/services/token.service";
 import { UserService } from "@app/services/user.service";
 import { MathSevice } from "@app/services/math.service";
+import { GoogleOAuthService } from "./google.oauth.service";
 
 export default [
   UserService,
@@ -16,4 +17,5 @@ export default [
   EmailService,
   AuthService,
   MathSevice,
+  GoogleOAuthService,
 ];

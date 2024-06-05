@@ -27,10 +27,14 @@ export const PASSWORD_RESET_RESPONSE = {
   message: "password has been reset",
 };
 
+export const EXTERNAL_PROVIDER = {
+  GOOGLE: 'google',
+};
+
 export function VERIFICATION_EMAIL_MESSAGE(email: string, url: string): string {
   return `Hello ${email} \n\n Please verify your account by clicking the link: ${url} \n\n Thank You!\n`;
-}
+};
 
 export function RESET_PASSWORD_MESSAGE(email: string, code: number): string {
   return `Hello ${email} \n\n Please reset your password with code: ${code} \n\n Thank You!\n`;
-}
+};

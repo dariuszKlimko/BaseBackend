@@ -66,10 +66,9 @@ export class User extends BaseEntity {
   @Column({
     name: "provider",
     type: "text",
-    array: true,
-    default: [],
+    nullable: true,
   })
-  provider: string[];
+  provider: string;
 
   @OneToMany(() => Measurement, (measurement: Measurement) => measurement.user, {
     cascade: true,
