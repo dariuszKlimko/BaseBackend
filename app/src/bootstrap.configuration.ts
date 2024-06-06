@@ -11,8 +11,8 @@ import { ThrottlerModuleOptions } from "@nestjs/throttler";
 
 export function configureSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
-    .setTitle("Health API")
-    .setDescription("Health API")
+    .setTitle("BaseBackend API")
+    .setDescription("BaseBackend API")
     .setVersion("1.0")
     .addBearerAuth()
     .build();
