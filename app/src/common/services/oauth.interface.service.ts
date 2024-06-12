@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { OauthUserInfoBody } from "../types/type/oauthUserInfoBody";
+import { OauthUserInfoBody } from "../types/type/userAuth";
 
 export interface OAuthInterfaceService {
     exchangeCodeForToken(code: string): Promise<AxiosResponse>

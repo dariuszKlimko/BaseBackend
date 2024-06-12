@@ -4,7 +4,6 @@ import { configureHttpExceptionFilters, configureSwagger, configureValidator } f
 import { ConfigService } from "@nestjs/config";
 import { INestApplication, Logger } from "@nestjs/common";
 import cookieParser from "cookie-parser";
-// import {fs} from "fs";
 import * as fs from 'fs';
 import path from "path";
 

@@ -6,10 +6,13 @@ import { MessageInfo } from "@app/dtos/auth/message.info.response";
 import { UserAlreadyConfirmedException } from "@app/common/exceptions/auth/user.already.confirmed.exception";
 import { ResetPasswordDto } from "@app/dtos/auth/password.reset.dto";
 import { InvalidVerificationCodeException } from "@app/common/exceptions/auth/invalid.verification.code.exception";
-import { PASSWORD_RESET_RESPONSE, USER_VERIFIED_RESPONSE } from "@app/common/constans/constans";
+import { EXTERNAL_PROVIDER, PASSWORD_RESET_RESPONSE, USER_VERIFIED_RESPONSE } from "@app/common/constans/constans";
 import {
+  DULICATED_EXCEPTION_MESSAGE,
   INCORRECT_EMAIL_ADDRES_OR_PASSWORD,
   INVALID_VERIFICATION_CODE,
+  OAUTH_USER_NOT_VERIFIED,
+  USER_PROVIDED_BY_EXTERNAL_PROVIDER,
   USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED,
 } from "@app/common/constans/exceptions.constans";
 import { AuthServiceIntrface } from "@app/common/types/interfaces/services/auth.service.interface";
@@ -17,6 +20,10 @@ import { UserServiceIntrface } from "@app/common/types/interfaces/services/user.
 import { UserService } from "@app/services/user.service";
 import { UpdatePasswordDto } from "@app/dtos/auth/update.password.dto";
 import { ExternalProviderException } from "@app/common/exceptions/auth/external.provider.exception";
+import { UserAuth } from "@app/common/types/type/userAuth";
+import { OauthNotVerifiedUserException } from "@app/common/exceptions/auth/oauth.not.verified.user.exception";
+import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
+import { Profile } from "@app/entities/profile.entity";
 
 @Injectable()
 export class AuthService implements AuthServiceIntrface {
@@ -66,8 +73,27 @@ export class AuthService implements AuthServiceIntrface {
   async checkIfNotExternalProvider(email: string): Promise<User> {
     const user: User = await this.userService.findOneByConditionOrThrow({ email });
     if (user.provider.length !== 0) {
-      throw new ExternalProviderException("User is provided by external provider.");
+      throw new ExternalProviderException(USER_PROVIDED_BY_EXTERNAL_PROVIDER);
     }
     return user;
+  }
+
+  async googleOauth(userAuth: UserAuth): Promise<User> {
+    if (!userAuth.verified) {
+      throw new OauthNotVerifiedUserException(OAUTH_USER_NOT_VERIFIED)
+    }
+    const user: [User[], number] = await this.userService.findOpenQuery({
+      where: { email: userAuth.email }
+    });
+    const authorizedUser: User = user[0][0];
+    if (authorizedUser && authorizedUser.provider !== EXTERNAL_PROVIDER.GOOGLE) {
+      throw new UserDuplicatedException(DULICATED_EXCEPTION_MESSAGE);
+    }
+    else if (authorizedUser && authorizedUser.provider == EXTERNAL_PROVIDER.GOOGLE) {
+      return authorizedUser
+    }
+    else if (!authorizedUser) {
+      return await this.userService.registerUser(authorizedUser);    
+    }
   }
 }

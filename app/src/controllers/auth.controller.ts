@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Get,
   HttpCode,
@@ -81,6 +82,8 @@ import { GoogleOAuthService } from "@app/services/google.oauth.service";
 import { GoogleOAuthIntrface } from "@app/common/types/interfaces/services/google.oauth.service.interface";
 import { TokenResponsePayload } from "@app/common/types/type/tokenResponsePayload";
 import { AxiosResponse } from "axios";
+import { OauthNotVerifiedUserException } from "@app/common/exceptions/auth/oauth.not.verified.user.exception";
+import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -401,34 +404,25 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: "User unauthorized." })
   @ApiInternalServerErrorResponse({ description: "Internal server error." })
   @Post("googleoauth")
-  async googleoauth(@Body() oauth: OAuthCodeDto): Promise<any> {
+  async googleoauth(@Body() oauth: OAuthCodeDto): Promise<LoginResponse> {
     try {
       const token: AxiosResponse = await this.googleOAuthService.exchangeCodeForToken(oauth.code)
       const userInfo: AxiosResponse = await this.googleOAuthService.exchangeTokenForUserInfo(token.data.access_token)
-
-      if (!userInfo.data.email_verified) {
-        // throw user not verified
+      const userAuth = {
+        email: userInfo.data.email,
+        verified: userInfo.data.email_verified,
       }
-      const user: [User[], number] = await this.userService.findOpenQuery({
-        where: { email: userInfo.data.email }
-      });
-      const authorizedUser: User = user[0][0];
-      if (authorizedUser && authorizedUser.provider !== EXTERNAL_PROVIDER.GOOGLE) {
-        // throw user with given email already exist in DB
-      }
-      if (authorizedUser && authorizedUser.provider == EXTERNAL_PROVIDER.GOOGLE) {
-        // return access_token and refresh_tokem
-      }
-      if (!authorizedUser) {
-        // save user to DB
-        // return access_token and refresh_tokem
-      }
-
-      // const refreshToken: string = this.generatorService.generateRefreshToken();
-      // await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
-      // const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
-      // return { accessToken, refreshToken };
+      const authorizedUser: User = await this.authService.googleOauth(userAuth);
+      const refreshToken: string = this.generatorService.generateRefreshToken();
+      await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);
+      const accessToken: string = this.generatorService.generateAccessToken(authorizedUser);
+      return { accessToken, refreshToken };
     } catch (error) {
+      if (error instanceof OauthNotVerifiedUserException) {
+        throw new BadRequestException(error.message);
+      } else if (error instanceof UserDuplicatedException) {
+        throw new ConflictException(error.message);
+      }
       throw new InternalServerErrorException();
     }
   }

@@ -5,3 +5,5 @@ export const USER_WITH_GIVEN_EMAIL_IS_ALREADY_CONFIRMED = "user with given email
 export const INCORRECT_EMAIL_ADDRES_OR_PASSWORD = "incorrect email address or password";
 export const INVALID_REFRESH_TOKEN = "invalid refreshToken";
 export const INVALID_VERIFICATION_CODE = "invalid verification code";
+export const USER_PROVIDED_BY_EXTERNAL_PROVIDER = "user is provided by external provider";
+export const OAUTH_USER_NOT_VERIFIED = "Oauth user not verified";
