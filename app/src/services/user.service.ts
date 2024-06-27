@@ -14,6 +14,7 @@ import { Role } from "@app/common/types/enum/role.enum";
 import { BaseAbstractService } from "@app/common/services/base.abstract.service";
 import { ProfileServiceIntrface } from "@app/common/types/interfaces/services/profile.service.interface";
 import { ProfileService } from "@app/services/profile.service";
+import { CreateUserOAuthDto } from "@app/dtos/user/create.user.oauth.dto";
 
 @Injectable()
 export class UserService extends BaseAbstractService<User> implements UserServiceIntrface {
@@ -43,6 +44,23 @@ export class UserService extends BaseAbstractService<User> implements UserServic
       throw new UserDuplicatedException(DULICATED_EXCEPTION_MESSAGE);
     }
     const userPayload: User = await this.createOne(userInfo);
+    const profile: Profile = await this.profileService.createOne();
+    userPayload.profile = profile;
+    await this.saveOneByEntity(userPayload);
+    return userPayload;
+  }
+
+  async oauthRegisterUser(userInfo: CreateUserOAuthDto): Promise<User> {
+    const [users]: [User[], number] = await this.findOpenQuery({
+      where: { email: userInfo.email },
+    });
+    if (users[0]) {
+      throw new UserDuplicatedException(DULICATED_EXCEPTION_MESSAGE);
+    }
+    const userPayload: User = await this.createOne(userInfo);
+    // userPayload.email = userInfo.email;
+    // userPayload.verified = userInfo.verified;
+    // userPayload.provider.push()
     const profile: Profile = await this.profileService.createOne();
     userPayload.profile = profile;
     await this.saveOneByEntity(userPayload);

@@ -80,20 +80,28 @@ export class AuthService implements AuthServiceIntrface {
 
   async googleOauth(userAuth: UserAuth): Promise<User> {
     if (!userAuth.verified) {
+      console.log("DK____userAuth.verified: ",userAuth.verified);
       throw new OauthNotVerifiedUserException(OAUTH_USER_NOT_VERIFIED)
     }
     const user: [User[], number] = await this.userService.findOpenQuery({
       where: { email: userAuth.email }
     });
+    console.log("DK____user: ",user);
     const authorizedUser: User = user[0][0];
     if (authorizedUser && authorizedUser.provider !== EXTERNAL_PROVIDER.GOOGLE) {
+      console.log("DK____authorizedUser: ",authorizedUser);
       throw new UserDuplicatedException(DULICATED_EXCEPTION_MESSAGE);
     }
     else if (authorizedUser && authorizedUser.provider == EXTERNAL_PROVIDER.GOOGLE) {
+      console.log("DK____authorizedUser_1: ",authorizedUser);
       return authorizedUser
     }
     else if (!authorizedUser) {
-      return await this.userService.registerUser(authorizedUser);    
+      console.log("DK____authorizedUser_1: ",authorizedUser);
+      const userrrr  = await this.userService.oauthRegisterUser(userAuth); 
+      console.log("DK____userrrr: ",userrrr);
+      return userrrr;
+      // return await this.userService.registerUser(authorizedUser);    
     }
   }
 }

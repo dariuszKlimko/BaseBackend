@@ -84,6 +84,7 @@ import { TokenResponsePayload } from "@app/common/types/type/tokenResponsePayloa
 import { AxiosResponse } from "axios";
 import { OauthNotVerifiedUserException } from "@app/common/exceptions/auth/oauth.not.verified.user.exception";
 import { UserDuplicatedException } from "@app/common/exceptions/user.duplicated.exception";
+import { ExternalProvider } from "@app/common/types/enum/external.provider.enum";
 
 @ApiTags("auth")
 @UseFilters(HttpExceptionFilter)
@@ -411,7 +412,9 @@ export class AuthController {
       const userAuth = {
         email: userInfo.data.email,
         verified: userInfo.data.email_verified,
+        provider: ExternalProvider.GOOGLE,
       }
+      console.log("DK____userAuth: ",userAuth)
       const authorizedUser: User = await this.authService.googleOauth(userAuth);
       const refreshToken: string = this.generatorService.generateRefreshToken();
       await this.tokenService.saveRefreshTokenToUser(authorizedUser, refreshToken);

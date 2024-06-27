@@ -6,6 +6,7 @@ import * as bcrypt from "bcrypt";
 import { Profile } from "@app/entities/profile.entity";
 import { BaseEntity } from "@app/common/entity/base.entity";
 import { Role } from "@app/common/types/enum/role.enum";
+import { ExternalProvider } from "@app/common/types/enum/external.provider.enum";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -65,7 +66,8 @@ export class User extends BaseEntity {
   @Exclude({ toPlainOnly: true })
   @Column({
     name: "provider",
-    type: "text",
+    type: "enum",
+    enum: ExternalProvider,
     nullable: true,
   })
   provider: string;
